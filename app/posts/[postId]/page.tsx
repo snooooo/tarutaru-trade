@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
-import { CheckCircle2, Star, Truck } from "lucide-react";
+import { CheckCircle2, Pencil, PauseCircle, Star, Truck } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { ButtonLink } from "@/components/ui/button-link";
 import { DataStatusNote } from "@/components/ui/status-note";
-import { getPublicTradePost } from "@/lib/data/trade-posts";
+import { updateTradePostVisibilityAction } from "@/lib/actions/trade-post-actions";
+import { getMyTradePost, getPublicTradePost } from "@/lib/data/trade-posts";
 import {
   bottleSubline,
   formatBoxCondition,
@@ -19,12 +20,22 @@ import type {
 
 type PostDetailPageProps = {
   params: Promise<{ postId: string }>;
+  searchParams: Promise<{ updated?: string; error?: string }>;
 };
 
-export default async function PostDetailPage({ params }: PostDetailPageProps) {
+export default async function PostDetailPage({
+  params,
+  searchParams,
+}: PostDetailPageProps) {
   const { postId } = await params;
-  const result = await getPublicTradePost(postId);
+  const query = await searchParams;
+  const [result, myPostResult] = await Promise.all([
+    getPublicTradePost(postId),
+    getMyTradePost(postId),
+  ]);
   const post = result.data[0];
+  const myPost = myPostResult.data[0];
+  const isMyPost = Boolean(myPost);
 
   if (result.isConfigured && !result.error && !post) {
     notFound();
@@ -33,6 +44,11 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
   return (
     <PageShell>
       <DataStatusNote isConfigured={result.isConfigured} error={result.error} />
+      <DataStatusNote
+        isConfigured={myPostResult.isConfigured}
+        error={myPostResult.error}
+      />
+      <PostUpdateMessage updated={query.updated} error={query.error} />
       {post ? (
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="grid gap-6">
@@ -112,22 +128,85 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                 <span>{formatFollowersRange(post.owner_x_followers_range)}</span>
               </div>
             </section>
-            <section className="rounded-md border border-stone-200 bg-white/82 p-5">
-              <h2 className="font-semibold">トレードに興味あり</h2>
-              <p className="mt-2 text-sm leading-6 text-stone-700">
-                興味あり時点ではX IDと自由記述メッセージは送信されません。相談開始後にX IDを相互開示します。
-              </p>
-              <ButtonLink
-                href={`/posts/${post.id}/interest`}
-                className="mt-4 w-full"
-              >
-                興味ありへ進む
-              </ButtonLink>
-            </section>
+            {isMyPost ? (
+              <OwnerPostActions postId={post.id} />
+            ) : (
+              <section className="rounded-md border border-stone-200 bg-white/82 p-5">
+                <h2 className="font-semibold">トレードに興味あり</h2>
+                <p className="mt-2 text-sm leading-6 text-stone-700">
+                  興味あり時点ではX IDと自由記述メッセージは送信されません。相談開始後にX IDを相互開示します。
+                </p>
+                <ButtonLink
+                  href={`/posts/${post.id}/interest`}
+                  className="mt-4 w-full"
+                >
+                  興味ありへ進む
+                </ButtonLink>
+              </section>
+            )}
           </aside>
         </div>
       ) : null}
     </PageShell>
+  );
+}
+
+function OwnerPostActions({ postId }: { postId: string }) {
+  return (
+    <section className="rounded-md border border-stone-200 bg-white/82 p-5">
+      <h2 className="font-semibold">自分の交換投稿</h2>
+      <p className="mt-2 text-sm leading-6 text-stone-700">
+        公開中の内容を確認しながら、編集や受付停止ができます。
+      </p>
+      <div className="mt-4 grid gap-2">
+        <ButtonLink
+          href={`/mypage/posts/${postId}/edit`}
+          variant="secondary"
+          className="w-full gap-2"
+        >
+          <Pencil size={16} aria-hidden="true" />
+          編集する
+        </ButtonLink>
+        <form action={updateTradePostVisibilityAction}>
+          <input type="hidden" name="trade_post_id" value={postId} />
+          <input type="hidden" name="next_status" value="private" />
+          <input type="hidden" name="redirect_to" value="/mypage" />
+          <button className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-stone-300 bg-white/70 px-4 text-sm font-semibold text-stone-950 transition hover:bg-white">
+            <PauseCircle size={16} aria-hidden="true" />
+            受付停止にする
+          </button>
+        </form>
+      </div>
+    </section>
+  );
+}
+
+function PostUpdateMessage({
+  updated,
+  error,
+}: {
+  updated?: string;
+  error?: string;
+}) {
+  const messages: Record<string, string> = {
+    post_private: "交換投稿の受付を停止しました。",
+    post_public: "交換投稿を再公開しました。",
+  };
+
+  if (!updated && !error) {
+    return null;
+  }
+
+  return (
+    <div
+      className={`mt-4 rounded-md border px-4 py-3 text-sm font-medium ${
+        error
+          ? "border-red-200 bg-red-50 text-red-800"
+          : "border-emerald-200 bg-emerald-50 text-emerald-800"
+      }`}
+    >
+      {error ?? messages[updated ?? ""] ?? "交換投稿を更新しました。"}
+    </div>
   );
 }
 

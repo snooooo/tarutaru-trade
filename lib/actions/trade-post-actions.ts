@@ -88,6 +88,11 @@ function redirectWithError(path: string, message: string): never {
   redirect(`${path}?${params.toString()}`);
 }
 
+function safePath(value: FormDataEntryValue | null, fallback: string) {
+  const path = typeof value === "string" ? value : fallback;
+  return path.startsWith("/") && !path.startsWith("//") ? path : fallback;
+}
+
 function stringValue(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" && value.trim() ? value.trim() : null;
@@ -421,7 +426,7 @@ export async function updateTradePostAction(formData: FormData) {
 }
 
 export async function updateTradePostVisibilityAction(formData: FormData) {
-  const redirectTo = "/mypage";
+  const redirectTo = safePath(formData.get("redirect_to"), "/mypage");
   await requireCompleteTradeProfile(redirectTo);
   const supabase = await createServerSupabaseClient();
 
