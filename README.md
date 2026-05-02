@@ -1,36 +1,160 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaruTaru Trade
 
-## Getting Started
+TaruTaru Trade is a whisky exchange posting app.
 
-First, run the development server:
+The core unit is an exchange post, not a standalone offer or wanted item.
 
-```bash
+- 出る: one or more bottle candidates
+- 求む: one or more bottle candidates, or unspecified
+- 補足条件: free-text trade conditions such as `どれか1本` or `まとめて希望`
+- 匿名プロフィール
+- 興味あり
+- X ID reveal only after consultation starts
+
+Public site:
+
+- https://tarutaru-trade.netlify.app/
+
+GitHub:
+
+- https://github.com/snooooo/tarutaru-trade
+
+## Stack
+
+- Next.js App Router
+- TypeScript
+- React Server Components
+- Server Actions
+- Supabase Auth/Postgres/RLS
+- Netlify
+
+## Local Development
+
+```sh
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Required `.env.local` values:
 
-## Learn More
+```sh
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
 
-To learn more about Next.js, take a look at the following resources:
+The local values are intentionally not committed.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Verification
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Run these before pushing meaningful changes:
 
-## Deploy on Vercel
+```sh
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Netlify deploys from:
+
+```text
+snooooo/tarutaru-trade main
+```
+
+Netlify environment variables must match `.env.local`:
+
+```text
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+```
+
+After deploy, smoke test:
+
+- `/posts`
+- `/login`
+- `/mypage`
+- `/mypage/posts/new`
+- `/mypage/posts/[postId]/edit`
+- `/posts/[postId]`
+- `/posts/[postId]/interest`
+- `/mypage/interests/received`
+- `/trades/[interestId]`
+
+## Shared Supabase Warning
+
+TaruTaru Trade currently shares the `WhiskyMap` Supabase project with MaltPeri.
+
+Do not run destructive database operations.
+
+Forbidden:
+
+- `supabase db reset`
+- `supabase db push`
+- `drop schema public cascade`
+- `drop database`
+- `truncate`
+- mass deletion against shared tables
+
+Use only reviewed additive migrations, with a schema backup first.
+
+Operational details are in [OPERATIONS.md](./OPERATIONS.md).
+
+## Migration Location
+
+The shared Supabase migration files live in the MaltPeri repo:
+
+```text
+/Users/user/Documents/sushiworks/maltperi/the_whisky_app1/supabase/migrations
+```
+
+TaruTaru-related migration files:
+
+```text
+20260501232500_create_tarutaru_trade.sql
+20260502033000_create_tarutaru_trade_posts.sql
+20260502103000_create_tarutaru_trade_proposal_offer_items.sql
+```
+
+Safe apply scripts:
+
+```text
+/Users/user/Documents/sushiworks/maltperi/the_whisky_app1/scripts/apply_tarutaru_phase9_trade_posts.sh
+/Users/user/Documents/sushiworks/maltperi/the_whisky_app1/scripts/apply_tarutaru_proposal_offer_items.sh
+```
+
+These scripts use direct `psql` application after backup. They do not use `db reset` or `db push`.
+
+## Test Accounts
+
+```text
+A:
+tarutaru.phase5.a.20260501174255@example.com
+
+B:
+tarutaru.phase5.b.20260501174255@example.com
+
+Password:
+TaruTaru-20260501174255!
+```
+
+Use A/B for interest and consultation lifecycle checks.
+
+## Current Product Direction
+
+Use exchange posts everywhere.
+
+The old standalone `/offers` and `/wants` app code has been removed. Legacy URLs are redirected by `proxy.ts`:
+
+- `/offers*` -> `/posts`
+- `/wants*` -> `/posts`
+- `/mypage/offers*` -> `/mypage/posts/new`
+- `/mypage/wants*` -> `/mypage/posts/new`
+
+Old database tables are intentionally not dropped because the Supabase project is shared.
