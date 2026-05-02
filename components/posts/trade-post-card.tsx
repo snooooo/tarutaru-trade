@@ -16,6 +16,7 @@ import type {
 export function TradePostCard({ post }: { post: PublicTradePost }) {
   const primaryOffer = post.offer_items[0];
   const primaryWant = post.want_items[0];
+  const hints = buildPostHints(post);
 
   return (
     <Link
@@ -36,6 +37,18 @@ export function TradePostCard({ post }: { post: PublicTradePost }) {
         <h3 className="line-clamp-2 text-lg font-semibold text-stone-950">
           {post.title || primaryOffer?.display_bottle_name || "交換投稿"}
         </h3>
+        {hints.length ? (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {hints.map((hint) => (
+              <span
+                key={hint}
+                className="rounded bg-stone-100 px-2 py-1 text-xs font-medium text-stone-700"
+              >
+                {hint}
+              </span>
+            ))}
+          </div>
+        ) : null}
         {post.condition_note ? (
           <p className="mt-2 line-clamp-2 text-sm leading-6 text-stone-700">
             {post.condition_note}
@@ -71,6 +84,33 @@ export function TradePostCard({ post }: { post: PublicTradePost }) {
       </div>
     </Link>
   );
+}
+
+function buildPostHints(post: PublicTradePost) {
+  const hints: string[] = [];
+
+  if (!post.want_items.length) {
+    hints.push("提案歓迎");
+  } else if (post.want_items.length > 1) {
+    hints.push("求む候補複数");
+  }
+
+  if (post.offer_items.length > 1) {
+    hints.push("出る候補複数");
+  }
+
+  if (post.condition_note?.trim()) {
+    hints.push("補足あり");
+  }
+
+  if (
+    post.offer_items.some((item) => item.median_price != null) ||
+    post.want_items.some((item) => item.median_price != null)
+  ) {
+    hints.push("相場データあり");
+  }
+
+  return hints.slice(0, 4);
 }
 
 function OfferPanel({ items }: { items: PublicTradePostOfferItem[] }) {
