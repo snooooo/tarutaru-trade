@@ -20,6 +20,7 @@ export type PublicTradePostOfferItem = {
   label_condition: string | null;
   image_url: string | null;
   note: string | null;
+  status?: string | null;
   sort_order: number | null;
   created_at: string | null;
 };
@@ -39,6 +40,7 @@ export type PublicTradePostWantItem = {
   median_price: number | null;
   price_sample_count: number | null;
   condition_note: string | null;
+  status?: string | null;
   sort_order: number | null;
   created_at: string | null;
 };

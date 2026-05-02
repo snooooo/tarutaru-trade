@@ -376,6 +376,16 @@ function TradePostRow({ post }: { post: MyTradePost }) {
           </ButtonLink>
         ) : null}
         {canToggleVisibility ? (
+          <ButtonLink
+            href={`/mypage/posts/${post.id}/edit`}
+            variant="secondary"
+            className="gap-2"
+          >
+            <Pencil size={15} aria-hidden="true" />
+            編集
+          </ButtonLink>
+        ) : null}
+        {canToggleVisibility ? (
           <form action={updateTradePostVisibilityAction}>
             <input type="hidden" name="trade_post_id" value={post.id} />
             <input
@@ -515,6 +525,7 @@ function MyItemUpdateMessage({
     want_withdrawn: "募集を非公開にしました。",
     post_private: "交換投稿の受付を停止しました。",
     post_public: "交換投稿を再公開しました。",
+    post_updated: "交換投稿を更新しました。",
   };
 
   if (!updated && !error) {

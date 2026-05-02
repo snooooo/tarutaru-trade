@@ -39,6 +39,50 @@ type LoosePostUpdateSupabase = {
   };
 };
 
+type LooseTradePostEditSupabase = {
+  auth: LoosePostUpdateSupabase["auth"];
+  from: (table: string) => {
+    select: (columns: string) => {
+      eq: (
+        column: string,
+        value: string,
+      ) => {
+        eq: (
+          column: string,
+          value: string,
+        ) => {
+          maybeSingle: () => Promise<{
+            data: unknown | null;
+            error: { message: string } | null;
+          }>;
+          order: (
+            column: string,
+            options?: { ascending?: boolean },
+          ) => Promise<{ data: unknown[] | null; error: { message: string } | null }>;
+        };
+        order: (
+          column: string,
+          options?: { ascending?: boolean },
+        ) => Promise<{ data: unknown[] | null; error: { message: string } | null }>;
+      };
+    };
+    update: (values: Record<string, unknown>) => {
+      eq: (
+        column: string,
+        value: string,
+      ) => {
+        eq: (
+          column: string,
+          value: string,
+        ) => Promise<{ error: { message: string } | null }>;
+      };
+    };
+    insert: (values: Record<string, unknown>) => Promise<{
+      error: { message: string } | null;
+    }>;
+  };
+};
+
 function redirectWithError(path: string, message: string): never {
   const params = new URLSearchParams({ error: message });
   redirect(`${path}?${params.toString()}`);
@@ -56,6 +100,44 @@ function stringValues(formData: FormData, key: string) {
     .map((value) => (value ? value : null));
 }
 
+function rawStringValues(formData: FormData, key: string) {
+  return formData
+    .getAll(key)
+    .map((value) => (typeof value === "string" ? value : ""));
+}
+
+function buildOfferItems(formData: FormData) {
+  const ids = rawStringValues(formData, "offer_item_id");
+  const names = stringValues(formData, "offer_manual_bottle_name");
+  const boxConditions = stringValues(formData, "box_condition");
+  const labelConditions = stringValues(formData, "label_condition");
+  const imageUrls = stringValues(formData, "image_url");
+  const notes = stringValues(formData, "offer_note");
+
+  return names.map((manualBottleName, index) => ({
+    id: ids[index] || null,
+    manualBottleName,
+    boxCondition: boxConditions[index] ?? "with_box_good",
+    labelCondition: labelConditions[index] ?? "good",
+    imageUrl: imageUrls[index] ?? null,
+    note: notes[index] ?? null,
+    sortOrder: index,
+  }));
+}
+
+function buildWantItems(formData: FormData) {
+  const ids = rawStringValues(formData, "want_item_id");
+  const names = stringValues(formData, "want_manual_bottle_name");
+  const conditionNotes = stringValues(formData, "want_condition_note");
+
+  return names.map((manualBottleName, index) => ({
+    id: ids[index] || null,
+    manualBottleName,
+    conditionNote: conditionNotes[index] ?? null,
+    sortOrder: index,
+  }));
+}
+
 export async function createTradePostAction(formData: FormData) {
   const path = "/mypage/posts/new";
   await requireCompleteTradeProfile(path);
@@ -67,45 +149,34 @@ export async function createTradePostAction(formData: FormData) {
 
   const title = stringValue(formData, "title");
   const conditionNote = stringValue(formData, "condition_note");
-  const offerManualBottleNames = stringValues(
-    formData,
-    "offer_manual_bottle_name",
-  );
-  const offerBoxConditions = stringValues(formData, "box_condition");
-  const offerLabelConditions = stringValues(formData, "label_condition");
-  const offerImageUrls = stringValues(formData, "image_url");
-  const offerNotes = stringValues(formData, "offer_note");
-  const wantManualBottleNames = stringValues(
-    formData,
-    "want_manual_bottle_name",
-  );
-  const wantConditionNotes = stringValues(formData, "want_condition_note");
+  const builtOfferItems = buildOfferItems(formData);
+  const builtWantItems = buildWantItems(formData);
 
-  if (!offerManualBottleNames.some(Boolean)) {
+  if (!builtOfferItems.some((item) => item.manualBottleName)) {
     redirectWithError(path, "出るボトル名を入力してください。");
   }
 
-  const offerItems = offerManualBottleNames.flatMap((manualBottleName, index) =>
-    manualBottleName
+  const offerItems = builtOfferItems.flatMap((item) =>
+    item.manualBottleName
       ? [
           {
             maltperi_bottle_id: null,
-            manual_bottle_name: manualBottleName,
-            box_condition: offerBoxConditions[index] ?? "with_box_good",
-            label_condition: offerLabelConditions[index] ?? "good",
-            image_url: offerImageUrls[index] ?? null,
-            note: offerNotes[index] ?? null,
+            manual_bottle_name: item.manualBottleName,
+            box_condition: item.boxCondition,
+            label_condition: item.labelCondition,
+            image_url: item.imageUrl,
+            note: item.note,
           },
         ]
       : [],
   );
-  const wantItems = wantManualBottleNames.flatMap((manualBottleName, index) =>
-    manualBottleName
+  const wantItems = builtWantItems.flatMap((item) =>
+    item.manualBottleName
       ? [
           {
             maltperi_bottle_id: null,
-            manual_bottle_name: manualBottleName,
-            condition_note: wantConditionNotes[index] ?? null,
+            manual_bottle_name: item.manualBottleName,
+            condition_note: item.conditionNote,
           },
         ]
       : [],
@@ -129,6 +200,224 @@ export async function createTradePostAction(formData: FormData) {
   revalidatePath("/posts");
   revalidatePath("/mypage");
   redirect("/posts?created=post");
+}
+
+export async function updateTradePostAction(formData: FormData) {
+  const postId = formData.get("trade_post_id");
+  const path =
+    typeof postId === "string" && postId
+      ? `/mypage/posts/${postId}/edit`
+      : "/mypage";
+
+  await requireCompleteTradeProfile(path);
+  const supabase = await createServerSupabaseClient();
+
+  if (!supabase) {
+    redirectWithError(path, "Supabase環境変数が未設定です。");
+  }
+
+  if (typeof postId !== "string" || !postId) {
+    redirectWithError("/mypage", "交換投稿が見つかりません。");
+  }
+
+  const title = stringValue(formData, "title");
+  const conditionNote = stringValue(formData, "condition_note");
+  const offerItems = buildOfferItems(formData);
+  const wantItems = buildWantItems(formData);
+  const activeOfferItems = offerItems.filter((item) => item.manualBottleName);
+
+  if (!activeOfferItems.length) {
+    redirectWithError(path, "出るボトル名を1件以上入力してください。");
+  }
+
+  const loose = supabase as unknown as LooseTradePostEditSupabase;
+  const {
+    data: { user },
+    error: userError,
+  } = await loose.auth.getUser();
+
+  if (userError || !user) {
+    redirectWithError(path, userError?.message ?? "ログインが必要です。");
+  }
+
+  const postResult = await loose
+    .from("trade_posts")
+    .select("id,status")
+    .eq("id", postId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (postResult.error) {
+    redirectWithError(path, postResult.error.message);
+  }
+
+  const post = postResult.data as { id: string; status: string } | null;
+
+  if (!post) {
+    redirectWithError("/mypage", "交換投稿が見つかりません。");
+  }
+
+  if (post.status !== "public" && post.status !== "private") {
+    redirectWithError(path, "相談中または終了済みの交換投稿は編集できません。");
+  }
+
+  const { error: postError } = await loose
+    .from("trade_posts")
+    .update({ title, condition_note: conditionNote })
+    .eq("id", postId)
+    .eq("user_id", user.id);
+
+  if (postError) {
+    redirectWithError(path, postError.message);
+  }
+
+  const [existingOffersResult, existingWantsResult] = await Promise.all([
+    loose
+      .from("trade_offer_items")
+      .select("id")
+      .eq("trade_post_id", postId)
+      .eq("user_id", user.id)
+      .order("sort_order", { ascending: true }),
+    loose
+      .from("trade_want_items")
+      .select("id")
+      .eq("trade_post_id", postId)
+      .eq("user_id", user.id)
+      .order("sort_order", { ascending: true }),
+  ]);
+
+  if (existingOffersResult.error || existingWantsResult.error) {
+    redirectWithError(
+      path,
+      existingOffersResult.error?.message ??
+        existingWantsResult.error?.message ??
+        "交換投稿の明細を読み込めませんでした。",
+    );
+  }
+
+  const existingOfferIds = new Set(
+    (existingOffersResult.data ?? [])
+      .map((row) => (row as { id?: unknown }).id)
+      .filter((id): id is string => typeof id === "string"),
+  );
+  const existingWantIds = new Set(
+    (existingWantsResult.data ?? [])
+      .map((row) => (row as { id?: unknown }).id)
+      .filter((id): id is string => typeof id === "string"),
+  );
+  const usedOfferIds = new Set<string>();
+  const usedWantIds = new Set<string>();
+
+  for (const item of offerItems) {
+    if (item.id && existingOfferIds.has(item.id)) {
+      usedOfferIds.add(item.id);
+      const { error } = await loose
+        .from("trade_offer_items")
+        .update({
+          manual_bottle_name: item.manualBottleName,
+          maltperi_bottle_id: null,
+          box_condition: item.boxCondition,
+          label_condition: item.labelCondition,
+          image_url: item.imageUrl,
+          note: item.note,
+          sort_order: item.sortOrder,
+          status: item.manualBottleName ? "public" : "private",
+        })
+        .eq("id", item.id)
+        .eq("user_id", user.id);
+
+      if (error) {
+        redirectWithError(path, error.message);
+      }
+    } else if (item.manualBottleName) {
+      const { error } = await loose.from("trade_offer_items").insert({
+        user_id: user.id,
+        trade_post_id: postId,
+        maltperi_bottle_id: null,
+        manual_bottle_name: item.manualBottleName,
+        box_condition: item.boxCondition,
+        label_condition: item.labelCondition,
+        image_url: item.imageUrl,
+        note: item.note,
+        sort_order: item.sortOrder,
+        status: "public",
+      });
+
+      if (error) {
+        redirectWithError(path, error.message);
+      }
+    }
+  }
+
+  for (const id of existingOfferIds) {
+    if (!usedOfferIds.has(id)) {
+      const { error } = await loose
+        .from("trade_offer_items")
+        .update({ status: "private" })
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (error) {
+        redirectWithError(path, error.message);
+      }
+    }
+  }
+
+  for (const item of wantItems) {
+    if (item.id && existingWantIds.has(item.id)) {
+      usedWantIds.add(item.id);
+      const { error } = await loose
+        .from("trade_want_items")
+        .update({
+          manual_bottle_name: item.manualBottleName,
+          maltperi_bottle_id: null,
+          condition_note: item.conditionNote,
+          sort_order: item.sortOrder,
+          status: item.manualBottleName ? "public" : "private",
+        })
+        .eq("id", item.id)
+        .eq("user_id", user.id);
+
+      if (error) {
+        redirectWithError(path, error.message);
+      }
+    } else if (item.manualBottleName) {
+      const { error } = await loose.from("trade_want_items").insert({
+        user_id: user.id,
+        trade_post_id: postId,
+        maltperi_bottle_id: null,
+        manual_bottle_name: item.manualBottleName,
+        condition_note: item.conditionNote,
+        sort_order: item.sortOrder,
+        status: "public",
+      });
+
+      if (error) {
+        redirectWithError(path, error.message);
+      }
+    }
+  }
+
+  for (const id of existingWantIds) {
+    if (!usedWantIds.has(id)) {
+      const { error } = await loose
+        .from("trade_want_items")
+        .update({ status: "private" })
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (error) {
+        redirectWithError(path, error.message);
+      }
+    }
+  }
+
+  revalidatePath("/");
+  revalidatePath("/posts");
+  revalidatePath(`/posts/${postId}`);
+  revalidatePath("/mypage");
+  revalidatePath(path);
+  redirect("/mypage?updated=post_updated");
 }
 
 export async function updateTradePostVisibilityAction(formData: FormData) {

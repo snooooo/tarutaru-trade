@@ -291,3 +291,18 @@ export async function getMyTradePosts(): Promise<QueryResult<MyTradePost>> {
     isConfigured: true,
   };
 }
+
+export async function getMyTradePost(
+  postId: string,
+): Promise<QueryResult<MyTradePost>> {
+  const result = await getMyTradePosts();
+
+  if (result.error || !result.data.length) {
+    return result;
+  }
+
+  return {
+    ...result,
+    data: result.data.filter((post) => post.id === postId),
+  };
+}
