@@ -1,0 +1,26 @@
+import Link from "next/link";
+import type { ComponentProps } from "react";
+
+type ButtonLinkProps = ComponentProps<typeof Link> & {
+  variant?: "primary" | "secondary" | "ghost";
+};
+
+export function ButtonLink({
+  className = "",
+  variant = "primary",
+  ...props
+}: ButtonLinkProps) {
+  const variants = {
+    primary: "bg-stone-950 text-white hover:bg-stone-800",
+    secondary:
+      "border border-stone-300 bg-white/70 text-stone-950 hover:bg-white",
+    ghost: "text-stone-700 hover:bg-stone-200/70",
+  };
+
+  return (
+    <Link
+      className={`inline-flex h-11 items-center justify-center whitespace-nowrap rounded-md px-4 text-sm font-semibold transition ${variants[variant]} ${className}`}
+      {...props}
+    />
+  );
+}
