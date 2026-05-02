@@ -6,6 +6,16 @@ import { requireCompleteTradeProfile } from "@/lib/auth/require-user";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { InterestTargetType } from "@/lib/types/interests";
 
+type LooseRpcSupabase = {
+  rpc: (
+    fn: "trade_create_post_interest",
+    args: {
+      p_target_trade_post_id: string;
+      p_proposal_offer_items: unknown[];
+    },
+  ) => Promise<{ error: { message: string } | null }>;
+};
+
 function safePath(value: FormDataEntryValue | null, fallback: string) {
   const path = typeof value === "string" ? value : fallback;
   return path.startsWith("/") && !path.startsWith("//") ? path : fallback;
@@ -14,6 +24,13 @@ function safePath(value: FormDataEntryValue | null, fallback: string) {
 function redirectWithError(path: string, message: string): never {
   const params = new URLSearchParams({ error: message });
   redirect(`${path}?${params.toString()}`);
+}
+
+function stringValues(formData: FormData, key: string) {
+  return formData
+    .getAll(key)
+    .map((value) => (typeof value === "string" ? value.trim() : ""))
+    .map((value) => (value ? value : null));
 }
 
 export async function createInterestAction(formData: FormData) {
@@ -46,6 +63,62 @@ export async function createInterestAction(formData: FormData) {
     p_target_id: targetId,
     p_proposed_offer_item_id: proposedOfferItemId,
   });
+
+  if (error) {
+    redirectWithError(returnPath, error.message);
+  }
+
+  revalidatePath("/mypage/interests/sent");
+  revalidatePath("/mypage/interests/received");
+  redirect("/mypage/interests/sent?created=interest");
+}
+
+export async function createPostInterestAction(formData: FormData) {
+  const returnPath = safePath(formData.get("return_path"), "/posts");
+  await requireCompleteTradeProfile(returnPath);
+  const supabase = await createServerSupabaseClient();
+
+  if (!supabase) {
+    redirectWithError(returnPath, "Supabase環境変数が未設定です。");
+  }
+
+  const targetPostId = formData.get("target_trade_post_id");
+  const manualBottleNames = stringValues(formData, "proposal_manual_bottle_name");
+  const boxConditions = stringValues(formData, "proposal_box_condition");
+  const labelConditions = stringValues(formData, "proposal_label_condition");
+  const imageUrls = stringValues(formData, "proposal_image_url");
+  const notes = stringValues(formData, "proposal_note");
+
+  if (typeof targetPostId !== "string" || !targetPostId) {
+    redirectWithError(returnPath, "交換投稿が見つかりません。");
+  }
+
+  if (!manualBottleNames.some(Boolean)) {
+    redirectWithError(returnPath, "交換候補ボトル名を入力してください。");
+  }
+
+  const proposalOfferItems = manualBottleNames.flatMap((manualBottleName, index) =>
+    manualBottleName
+      ? [
+          {
+            maltperi_bottle_id: null,
+            manual_bottle_name: manualBottleName,
+            box_condition: boxConditions[index] ?? "with_box_good",
+            label_condition: labelConditions[index] ?? "good",
+            image_url: imageUrls[index] ?? null,
+            note: notes[index] ?? null,
+          },
+        ]
+      : [],
+  );
+
+  const { error } = await (supabase as unknown as LooseRpcSupabase).rpc(
+    "trade_create_post_interest",
+    {
+      p_target_trade_post_id: targetPostId,
+      p_proposal_offer_items: proposalOfferItems,
+    },
+  );
 
   if (error) {
     redirectWithError(returnPath, error.message);

@@ -22,7 +22,7 @@ export default async function NewWantPage({ searchParams }: NewWantPageProps) {
           </h1>
           <p className="mt-3 text-stone-700">
             MaltPeriのボトルを選ぶか、見つからない場合は手動名で募集できます。
-            公開後は募集一覧に表示されます。
+            Phase 9以降の主導線は交換投稿です。この画面は既存データ互換用です。
           </p>
         </div>
 
@@ -35,11 +35,11 @@ export default async function NewWantPage({ searchParams }: NewWantPageProps) {
         <WantForm />
 
         <div className="flex flex-col gap-2 sm:flex-row">
-          <ButtonLink href="/wants" variant="secondary">
-            募集一覧へ戻る
+          <ButtonLink href="/mypage" variant="secondary">
+            マイページへ戻る
           </ButtonLink>
-          <ButtonLink href="/mypage/offers/new" className="gap-2">
-            出せるボトル登録へ
+          <ButtonLink href="/mypage/posts/new" className="gap-2">
+            交換投稿を作る
             <ArrowRight size={16} aria-hidden="true" />
           </ButtonLink>
         </div>

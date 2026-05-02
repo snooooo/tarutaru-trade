@@ -29,6 +29,7 @@ import type {
   TradeInterestDetailItem,
   TradeInterestStatus,
 } from "@/lib/types/interests";
+import type { PublicTradePost } from "@/lib/types/trade-posts";
 
 const statusLabels: Record<TradeInterestStatus, string> = {
   interested: "確認待ち",
@@ -87,13 +88,26 @@ export function TradeDetailPanel({
       </section>
 
       <section className="grid gap-3 lg:grid-cols-2">
-        <BottlePanel
-          label={trade.user_role === "requester" ? "相手の対象" : "あなたの対象"}
-          bottle={trade.target}
-        />
-        <BottlePanel
+        {trade.targetPost ? (
+          <TradePostPanel
+            label={trade.user_role === "requester" ? "相手の投稿" : "あなたの投稿"}
+            post={trade.targetPost}
+          />
+        ) : (
+          <BottlePanel
+            label={trade.user_role === "requester" ? "相手の対象" : "あなたの対象"}
+            bottle={trade.target}
+          />
+        )}
+        <BottleListPanel
           label={trade.user_role === "requester" ? "あなたの候補" : "相手の候補"}
-          bottle={trade.proposedOffer}
+          bottles={
+            trade.proposalOfferItems.length
+              ? trade.proposalOfferItems
+              : trade.proposedOffer
+                ? [trade.proposedOffer]
+                : []
+          }
         />
       </section>
 
@@ -241,6 +255,55 @@ function StatusMessage({
   );
 }
 
+function TradePostPanel({
+  label,
+  post,
+}: {
+  label: string;
+  post: PublicTradePost;
+}) {
+  const offer = post.offer_items[0];
+  const want = post.want_items[0];
+
+  return (
+    <section className="rounded-md border border-stone-200 bg-white/82 p-5">
+      <p className="text-xs font-medium text-stone-500">{label}</p>
+      <h2 className="mt-1 text-xl font-semibold">
+        {post.title || offer?.display_bottle_name || "交換投稿"}
+      </h2>
+      <div className="mt-4 grid gap-3">
+        <div className="rounded-md bg-stone-50 p-3">
+          <p className="text-xs font-medium text-stone-500">出る</p>
+          <p className="mt-1 font-semibold">
+            {offer?.display_bottle_name ?? "名称未設定のボトル"}
+          </p>
+          {offer ? (
+            <p className="mt-1 text-sm text-stone-600">
+              {bottleSubline(offer) || "MaltPeri情報なし"}
+            </p>
+          ) : null}
+        </div>
+        <div className="rounded-md bg-stone-50 p-3">
+          <p className="text-xs font-medium text-stone-500">求む</p>
+          <p className="mt-1 font-semibold">
+            {want?.display_bottle_name ?? "提案歓迎"}
+          </p>
+          {want ? (
+            <p className="mt-1 text-sm text-stone-600">
+              {bottleSubline(want) || "MaltPeri情報なし"}
+            </p>
+          ) : null}
+        </div>
+      </div>
+      {post.condition_note ? (
+        <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-stone-700">
+          {post.condition_note}
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
 function BottlePanel({
   label,
   bottle,
@@ -280,6 +343,59 @@ function BottlePanel({
             </span>
           </div>
         </>
+      ) : (
+        <p className="mt-2 text-sm text-stone-600">詳細を読み込めませんでした。</p>
+      )}
+    </section>
+  );
+}
+
+function BottleListPanel({
+  label,
+  bottles,
+}: {
+  label: string;
+  bottles: TradeBottleSummary[];
+}) {
+  return (
+    <section className="rounded-md border border-stone-200 bg-white/82 p-5">
+      <p className="text-xs font-medium text-stone-500">{label}</p>
+      {bottles.length ? (
+        <div className="mt-3 grid gap-3">
+          {bottles.map((bottle, index) => (
+            <div key={bottle.id} className="rounded-md bg-stone-50 p-3">
+              <p className="text-xs font-medium text-stone-500">
+                候補 {index + 1}
+              </p>
+              <h2 className="mt-1 text-lg font-semibold">
+                {bottle.display_bottle_name ?? "名称未設定のボトル"}
+              </h2>
+              <p className="mt-2 text-sm text-stone-600">
+                {bottleSubline(bottle) || "MaltPeri情報なし"}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2 text-xs text-stone-700">
+                {bottle.box_condition ? (
+                  <span className="rounded bg-white px-2 py-1">
+                    {formatBoxCondition(bottle.box_condition)}
+                  </span>
+                ) : null}
+                {bottle.label_condition ? (
+                  <span className="rounded bg-white px-2 py-1">
+                    ラベル {formatLabelCondition(bottle.label_condition)}
+                  </span>
+                ) : null}
+                {bottle.note ? (
+                  <span className="rounded bg-white px-2 py-1">
+                    備考 {bottle.note}
+                  </span>
+                ) : null}
+                <span className="rounded bg-white px-2 py-1">
+                  {formatPrice(bottle.median_price)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <p className="mt-2 text-sm text-stone-600">詳細を読み込めませんでした。</p>
       )}

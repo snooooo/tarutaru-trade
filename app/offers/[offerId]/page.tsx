@@ -35,22 +35,6 @@ export default async function OfferDetailPage({
       {offer ? (
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="grid gap-6">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-stone-100">
-              {offer.image_url ? (
-                <Image
-                  src={offer.image_url}
-                  alt={offer.display_bottle_name ?? "出品ボトル"}
-                  fill
-                  sizes="(min-width: 1024px) 65vw, 100vw"
-                  className="object-cover"
-                  priority
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-stone-500">
-                  Bottle image
-                </div>
-              )}
-            </div>
             <section className="rounded-md border border-stone-200 bg-white/82 p-5">
               <p className="text-sm font-medium text-stone-500">
                 {formatDate(offer.created_at)}
@@ -77,6 +61,20 @@ export default async function OfferDetailPage({
                 </p>
               </div>
             </section>
+            {offer.image_url ? (
+              <section className="rounded-md border border-stone-200 bg-white/82 p-5">
+                <h2 className="font-semibold">参考画像</h2>
+                <div className="relative mt-4 aspect-[4/3] max-w-xl overflow-hidden rounded-md bg-stone-100">
+                  <Image
+                    src={offer.image_url}
+                    alt={offer.display_bottle_name ?? "出品ボトル"}
+                    fill
+                    sizes="(min-width: 1024px) 560px, 100vw"
+                    className="object-cover"
+                  />
+                </div>
+              </section>
+            ) : null}
           </div>
 
           <aside className="grid content-start gap-4">

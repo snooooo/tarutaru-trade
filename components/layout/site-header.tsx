@@ -28,11 +28,8 @@ export async function SiteHeader() {
           <span className="whitespace-nowrap">TaruTaru Trade</span>
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">
-          <ButtonLink href="/offers" variant="ghost">
-            出品を探す
-          </ButtonLink>
-          <ButtonLink href="/wants" variant="ghost">
-            募集を探す
+          <ButtonLink href="/posts" variant="ghost">
+            交換投稿を探す
           </ButtonLink>
           {user ? (
             <ButtonLink href="/mypage" variant="ghost">
@@ -41,7 +38,7 @@ export async function SiteHeader() {
           ) : null}
         </nav>
         <div className="flex items-center gap-2">
-          <ButtonLink href="/offers" variant="secondary" className="gap-2">
+          <ButtonLink href="/posts" variant="secondary" className="gap-2">
             <Search size={16} aria-hidden="true" />
             探す
           </ButtonLink>
@@ -64,11 +61,11 @@ export async function SiteHeader() {
                 マイページ
               </ButtonLink>
               <ButtonLink
-                href="/mypage/offers/new"
+                href="/mypage/posts/new"
                 className="hidden gap-2 lg:flex"
               >
                 <PlusCircle size={16} aria-hidden="true" />
-                登録
+                投稿
               </ButtonLink>
               <ButtonLink
                 href="/settings/profile"

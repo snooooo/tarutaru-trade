@@ -82,7 +82,7 @@ export function WantEditForm({ item }: { item: ManagedWantItem }) {
           <div>
             <h2 className="font-semibold">募集を取り下げる</h2>
             <p className="mt-1 text-sm text-stone-600">
-              非公開にして、募集一覧と新しい興味あり受付から外します。
+              非公開にして、旧互換の興味あり受付から外します。
             </p>
           </div>
           <button className="inline-flex h-11 items-center justify-center rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-950 transition hover:bg-stone-50">

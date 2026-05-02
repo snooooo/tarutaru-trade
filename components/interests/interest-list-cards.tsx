@@ -19,6 +19,7 @@ import type {
   TradeInterestListItem,
   TradeInterestStatus,
 } from "@/lib/types/interests";
+import type { PublicTradePost } from "@/lib/types/trade-posts";
 
 type InterestListCardsProps = {
   interests: TradeInterestListItem[];
@@ -49,15 +50,15 @@ export function InterestListCards({
           </h2>
           <p className="mt-1 text-sm">
             {direction === "sent"
-              ? "気になる出品・募集から、交換候補のボトルを選んで興味ありを送れます。"
-              : "自分の出品や募集に興味ありが届くと、ここから相談開始または見送りを選べます。"}
+              ? "気になる交換投稿から、交換候補のボトルを選んで興味ありを送れます。"
+              : "自分の交換投稿に興味ありが届くと、ここから相談開始または見送りを選べます。"}
           </p>
         </div>
         <Link
-          href={direction === "sent" ? "/offers" : "/mypage"}
+          href={direction === "sent" ? "/posts" : "/mypage"}
           className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-stone-300 bg-white/70 px-4 text-sm font-semibold text-stone-950 transition hover:bg-white sm:w-fit"
         >
-          {direction === "sent" ? "出品を探す" : "マイページへ戻る"}
+          {direction === "sent" ? "交換投稿を探す" : "マイページへ戻る"}
           <ArrowRight size={16} aria-hidden="true" />
         </Link>
       </div>
@@ -84,13 +85,26 @@ export function InterestListCards({
           </div>
 
           <div className="grid gap-3 lg:grid-cols-2">
-            <BottlePanel
-              label={direction === "sent" ? "相手の対象" : "あなたの対象"}
-              bottle={interest.target}
-            />
-            <BottlePanel
+            {interest.targetPost ? (
+              <TradePostPanel
+                label={direction === "sent" ? "相手の投稿" : "あなたの投稿"}
+                post={interest.targetPost}
+              />
+            ) : (
+              <BottlePanel
+                label={direction === "sent" ? "相手の対象" : "あなたの対象"}
+                bottle={interest.target}
+              />
+            )}
+            <BottleListPanel
               label={direction === "sent" ? "あなたの候補" : "相手の候補"}
-              bottle={interest.proposedOffer}
+              bottles={
+                interest.proposalOfferItems.length
+                  ? interest.proposalOfferItems
+                  : interest.proposedOffer
+                    ? [interest.proposedOffer]
+                    : []
+              }
             />
           </div>
 
@@ -162,6 +176,45 @@ export function InterestListCards({
   );
 }
 
+function TradePostPanel({
+  label,
+  post,
+}: {
+  label: string;
+  post: PublicTradePost;
+}) {
+  const offer = post.offer_items[0];
+  const want = post.want_items[0];
+
+  return (
+    <section className="rounded-md bg-stone-50 p-4">
+      <p className="text-xs font-medium text-stone-500">{label}</p>
+      <h3 className="mt-1 font-semibold">
+        {post.title || offer?.display_bottle_name || "交換投稿"}
+      </h3>
+      <div className="mt-3 grid gap-2 text-sm">
+        <div>
+          <p className="text-xs font-medium text-stone-500">出る</p>
+          <p className="mt-0.5 font-semibold">
+            {offer?.display_bottle_name ?? "名称未設定のボトル"}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs font-medium text-stone-500">求む</p>
+          <p className="mt-0.5 font-semibold">
+            {want?.display_bottle_name ?? "提案歓迎"}
+          </p>
+        </div>
+      </div>
+      {post.condition_note ? (
+        <p className="mt-3 line-clamp-2 text-sm leading-6 text-stone-700">
+          {post.condition_note}
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
 function StatusPill({ status }: { status: TradeInterestStatus }) {
   const active =
     status === "interested" ||
@@ -220,6 +273,54 @@ function BottlePanel({
             </span>
           </div>
         </>
+      ) : (
+        <p className="mt-1 text-sm text-stone-600">詳細を読み込めませんでした。</p>
+      )}
+    </section>
+  );
+}
+
+function BottleListPanel({
+  label,
+  bottles,
+}: {
+  label: string;
+  bottles: TradeBottleSummary[];
+}) {
+  return (
+    <section className="rounded-md bg-stone-50 p-4">
+      <p className="text-xs font-medium text-stone-500">{label}</p>
+      {bottles.length ? (
+        <div className="mt-2 grid gap-3">
+          {bottles.map((bottle, index) => (
+            <div key={bottle.id} className="rounded-md bg-white p-3">
+              <p className="text-xs font-medium text-stone-500">
+                候補 {index + 1}
+              </p>
+              <h3 className="mt-1 font-semibold">
+                {bottle.display_bottle_name ?? "名称未設定のボトル"}
+              </h3>
+              <p className="mt-1 text-sm text-stone-600">
+                {bottleSubline(bottle) || "MaltPeri情報なし"}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs text-stone-700">
+                {bottle.box_condition ? (
+                  <span className="rounded bg-stone-50 px-2 py-1">
+                    {formatBoxCondition(bottle.box_condition)}
+                  </span>
+                ) : null}
+                {bottle.label_condition ? (
+                  <span className="rounded bg-stone-50 px-2 py-1">
+                    ラベル {formatLabelCondition(bottle.label_condition)}
+                  </span>
+                ) : null}
+                <span className="rounded bg-stone-50 px-2 py-1">
+                  {formatPrice(bottle.median_price)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <p className="mt-1 text-sm text-stone-600">詳細を読み込めませんでした。</p>
       )}

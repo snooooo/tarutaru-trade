@@ -3,6 +3,7 @@ import {
   ArrowRight,
   CheckCircle2,
   Clock,
+  Handshake,
   HandHeart,
   Inbox,
   Pencil,
@@ -13,6 +14,7 @@ import {
 import { PageShell } from "@/components/layout/page-shell";
 import { ButtonLink } from "@/components/ui/button-link";
 import { DataStatusNote } from "@/components/ui/status-note";
+import { updateTradePostVisibilityAction } from "@/lib/actions/trade-post-actions";
 import { requireCompleteTradeProfile } from "@/lib/auth/require-user";
 import {
   getMyOfferItems,
@@ -27,11 +29,13 @@ import {
   formatLabelCondition,
   formatPrice,
 } from "@/lib/format/trade";
+import { getMyTradePosts } from "@/lib/data/trade-posts";
 import type {
   TradeBottleSummary,
   TradeInterestListItem,
   TradeInterestStatus,
 } from "@/lib/types/interests";
+import type { MyTradePost } from "@/lib/types/trade-posts";
 
 const tradeStatusLabels: Record<TradeInterestStatus, string> = {
   interested: "確認待ち",
@@ -52,6 +56,13 @@ const itemStatusLabels: Record<string, string> = {
   archived: "終了",
 };
 
+const postStatusLabels: Record<string, string> = {
+  public: "公開中",
+  private: "非公開",
+  consulting: "相談中",
+  closed: "終了",
+};
+
 type MyPageProps = {
   searchParams: Promise<{ updated?: string; error?: string }>;
 };
@@ -60,7 +71,8 @@ export default async function MyPage({ searchParams }: MyPageProps) {
   const params = await searchParams;
   await requireCompleteTradeProfile("/mypage");
 
-  const [offers, wants, sentInterests, receivedInterests] = await Promise.all([
+  const [tradePosts, offers, wants, sentInterests, receivedInterests] = await Promise.all([
+    getMyTradePosts(),
     getMyOfferItems(),
     getMyWantItems(),
     getSentInterests(),
@@ -94,17 +106,17 @@ export default async function MyPage({ searchParams }: MyPageProps) {
             <p className="text-sm font-medium text-stone-500">My page</p>
             <h1 className="mt-1 text-3xl font-semibold">マイページ</h1>
             <p className="mt-3 max-w-2xl text-stone-700">
-              出品、募集、興味あり、進行中の取引をここから確認できます。
+              交換投稿、興味あり、進行中の取引をここから確認できます。
               X IDは相談開始後の取引詳細でのみ表示されます。
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <ButtonLink href="/mypage/offers/new" className="gap-2">
+            <ButtonLink href="/mypage/posts/new" className="gap-2">
               <PlusCircle size={16} aria-hidden="true" />
-              出せるボトル登録
+              交換投稿を作る
             </ButtonLink>
-            <ButtonLink href="/mypage/wants/new" variant="secondary" className="gap-2">
-              欲しいボトル登録
+            <ButtonLink href="/posts" variant="secondary" className="gap-2">
+              交換投稿を探す
               <ArrowRight size={16} aria-hidden="true" />
             </ButtonLink>
           </div>
@@ -151,12 +163,14 @@ export default async function MyPage({ searchParams }: MyPageProps) {
 
         <DataStatusNote
           isConfigured={
+            tradePosts.isConfigured &&
             offers.isConfigured &&
             wants.isConfigured &&
             sentInterests.isConfigured &&
             receivedInterests.isConfigured
           }
           error={
+            tradePosts.error ??
             offers.error ??
             wants.error ??
             sentInterests.error ??
@@ -166,10 +180,12 @@ export default async function MyPage({ searchParams }: MyPageProps) {
 
         <MyItemUpdateMessage updated={params.updated} error={params.error} />
 
+        <TradePostSection posts={tradePosts.data} />
+
         <div className="grid gap-6 lg:grid-cols-2">
           <BottleSection
-            title="自分の出品"
-            description="公開中の出せるボトルは出品一覧にも表示されます。"
+            title="旧: 自分の出品"
+            description="既存データ確認用です。今後の主導線は交換投稿です。"
             emptyTitle="出せるボトルはまだありません"
             emptyText="最初の1本を登録すると、相手から興味ありを受け取れるようになります。"
             actionHref="/mypage/offers/new"
@@ -178,8 +194,8 @@ export default async function MyPage({ searchParams }: MyPageProps) {
             kind="offer"
           />
           <BottleSection
-            title="自分の募集"
-            description="欲しいボトルを登録して、交換候補を待てます。"
+            title="旧: 自分の募集"
+            description="既存データ確認用です。今後の主導線は交換投稿です。"
             emptyTitle="募集はまだありません"
             emptyText="探しているボトルを登録すると、相手が候補を添えて興味ありを送れます。"
             actionHref="/mypage/wants/new"
@@ -214,9 +230,9 @@ export default async function MyPage({ searchParams }: MyPageProps) {
           ) : (
             <EmptyState
               title="進行中の取引はまだありません"
-              text="届いた興味ありから相談開始するか、気になる出品・募集に興味ありを送ると取引詳細が作られます。"
-              href="/offers"
-              label="出品を探す"
+              text="届いた興味ありから相談開始するか、気になる交換投稿に興味ありを送ると取引詳細が作られます。"
+              href="/posts"
+              label="交換投稿を探す"
             />
           )}
         </section>
@@ -255,6 +271,125 @@ function SummaryLink({
         <p className="mt-1 text-sm text-stone-600">{note}</p>
       </div>
     </Link>
+  );
+}
+
+function TradePostSection({ posts }: { posts: MyTradePost[] }) {
+  return (
+    <section className="grid gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-medium text-stone-500">Trade posts</p>
+          <h2 className="mt-1 text-2xl font-semibold">自分の交換投稿</h2>
+          <p className="mt-1 text-sm text-stone-600">
+            出る / 求むを1つの投稿として管理します。
+          </p>
+        </div>
+        <ButtonLink href="/mypage/posts/new" variant="secondary" className="gap-2">
+          <PlusCircle size={16} aria-hidden="true" />
+          交換投稿を作る
+        </ButtonLink>
+      </div>
+
+      {posts.length ? (
+        <div className="grid gap-3">
+          {posts.slice(0, 6).map((post) => (
+            <TradePostRow key={post.id} post={post} />
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          title="交換投稿はまだありません"
+          text="出るボトルと求む条件をまとめて、最初の交換投稿を作りましょう。"
+          href="/mypage/posts/new"
+          label="交換投稿を作る"
+        />
+      )}
+    </section>
+  );
+}
+
+function TradePostRow({ post }: { post: MyTradePost }) {
+  const offer = post.offer_items[0];
+  const want = post.want_items[0];
+  const canToggleVisibility = post.status === "public" || post.status === "private";
+
+  return (
+    <article className="grid gap-4 rounded-md border border-stone-200 bg-white/82 p-4 shadow-sm">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-medium text-stone-500">
+            {formatDate(post.published_at ?? post.created_at)}
+          </p>
+          <h3 className="mt-1 font-semibold">
+            {post.title || offer?.display_bottle_name || "交換投稿"}
+          </h3>
+          {post.condition_note ? (
+            <p className="mt-1 line-clamp-2 text-sm text-stone-600">
+              {post.condition_note}
+            </p>
+          ) : null}
+        </div>
+        <StatusBadge label={postStatusLabels[post.status] ?? post.status} />
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="rounded-md bg-stone-50 p-3">
+          <p className="text-xs font-medium text-stone-500">出る</p>
+          <p className="mt-1 font-semibold">
+            {offer?.display_bottle_name ?? "名称未設定のボトル"}
+          </p>
+          {offer ? (
+            <p className="mt-1 text-sm text-stone-600">
+              {bottleSubline(offer) || "MaltPeri情報なし"}
+            </p>
+          ) : null}
+          {post.offer_items.length > 1 ? (
+            <p className="mt-1 text-xs text-stone-500">
+              ほか {post.offer_items.length - 1}件
+            </p>
+          ) : null}
+        </div>
+        <div className="rounded-md bg-stone-50 p-3">
+          <p className="text-xs font-medium text-stone-500">求む</p>
+          <p className="mt-1 font-semibold">
+            {want?.display_bottle_name ?? "提案歓迎"}
+          </p>
+          {want ? (
+            <p className="mt-1 text-sm text-stone-600">
+              {bottleSubline(want) || "MaltPeri情報なし"}
+            </p>
+          ) : null}
+          {post.want_items.length > 1 ? (
+            <p className="mt-1 text-xs text-stone-500">
+              ほか {post.want_items.length - 1}件
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+        {post.status === "public" ? (
+          <ButtonLink href={`/posts/${post.id}`} variant="secondary" className="gap-2">
+            <Handshake size={15} aria-hidden="true" />
+            公開表示を見る
+          </ButtonLink>
+        ) : null}
+        {canToggleVisibility ? (
+          <form action={updateTradePostVisibilityAction}>
+            <input type="hidden" name="trade_post_id" value={post.id} />
+            <input
+              type="hidden"
+              name="next_status"
+              value={post.status === "public" ? "private" : "public"}
+            />
+            <button className="inline-flex h-11 w-full items-center justify-center rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-950 transition hover:border-stone-950 sm:w-auto">
+              {post.status === "public" ? "受付停止にする" : "再公開する"}
+            </button>
+          </form>
+        ) : null}
+      </div>
+    </article>
   );
 }
 
@@ -378,6 +513,8 @@ function MyItemUpdateMessage({
   const messages: Record<string, string> = {
     offer_withdrawn: "出品を非公開にしました。",
     want_withdrawn: "募集を非公開にしました。",
+    post_private: "交換投稿の受付を停止しました。",
+    post_public: "交換投稿を再公開しました。",
   };
 
   if (!updated && !error) {

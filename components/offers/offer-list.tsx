@@ -1,7 +1,12 @@
 import { OfferCard } from "@/components/offers/offer-card";
 import type { PublicOfferItem } from "@/lib/types/trade";
 
-export function OfferList({ offers }: { offers: PublicOfferItem[] }) {
+type OfferListProps = {
+  offers: PublicOfferItem[];
+  className?: string;
+};
+
+export function OfferList({ offers, className }: OfferListProps) {
   if (offers.length === 0) {
     return (
       <div className="rounded-md border border-dashed border-stone-300 bg-white/50 p-8 text-center text-stone-600">
@@ -11,7 +16,7 @@ export function OfferList({ offers }: { offers: PublicOfferItem[] }) {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className={className ?? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"}>
       {offers.map((offer) => (
         <OfferCard key={offer.id} offer={offer} />
       ))}

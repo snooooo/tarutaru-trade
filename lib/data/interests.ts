@@ -6,6 +6,11 @@ import type {
   TradeInterestListItem,
   TradeInterestStatus,
 } from "@/lib/types/interests";
+import type { PublicTradePost } from "@/lib/types/trade-posts";
+import type {
+  PublicTradePostOfferItem,
+  PublicTradePostWantItem,
+} from "@/lib/types/trade-posts";
 import type { PublicOfferItem, PublicWantItem } from "@/lib/types/trade";
 
 type QueryResult<T> = {
@@ -52,7 +57,7 @@ type InterestRow = {
   id: string;
   requester_user_id: string;
   receiver_user_id: string;
-  target_type: "offer" | "want";
+  target_type: "offer" | "want" | null;
   status: TradeInterestStatus;
   created_at: string;
   consulting_started_at: string | null;
@@ -63,7 +68,31 @@ type InterestRow = {
   completed_at?: string | null;
   target_offer_item_id: string | null;
   target_want_item_id: string | null;
-  proposed_offer_item_id: string;
+  target_trade_post_id?: string | null;
+  proposed_offer_item_id: string | null;
+};
+
+type ProposalOfferRow = OfferRow & {
+  trade_interest_id: string;
+  sort_order: number | null;
+};
+
+type RelatedPostRow = {
+  id: string;
+  title: string | null;
+  condition_note: string | null;
+  created_at: string;
+  published_at: string | null;
+};
+
+type RelatedPostOfferRow = OfferRow & {
+  trade_post_id: string;
+  sort_order: number | null;
+};
+
+type RelatedPostWantRow = WantRow & {
+  trade_post_id: string;
+  sort_order: number | null;
 };
 
 type VisibleCounterpartyRow = {
@@ -84,6 +113,7 @@ const interestSelect = [
   "requester_user_id",
   "receiver_user_id",
   "target_type",
+  "target_trade_post_id",
   "status",
   "created_at",
   "consulting_started_at",
@@ -91,6 +121,43 @@ const interestSelect = [
   "target_want_item_id",
   "proposed_offer_item_id",
 ].join(",");
+
+type LoosePostQuery = {
+  select: (columns: string) => {
+    in: (
+      column: string,
+      values: string[],
+    ) => Promise<{ data: unknown[] | null; error: { message: string } | null }>;
+  };
+};
+
+type LoosePublicPostSupabase = {
+  from: (table: "trade_public_posts") => LoosePostQuery;
+};
+
+type LooseProposalQuery = {
+  select: (columns: string) => {
+    in: (
+      column: string,
+      values: string[],
+    ) => Promise<{ data: unknown[] | null; error: { message: string } | null }>;
+  };
+};
+
+type LooseProposalSupabase = {
+  from: (table: "trade_proposal_offer_items") => LooseProposalQuery;
+};
+
+type LooseRelatedSupabase = {
+  from: (table: string) => {
+    select: (columns: string) => {
+      in: (
+        column: string,
+        values: string[],
+      ) => Promise<{ data: unknown[] | null; error: { message: string } | null }>;
+    };
+  };
+};
 
 function toOfferSummary(
   row: OfferRow,
@@ -221,6 +288,95 @@ function ownerStatsFromVisible(
   };
 }
 
+function ownerStatsFromPost(row: PublicTradePost): InterestCounterpartySummary {
+  return {
+    profile_public_id: row.profile_public_id,
+    display_name: row.owner_display_name,
+    owner_display_name: row.owner_display_name,
+    owner_x_followers_range: row.owner_x_followers_range,
+    owner_anonymous_shipping_ok: row.owner_anonymous_shipping_ok,
+    owner_completed_count: row.owner_completed_count,
+    owner_review_count: row.owner_review_count,
+    owner_average_rating: row.owner_average_rating,
+    owner_cancellation_rate: row.owner_cancellation_rate,
+  };
+}
+
+function normalizePost(row: unknown): PublicTradePost {
+  const post = row as PublicTradePost;
+
+  return {
+    ...post,
+    offer_items: Array.isArray(post.offer_items) ? post.offer_items : [],
+    want_items: Array.isArray(post.want_items) ? post.want_items : [],
+  };
+}
+
+function toPostOfferItem(
+  row: RelatedPostOfferRow,
+  bottleMap: Map<string, BottleRow>,
+  priceMap: Map<string, number | null>,
+): PublicTradePostOfferItem {
+  const bottle = row.maltperi_bottle_id
+    ? bottleMap.get(row.maltperi_bottle_id)
+    : null;
+
+  return {
+    id: row.id,
+    maltperi_bottle_id: row.maltperi_bottle_id,
+    manual_bottle_name: row.manual_bottle_name,
+    display_bottle_name: row.manual_bottle_name ?? bottle?.bottle_name ?? null,
+    bottle_name: bottle?.bottle_name ?? null,
+    brand_name: bottle?.brand_name ?? null,
+    country: bottle?.country ?? null,
+    category: null,
+    distillery_name_ja: bottle?.distillery_name_ja ?? null,
+    distillery_id: null,
+    distillery_area: null,
+    median_price: row.maltperi_bottle_id
+      ? (priceMap.get(row.maltperi_bottle_id) ?? null)
+      : null,
+    price_sample_count: null,
+    box_condition: row.box_condition,
+    label_condition: row.label_condition,
+    image_url: row.image_url,
+    note: row.note,
+    sort_order: row.sort_order,
+    created_at: row.created_at,
+  };
+}
+
+function toPostWantItem(
+  row: RelatedPostWantRow,
+  bottleMap: Map<string, BottleRow>,
+  priceMap: Map<string, number | null>,
+): PublicTradePostWantItem {
+  const bottle = row.maltperi_bottle_id
+    ? bottleMap.get(row.maltperi_bottle_id)
+    : null;
+
+  return {
+    id: row.id,
+    maltperi_bottle_id: row.maltperi_bottle_id,
+    manual_bottle_name: row.manual_bottle_name,
+    display_bottle_name: row.manual_bottle_name ?? bottle?.bottle_name ?? null,
+    bottle_name: bottle?.bottle_name ?? null,
+    brand_name: bottle?.brand_name ?? null,
+    country: bottle?.country ?? null,
+    category: null,
+    distillery_name_ja: bottle?.distillery_name_ja ?? null,
+    distillery_id: null,
+    distillery_area: null,
+    median_price: row.maltperi_bottle_id
+      ? (priceMap.get(row.maltperi_bottle_id) ?? null)
+      : null,
+    price_sample_count: null,
+    condition_note: row.condition_note,
+    sort_order: row.sort_order,
+    created_at: row.created_at,
+  };
+}
+
 async function hydrateRawItems(
   supabase: NonNullable<Awaited<ReturnType<typeof createServerSupabaseClient>>>,
   offerIds: string[],
@@ -322,6 +478,210 @@ async function getPublicMaps(
   };
 }
 
+async function getPublicPostMaps(
+  supabase: NonNullable<Awaited<ReturnType<typeof createServerSupabaseClient>>>,
+  postIds: string[],
+) {
+  if (!postIds.length) {
+    return {
+      posts: new Map<string, PublicTradePost>(),
+      owners: new Map<string, InterestCounterpartySummary>(),
+      error: null,
+    };
+  }
+
+  const { data, error } = await (supabase as unknown as LoosePublicPostSupabase)
+    .from("trade_public_posts")
+    .select("*")
+    .in("id", postIds);
+  const posts = (data ?? []).map(normalizePost);
+
+  return {
+    posts: new Map(posts.map((post) => [post.id, post])),
+    owners: new Map(posts.map((post) => [post.id, ownerStatsFromPost(post)])),
+    error: error?.message ?? null,
+  };
+}
+
+async function getRelatedPostMaps(
+  supabase: NonNullable<Awaited<ReturnType<typeof createServerSupabaseClient>>>,
+  postIds: string[],
+) {
+  if (!postIds.length) {
+    return {
+      posts: new Map<string, PublicTradePost>(),
+      owners: new Map<string, InterestCounterpartySummary>(),
+      error: null,
+    };
+  }
+
+  const loose = supabase as unknown as LooseRelatedSupabase;
+  const [postResult, offerResult, wantResult] = await Promise.all([
+    loose
+      .from("trade_posts")
+      .select("id,title,condition_note,created_at,published_at")
+      .in("id", postIds),
+    loose
+      .from("trade_offer_items")
+      .select(
+        "id,trade_post_id,maltperi_bottle_id,manual_bottle_name,box_condition,label_condition,image_url,note,status,sort_order,created_at",
+      )
+      .in("trade_post_id", postIds),
+    loose
+      .from("trade_want_items")
+      .select(
+        "id,trade_post_id,maltperi_bottle_id,manual_bottle_name,condition_note,status,sort_order,created_at",
+      )
+      .in("trade_post_id", postIds),
+  ]);
+  const postRows = (postResult.data ?? []) as RelatedPostRow[];
+  const offerRows = (offerResult.data ?? []) as RelatedPostOfferRow[];
+  const wantRows = (wantResult.data ?? []) as RelatedPostWantRow[];
+  const bottleIds = Array.from(
+    new Set(
+      [...offerRows, ...wantRows]
+        .map((row) => row.maltperi_bottle_id)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  );
+  const [bottleResult, priceResult] = await Promise.all([
+    bottleIds.length
+      ? supabase
+          .from("bottles")
+          .select("id,bottle_name,brand_name,country,distillery_name_ja")
+          .in("id", bottleIds)
+      : Promise.resolve({ data: [], error: null }),
+    bottleIds.length
+      ? supabase
+          .from("trade_bottle_auction_price_stats")
+          .select("bottle_id,median_price")
+          .in("bottle_id", bottleIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  const bottleMap = new Map(
+    ((bottleResult.data ?? []) as BottleRow[]).map((row) => [row.id, row]),
+  );
+  const priceMap = new Map(
+    ((priceResult.data ?? []) as PriceStatsRow[])
+      .filter((row) => row.bottle_id)
+      .map((row) => [row.bottle_id as string, row.median_price]),
+  );
+  const offersByPost = new Map<string, PublicTradePostOfferItem[]>();
+  for (const row of offerRows) {
+    const items = offersByPost.get(row.trade_post_id) ?? [];
+    items.push(toPostOfferItem(row, bottleMap, priceMap));
+    offersByPost.set(row.trade_post_id, items);
+  }
+  const wantsByPost = new Map<string, PublicTradePostWantItem[]>();
+  for (const row of wantRows) {
+    const items = wantsByPost.get(row.trade_post_id) ?? [];
+    items.push(toPostWantItem(row, bottleMap, priceMap));
+    wantsByPost.set(row.trade_post_id, items);
+  }
+  const posts = postRows.map((post) => ({
+    id: post.id,
+    title: post.title,
+    condition_note: post.condition_note,
+    created_at: post.created_at,
+    published_at: post.published_at,
+    profile_public_id: null,
+    owner_display_name: null,
+    owner_x_followers_range: null,
+    owner_anonymous_shipping_ok: null,
+    owner_completed_count: null,
+    owner_review_count: null,
+    owner_average_rating: null,
+    owner_cancellation_rate: null,
+    offer_items: (offersByPost.get(post.id) ?? []).sort(
+      (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+    ),
+    want_items: (wantsByPost.get(post.id) ?? []).sort(
+      (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+    ),
+  }));
+
+  return {
+    posts: new Map(posts.map((post) => [post.id, post])),
+    owners: new Map(posts.map((post) => [post.id, ownerStatsFromPost(post)])),
+    error:
+      postResult.error?.message ??
+      offerResult.error?.message ??
+      wantResult.error?.message ??
+      bottleResult.error?.message ??
+      priceResult.error?.message ??
+      null,
+  };
+}
+
+async function getProposalOfferMaps(
+  supabase: NonNullable<Awaited<ReturnType<typeof createServerSupabaseClient>>>,
+  interestIds: string[],
+) {
+  if (!interestIds.length) {
+    return {
+      items: new Map<string, TradeBottleSummary[]>(),
+      error: null,
+    };
+  }
+
+  const { data, error } = await (supabase as unknown as LooseProposalSupabase)
+    .from("trade_proposal_offer_items")
+    .select(
+      "id,trade_interest_id,maltperi_bottle_id,manual_bottle_name,box_condition,label_condition,image_url,note,status,sort_order,created_at",
+    )
+    .in("trade_interest_id", interestIds);
+  const rows = (data ?? []) as ProposalOfferRow[];
+  const bottleIds = Array.from(
+    new Set(
+      rows
+        .map((row) => row.maltperi_bottle_id)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  );
+
+  const [bottleResult, priceResult] = await Promise.all([
+    bottleIds.length
+      ? supabase
+          .from("bottles")
+          .select("id,bottle_name,brand_name,country,distillery_name_ja")
+          .in("id", bottleIds)
+      : Promise.resolve({ data: [], error: null }),
+    bottleIds.length
+      ? supabase
+          .from("trade_bottle_auction_price_stats")
+          .select("bottle_id,median_price")
+          .in("bottle_id", bottleIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
+  const bottleMap = new Map(
+    ((bottleResult.data ?? []) as BottleRow[]).map((row) => [row.id, row]),
+  );
+  const priceMap = new Map(
+    ((priceResult.data ?? []) as PriceStatsRow[])
+      .filter((row) => row.bottle_id)
+      .map((row) => [row.bottle_id as string, row.median_price]),
+  );
+  const items = new Map<string, TradeBottleSummary[]>();
+
+  for (const row of rows.sort(
+    (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+  )) {
+    const current = items.get(row.trade_interest_id) ?? [];
+    current.push(toOfferSummary(row, bottleMap, priceMap));
+    items.set(row.trade_interest_id, current);
+  }
+
+  return {
+    items,
+    error:
+      error?.message ??
+      bottleResult.error?.message ??
+      priceResult.error?.message ??
+      null,
+  };
+}
+
 async function buildInterestItems(
   supabase: NonNullable<Awaited<ReturnType<typeof createServerSupabaseClient>>>,
   rows: InterestRow[],
@@ -341,11 +701,28 @@ async function buildInterestItems(
         .filter((id): id is string => Boolean(id)),
     ),
   );
+  const postIds = Array.from(
+    new Set(
+      rows
+        .map((row) => row.target_trade_post_id)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  );
   const interestIds = rows.map((row) => row.id);
 
-  const [rawMaps, publicMaps, visibleResult] = await Promise.all([
+  const [
+    rawMaps,
+    publicMaps,
+    publicPostMaps,
+    relatedPostMaps,
+    proposalMaps,
+    visibleResult,
+  ] = await Promise.all([
     hydrateRawItems(supabase, offerIds, wantIds),
     getPublicMaps(supabase, offerIds, wantIds),
+    getPublicPostMaps(supabase, postIds),
+    getRelatedPostMaps(supabase, postIds),
+    getProposalOfferMaps(supabase, interestIds),
     interestIds.length
       ? supabase
           .from("trade_visible_counterparty_profiles")
@@ -364,8 +741,15 @@ async function buildInterestItems(
 
   return {
     items: rows.map((row) => {
+      const targetPost = row.target_trade_post_id
+        ? (publicPostMaps.posts.get(row.target_trade_post_id) ??
+          relatedPostMaps.posts.get(row.target_trade_post_id) ??
+          null)
+        : null;
       const target =
-        row.target_type === "offer" && row.target_offer_item_id
+        targetPost
+          ? null
+          : row.target_type === "offer" && row.target_offer_item_id
           ? (publicMaps.offerSummaries.get(row.target_offer_item_id) ??
             rawMaps.offers.get(row.target_offer_item_id) ??
             null)
@@ -374,28 +758,45 @@ async function buildInterestItems(
               rawMaps.wants.get(row.target_want_item_id) ??
               null)
             : null;
+      const proposalOfferItems = proposalMaps.items.get(row.id) ?? [];
       const proposedOffer =
-        publicMaps.offerSummaries.get(row.proposed_offer_item_id) ??
-        rawMaps.offers.get(row.proposed_offer_item_id) ??
-        null;
+        proposalOfferItems[0] ??
+        (row.proposed_offer_item_id
+          ? (publicMaps.offerSummaries.get(row.proposed_offer_item_id) ??
+            rawMaps.offers.get(row.proposed_offer_item_id) ??
+            null)
+          : null);
 
       const publicCounterparty =
         direction === "sent"
-          ? row.target_type === "offer" && row.target_offer_item_id
+          ? row.target_trade_post_id
+            ? (publicPostMaps.owners.get(row.target_trade_post_id) ??
+              relatedPostMaps.owners.get(row.target_trade_post_id))
+            : row.target_type === "offer" && row.target_offer_item_id
             ? publicMaps.offerOwners.get(row.target_offer_item_id)
             : row.target_want_item_id
               ? publicMaps.wantOwners.get(row.target_want_item_id)
               : null
-          : publicMaps.offerOwners.get(row.proposed_offer_item_id);
+          : row.proposed_offer_item_id
+            ? publicMaps.offerOwners.get(row.proposed_offer_item_id)
+            : null;
 
       return {
         ...row,
+        targetPost,
         target,
+        proposalOfferItems,
         proposedOffer,
         counterparty: visibleMap.get(row.id) ?? publicCounterparty ?? null,
       };
     }),
-    error: rawMaps.error ?? visibleResult.error?.message ?? null,
+    error:
+      rawMaps.error ??
+      publicPostMaps.error ??
+      relatedPostMaps.error ??
+      proposalMaps.error ??
+      visibleResult.error?.message ??
+      null,
   };
 }
 

@@ -1,4 +1,5 @@
 import type { PublicOwnerStats } from "@/lib/types/trade";
+import type { PublicTradePost } from "@/lib/types/trade-posts";
 
 export type TradeInterestStatus =
   | "interested"
@@ -34,14 +35,17 @@ export type InterestCounterpartySummary = PublicOwnerStats & {
 
 export type TradeInterestListItem = {
   id: string;
-  target_type: InterestTargetType;
+  target_type: InterestTargetType | null;
   status: TradeInterestStatus;
   created_at: string;
   consulting_started_at: string | null;
   target_offer_item_id: string | null;
   target_want_item_id: string | null;
-  proposed_offer_item_id: string;
+  target_trade_post_id?: string | null;
+  proposed_offer_item_id: string | null;
+  targetPost?: PublicTradePost | null;
   target: TradeBottleSummary | null;
+  proposalOfferItems: TradeBottleSummary[];
   proposedOffer: TradeBottleSummary | null;
   counterparty: InterestCounterpartySummary | null;
 };

@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { Star, Truck } from "lucide-react";
+import { ArrowRight, Star, Truck } from "lucide-react";
 import {
   bottleSubline,
   formatBoxCondition,
@@ -16,28 +15,20 @@ export function OfferCard({ offer }: { offer: PublicOfferItem }) {
   return (
     <Link
       href={`/offers/${offer.id}`}
-      className="group grid overflow-hidden rounded-md border border-stone-200 bg-white/82 shadow-sm transition hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-md"
+      className="group grid gap-4 rounded-md border border-stone-200 bg-white/82 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-md"
     >
-      <div className="relative aspect-[4/3] bg-stone-100">
-        {offer.image_url ? (
-          <Image
-            src={offer.image_url}
-            alt={offer.display_bottle_name ?? "出品ボトル"}
-            fill
-            sizes="(min-width: 1024px) 33vw, 100vw"
-            className="object-cover"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center px-6 text-center text-sm text-stone-500">
-            Bottle image
+      <div className="grid gap-4">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <span className="rounded bg-stone-100 px-2 py-1 text-xs font-medium text-stone-600">
+              出せるもの
+            </span>
           </div>
-        )}
-      </div>
-      <div className="grid gap-4 p-4">
-        <div>
           <p className="text-xs font-medium text-stone-500">
             {formatDate(offer.created_at)}
           </p>
+        </div>
+        <div>
           <h3 className="mt-1 line-clamp-2 text-lg font-semibold text-stone-950">
             {offer.display_bottle_name ?? "名称未設定のボトル"}
           </h3>
@@ -61,6 +52,9 @@ export function OfferCard({ offer }: { offer: PublicOfferItem }) {
             </span>
           </div>
         </div>
+        <div className="min-h-16 rounded bg-stone-50 p-3 text-sm leading-6 text-stone-700">
+          <p className="line-clamp-3">{offer.note || "備考の記載なし"}</p>
+        </div>
         <div className="flex items-center justify-between border-t border-stone-100 pt-3 text-sm text-stone-600">
           <span>{offer.owner_display_name ?? "ななしさん"}</span>
           <span className="flex items-center gap-3">
@@ -72,6 +66,10 @@ export function OfferCard({ offer }: { offer: PublicOfferItem }) {
               <Truck size={15} aria-label="匿名配送OK" />
             ) : null}
           </span>
+        </div>
+        <div className="flex items-center justify-end gap-1 text-sm font-medium text-stone-950">
+          条件を見て相談へ
+          <ArrowRight size={15} aria-hidden="true" />
         </div>
       </div>
     </Link>
