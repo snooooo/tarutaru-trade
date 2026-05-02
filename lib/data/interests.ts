@@ -1,0 +1,707 @@
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type {
+  InterestCounterpartySummary,
+  TradeBottleSummary,
+  TradeInterestDetailItem,
+  TradeInterestListItem,
+  TradeInterestStatus,
+} from "@/lib/types/interests";
+import type { PublicOfferItem, PublicWantItem } from "@/lib/types/trade";
+
+type QueryResult<T> = {
+  data: T[];
+  error: string | null;
+  isConfigured: boolean;
+};
+
+type OfferRow = {
+  id: string;
+  maltperi_bottle_id: string | null;
+  manual_bottle_name: string | null;
+  box_condition: string | null;
+  label_condition: string | null;
+  image_url: string | null;
+  note: string | null;
+  status: string | null;
+  created_at: string | null;
+};
+
+type WantRow = {
+  id: string;
+  maltperi_bottle_id: string | null;
+  manual_bottle_name: string | null;
+  condition_note: string | null;
+  status: string | null;
+  created_at: string | null;
+};
+
+type BottleRow = {
+  id: string;
+  bottle_name: string;
+  brand_name: string | null;
+  country: string | null;
+  distillery_name_ja: string | null;
+};
+
+type PriceStatsRow = {
+  bottle_id: string | null;
+  median_price: number | null;
+};
+
+type InterestRow = {
+  id: string;
+  requester_user_id: string;
+  receiver_user_id: string;
+  target_type: "offer" | "want";
+  status: TradeInterestStatus;
+  created_at: string;
+  consulting_started_at: string | null;
+  canceled_at?: string | null;
+  dismissed_at?: string | null;
+  requester_completed_at?: string | null;
+  receiver_completed_at?: string | null;
+  completed_at?: string | null;
+  target_offer_item_id: string | null;
+  target_want_item_id: string | null;
+  proposed_offer_item_id: string;
+};
+
+type VisibleCounterpartyRow = {
+  trade_interest_id: string | null;
+  counterparty_profile_public_id: string | null;
+  counterparty_display_name: string | null;
+  counterparty_x_followers_range: string | null;
+  counterparty_anonymous_shipping_ok: boolean | null;
+  counterparty_completed_count: number | null;
+  counterparty_review_count: number | null;
+  counterparty_average_rating: number | null;
+  counterparty_cancellation_rate: number | null;
+  counterparty_x_id?: string | null;
+};
+
+const interestSelect = [
+  "id",
+  "requester_user_id",
+  "receiver_user_id",
+  "target_type",
+  "status",
+  "created_at",
+  "consulting_started_at",
+  "target_offer_item_id",
+  "target_want_item_id",
+  "proposed_offer_item_id",
+].join(",");
+
+function toOfferSummary(
+  row: OfferRow,
+  bottleMap: Map<string, BottleRow>,
+  priceMap: Map<string, number | null>,
+): TradeBottleSummary {
+  const bottle = row.maltperi_bottle_id
+    ? bottleMap.get(row.maltperi_bottle_id)
+    : null;
+
+  return {
+    id: row.id,
+    display_bottle_name: row.manual_bottle_name ?? bottle?.bottle_name ?? null,
+    brand_name: bottle?.brand_name ?? null,
+    country: bottle?.country ?? null,
+    distillery_name_ja: bottle?.distillery_name_ja ?? null,
+    distillery_area: null,
+    median_price: row.maltperi_bottle_id
+      ? (priceMap.get(row.maltperi_bottle_id) ?? null)
+      : null,
+    box_condition: row.box_condition,
+    label_condition: row.label_condition,
+    image_url: row.image_url,
+    note: row.note,
+    status: row.status,
+    created_at: row.created_at,
+  };
+}
+
+function toWantSummary(
+  row: WantRow,
+  bottleMap: Map<string, BottleRow>,
+  priceMap: Map<string, number | null>,
+): TradeBottleSummary {
+  const bottle = row.maltperi_bottle_id
+    ? bottleMap.get(row.maltperi_bottle_id)
+    : null;
+
+  return {
+    id: row.id,
+    display_bottle_name: row.manual_bottle_name ?? bottle?.bottle_name ?? null,
+    brand_name: bottle?.brand_name ?? null,
+    country: bottle?.country ?? null,
+    distillery_name_ja: bottle?.distillery_name_ja ?? null,
+    distillery_area: null,
+    median_price: row.maltperi_bottle_id
+      ? (priceMap.get(row.maltperi_bottle_id) ?? null)
+      : null,
+    condition_note: row.condition_note,
+    status: row.status,
+    created_at: row.created_at,
+  };
+}
+
+function toPublicOfferSummary(row: PublicOfferItem): TradeBottleSummary {
+  return {
+    id: row.id,
+    display_bottle_name: row.display_bottle_name,
+    brand_name: row.brand_name,
+    country: row.country,
+    distillery_name_ja: row.distillery_name_ja,
+    distillery_area: row.distillery_area,
+    median_price: row.median_price,
+    box_condition: row.box_condition,
+    label_condition: row.label_condition,
+    image_url: row.image_url,
+    note: row.note,
+    created_at: row.created_at,
+  };
+}
+
+function toPublicWantSummary(row: PublicWantItem): TradeBottleSummary {
+  return {
+    id: row.id,
+    display_bottle_name: row.display_bottle_name,
+    brand_name: row.brand_name,
+    country: row.country,
+    distillery_name_ja: row.distillery_name_ja,
+    distillery_area: row.distillery_area,
+    median_price: row.median_price,
+    condition_note: row.condition_note,
+    created_at: row.created_at,
+  };
+}
+
+function ownerStatsFromOffer(row: PublicOfferItem): InterestCounterpartySummary {
+  return {
+    profile_public_id: row.profile_public_id,
+    display_name: row.owner_display_name,
+    owner_display_name: row.owner_display_name,
+    owner_x_followers_range: row.owner_x_followers_range,
+    owner_anonymous_shipping_ok: row.owner_anonymous_shipping_ok,
+    owner_completed_count: row.owner_completed_count,
+    owner_review_count: row.owner_review_count,
+    owner_average_rating: row.owner_average_rating,
+    owner_cancellation_rate: row.owner_cancellation_rate,
+  };
+}
+
+function ownerStatsFromWant(row: PublicWantItem): InterestCounterpartySummary {
+  return {
+    profile_public_id: row.profile_public_id,
+    display_name: row.owner_display_name,
+    owner_display_name: row.owner_display_name,
+    owner_x_followers_range: row.owner_x_followers_range,
+    owner_anonymous_shipping_ok: row.owner_anonymous_shipping_ok,
+    owner_completed_count: row.owner_completed_count,
+    owner_review_count: row.owner_review_count,
+    owner_average_rating: row.owner_average_rating,
+    owner_cancellation_rate: row.owner_cancellation_rate,
+  };
+}
+
+function ownerStatsFromVisible(
+  row: VisibleCounterpartyRow,
+): InterestCounterpartySummary {
+  return {
+    profile_public_id: row.counterparty_profile_public_id,
+    display_name: row.counterparty_display_name,
+    owner_display_name: row.counterparty_display_name,
+    owner_x_followers_range: row.counterparty_x_followers_range,
+    owner_anonymous_shipping_ok: row.counterparty_anonymous_shipping_ok,
+    owner_completed_count: row.counterparty_completed_count,
+    owner_review_count: row.counterparty_review_count,
+    owner_average_rating: row.counterparty_average_rating,
+    owner_cancellation_rate: row.counterparty_cancellation_rate,
+    x_id: row.counterparty_x_id ?? null,
+  };
+}
+
+async function hydrateRawItems(
+  supabase: NonNullable<Awaited<ReturnType<typeof createServerSupabaseClient>>>,
+  offerIds: string[],
+  wantIds: string[],
+) {
+  const [offerResult, wantResult] = await Promise.all([
+    offerIds.length
+      ? supabase
+          .from("trade_offer_items")
+          .select(
+            "id,maltperi_bottle_id,manual_bottle_name,box_condition,label_condition,image_url,note,status,created_at",
+          )
+          .in("id", offerIds)
+      : Promise.resolve({ data: [], error: null }),
+    wantIds.length
+      ? supabase
+          .from("trade_want_items")
+          .select("id,maltperi_bottle_id,manual_bottle_name,condition_note,status,created_at")
+          .in("id", wantIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
+  const offerRows = (offerResult.data ?? []) as OfferRow[];
+  const wantRows = (wantResult.data ?? []) as WantRow[];
+  const bottleIds = Array.from(
+    new Set(
+      [...offerRows, ...wantRows]
+        .map((row) => row.maltperi_bottle_id)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  );
+
+  const [bottleResult, priceResult] = await Promise.all([
+    bottleIds.length
+      ? supabase
+          .from("bottles")
+          .select("id,bottle_name,brand_name,country,distillery_name_ja")
+          .in("id", bottleIds)
+      : Promise.resolve({ data: [], error: null }),
+    bottleIds.length
+      ? supabase
+          .from("trade_bottle_auction_price_stats")
+          .select("bottle_id,median_price")
+          .in("bottle_id", bottleIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
+  const bottleMap = new Map(
+    ((bottleResult.data ?? []) as BottleRow[]).map((row) => [row.id, row]),
+  );
+  const priceMap = new Map(
+    ((priceResult.data ?? []) as PriceStatsRow[])
+      .filter((row) => row.bottle_id)
+      .map((row) => [row.bottle_id as string, row.median_price]),
+  );
+
+  return {
+    offers: new Map(
+      offerRows.map((row) => [row.id, toOfferSummary(row, bottleMap, priceMap)]),
+    ),
+    wants: new Map(
+      wantRows.map((row) => [row.id, toWantSummary(row, bottleMap, priceMap)]),
+    ),
+    error:
+      offerResult.error?.message ??
+      wantResult.error?.message ??
+      bottleResult.error?.message ??
+      priceResult.error?.message ??
+      null,
+  };
+}
+
+async function getPublicMaps(
+  supabase: NonNullable<Awaited<ReturnType<typeof createServerSupabaseClient>>>,
+  offerIds: string[],
+  wantIds: string[],
+) {
+  const [offerResult, wantResult] = await Promise.all([
+    offerIds.length
+      ? supabase.from("trade_public_offer_items").select("*").in("id", offerIds)
+      : Promise.resolve({ data: [], error: null }),
+    wantIds.length
+      ? supabase.from("trade_public_want_items").select("*").in("id", wantIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
+  const publicOffers = (offerResult.data ?? []) as PublicOfferItem[];
+  const publicWants = (wantResult.data ?? []) as PublicWantItem[];
+
+  return {
+    offerSummaries: new Map(
+      publicOffers.map((row) => [row.id, toPublicOfferSummary(row)]),
+    ),
+    wantSummaries: new Map(
+      publicWants.map((row) => [row.id, toPublicWantSummary(row)]),
+    ),
+    offerOwners: new Map(publicOffers.map((row) => [row.id, ownerStatsFromOffer(row)])),
+    wantOwners: new Map(publicWants.map((row) => [row.id, ownerStatsFromWant(row)])),
+  };
+}
+
+async function buildInterestItems(
+  supabase: NonNullable<Awaited<ReturnType<typeof createServerSupabaseClient>>>,
+  rows: InterestRow[],
+  direction: "sent" | "received",
+): Promise<{ items: TradeInterestListItem[]; error: string | null }> {
+  const offerIds = Array.from(
+    new Set(
+      rows
+        .flatMap((row) => [row.target_offer_item_id, row.proposed_offer_item_id])
+        .filter((id): id is string => Boolean(id)),
+    ),
+  );
+  const wantIds = Array.from(
+    new Set(
+      rows
+        .map((row) => row.target_want_item_id)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  );
+  const interestIds = rows.map((row) => row.id);
+
+  const [rawMaps, publicMaps, visibleResult] = await Promise.all([
+    hydrateRawItems(supabase, offerIds, wantIds),
+    getPublicMaps(supabase, offerIds, wantIds),
+    interestIds.length
+      ? supabase
+          .from("trade_visible_counterparty_profiles")
+          .select(
+            "trade_interest_id,counterparty_profile_public_id,counterparty_display_name,counterparty_x_followers_range,counterparty_anonymous_shipping_ok,counterparty_completed_count,counterparty_review_count,counterparty_average_rating,counterparty_cancellation_rate",
+          )
+          .in("trade_interest_id", interestIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
+  const visibleMap = new Map(
+    ((visibleResult.data ?? []) as VisibleCounterpartyRow[])
+      .filter((row) => row.trade_interest_id)
+      .map((row) => [row.trade_interest_id as string, ownerStatsFromVisible(row)]),
+  );
+
+  return {
+    items: rows.map((row) => {
+      const target =
+        row.target_type === "offer" && row.target_offer_item_id
+          ? (publicMaps.offerSummaries.get(row.target_offer_item_id) ??
+            rawMaps.offers.get(row.target_offer_item_id) ??
+            null)
+          : row.target_want_item_id
+            ? (publicMaps.wantSummaries.get(row.target_want_item_id) ??
+              rawMaps.wants.get(row.target_want_item_id) ??
+              null)
+            : null;
+      const proposedOffer =
+        publicMaps.offerSummaries.get(row.proposed_offer_item_id) ??
+        rawMaps.offers.get(row.proposed_offer_item_id) ??
+        null;
+
+      const publicCounterparty =
+        direction === "sent"
+          ? row.target_type === "offer" && row.target_offer_item_id
+            ? publicMaps.offerOwners.get(row.target_offer_item_id)
+            : row.target_want_item_id
+              ? publicMaps.wantOwners.get(row.target_want_item_id)
+              : null
+          : publicMaps.offerOwners.get(row.proposed_offer_item_id);
+
+      return {
+        ...row,
+        target,
+        proposedOffer,
+        counterparty: visibleMap.get(row.id) ?? publicCounterparty ?? null,
+      };
+    }),
+    error: rawMaps.error ?? visibleResult.error?.message ?? null,
+  };
+}
+
+export async function getMySelectableOfferItems(): Promise<
+  QueryResult<TradeBottleSummary>
+> {
+  const supabase = await createServerSupabaseClient();
+
+  if (!supabase) {
+    return { data: [], error: null, isConfigured: false };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { data: [], error: userError?.message ?? null, isConfigured: true };
+  }
+
+  const { data, error } = await supabase
+    .from("trade_offer_items")
+    .select(
+      "id,maltperi_bottle_id,manual_bottle_name,box_condition,label_condition,image_url,note,status,created_at",
+    )
+    .eq("user_id", user.id)
+    .in("status", ["public", "private"])
+    .order("created_at", { ascending: false });
+
+  const rows = (data ?? []) as OfferRow[];
+  const hydrated = await hydrateRawItems(
+    supabase,
+    rows.map((row) => row.id),
+    [],
+  );
+
+  return {
+    data: rows
+      .map((row) => hydrated.offers.get(row.id))
+      .filter((item): item is TradeBottleSummary => Boolean(item)),
+    error: error?.message ?? hydrated.error,
+    isConfigured: true,
+  };
+}
+
+export async function getMyOfferItems(): Promise<QueryResult<TradeBottleSummary>> {
+  const supabase = await createServerSupabaseClient();
+
+  if (!supabase) {
+    return { data: [], error: null, isConfigured: false };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { data: [], error: userError?.message ?? null, isConfigured: true };
+  }
+
+  const { data, error } = await supabase
+    .from("trade_offer_items")
+    .select(
+      "id,maltperi_bottle_id,manual_bottle_name,box_condition,label_condition,image_url,note,status,created_at",
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  const rows = (data ?? []) as OfferRow[];
+  const hydrated = await hydrateRawItems(
+    supabase,
+    rows.map((row) => row.id),
+    [],
+  );
+
+  return {
+    data: rows
+      .map((row) => hydrated.offers.get(row.id))
+      .filter((item): item is TradeBottleSummary => Boolean(item)),
+    error: error?.message ?? hydrated.error,
+    isConfigured: true,
+  };
+}
+
+export async function getMyWantItems(): Promise<QueryResult<TradeBottleSummary>> {
+  const supabase = await createServerSupabaseClient();
+
+  if (!supabase) {
+    return { data: [], error: null, isConfigured: false };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { data: [], error: userError?.message ?? null, isConfigured: true };
+  }
+
+  const { data, error } = await supabase
+    .from("trade_want_items")
+    .select("id,maltperi_bottle_id,manual_bottle_name,condition_note,status,created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  const rows = (data ?? []) as WantRow[];
+  const hydrated = await hydrateRawItems(
+    supabase,
+    [],
+    rows.map((row) => row.id),
+  );
+
+  return {
+    data: rows
+      .map((row) => hydrated.wants.get(row.id))
+      .filter((item): item is TradeBottleSummary => Boolean(item)),
+    error: error?.message ?? hydrated.error,
+    isConfigured: true,
+  };
+}
+
+export async function getSentInterests(): Promise<
+  QueryResult<TradeInterestListItem>
+> {
+  const supabase = await createServerSupabaseClient();
+
+  if (!supabase) {
+    return { data: [], error: null, isConfigured: false };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { data: [], error: userError?.message ?? null, isConfigured: true };
+  }
+
+  const { data, error } = await supabase
+    .from("trade_interests")
+    .select(interestSelect)
+    .eq("requester_user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  const rows = ((data ?? []) as unknown) as InterestRow[];
+  const built = await buildInterestItems(supabase, rows, "sent");
+
+  return {
+    data: built.items,
+    error: error?.message ?? built.error,
+    isConfigured: true,
+  };
+}
+
+export async function getReceivedInterests(): Promise<
+  QueryResult<TradeInterestListItem>
+> {
+  const supabase = await createServerSupabaseClient();
+
+  if (!supabase) {
+    return { data: [], error: null, isConfigured: false };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { data: [], error: userError?.message ?? null, isConfigured: true };
+  }
+
+  const { data, error } = await supabase
+    .from("trade_interests")
+    .select(interestSelect)
+    .eq("receiver_user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  const rows = ((data ?? []) as unknown) as InterestRow[];
+  const built = await buildInterestItems(supabase, rows, "received");
+
+  return {
+    data: built.items,
+    error: error?.message ?? built.error,
+    isConfigured: true,
+  };
+}
+
+type DetailResult = {
+  data: TradeInterestDetailItem | null;
+  error: string | null;
+  isConfigured: boolean;
+};
+
+export async function getTradeInterestDetail(
+  interestId: string,
+): Promise<DetailResult> {
+  const supabase = await createServerSupabaseClient();
+
+  if (!supabase) {
+    return { data: null, error: null, isConfigured: false };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { data: null, error: userError?.message ?? null, isConfigured: true };
+  }
+
+  const { data, error } = await supabase
+    .from("trade_interests")
+    .select(
+      [
+        interestSelect,
+        "canceled_at",
+        "dismissed_at",
+        "requester_completed_at",
+        "receiver_completed_at",
+        "completed_at",
+      ].join(","),
+    )
+    .eq("id", interestId)
+    .single();
+
+  if (error || !data) {
+    return {
+      data: null,
+      error: error?.message ?? "取引が見つかりません。",
+      isConfigured: true,
+    };
+  }
+
+  const row = (data as unknown) as InterestRow;
+  const userRole =
+    row.requester_user_id === user.id
+      ? "requester"
+      : row.receiver_user_id === user.id
+        ? "receiver"
+        : null;
+
+  if (!userRole) {
+    return {
+      data: null,
+      error: "この取引を表示する権限がありません。",
+      isConfigured: true,
+    };
+  }
+
+  const [built, visibleResult, reviewResult] = await Promise.all([
+    buildInterestItems(supabase, [row], userRole === "requester" ? "sent" : "received"),
+    supabase
+      .from("trade_visible_counterparty_profiles")
+      .select(
+        "trade_interest_id,counterparty_profile_public_id,counterparty_display_name,counterparty_x_followers_range,counterparty_anonymous_shipping_ok,counterparty_completed_count,counterparty_review_count,counterparty_average_rating,counterparty_cancellation_rate,counterparty_x_id",
+      )
+      .eq("trade_interest_id", interestId)
+      .maybeSingle(),
+    supabase
+      .from("trade_reviews")
+      .select("id")
+      .eq("trade_interest_id", interestId)
+      .eq("reviewer_user_id", user.id)
+      .maybeSingle(),
+  ]);
+
+  const item = built.items[0];
+
+  if (!item) {
+    return {
+      data: null,
+      error: built.error ?? "取引詳細を読み込めませんでした。",
+      isConfigured: true,
+    };
+  }
+
+  const visibleCounterparty = visibleResult.data
+    ? ownerStatsFromVisible(visibleResult.data as VisibleCounterpartyRow)
+    : null;
+
+  return {
+    data: {
+      ...item,
+      counterparty: visibleCounterparty ?? item.counterparty,
+      requester_user_id: row.requester_user_id,
+      receiver_user_id: row.receiver_user_id,
+      requester_completed_at: row.requester_completed_at ?? null,
+      receiver_completed_at: row.receiver_completed_at ?? null,
+      completed_at: row.completed_at ?? null,
+      canceled_at: row.canceled_at ?? null,
+      dismissed_at: row.dismissed_at ?? null,
+      user_role: userRole,
+      has_reviewed: Boolean(reviewResult.data),
+    },
+    error:
+      built.error ??
+      visibleResult.error?.message ??
+      (reviewResult.error && reviewResult.error.code !== "PGRST116"
+        ? reviewResult.error.message
+        : null),
+    isConfigured: true,
+  };
+}
