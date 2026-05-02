@@ -1,5 +1,12 @@
 import { notFound } from "next/navigation";
-import { CheckCircle2, Pencil, PauseCircle, Star, Truck } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Pencil,
+  PauseCircle,
+  Star,
+  Truck,
+} from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { ButtonLink } from "@/components/ui/button-link";
 import { DataStatusNote } from "@/components/ui/status-note";
@@ -36,6 +43,10 @@ export default async function PostDetailPage({
   const post = result.data[0];
   const myPost = myPostResult.data[0];
   const isMyPost = Boolean(myPost);
+  const primaryOffer = post?.offer_items[0];
+  const primaryWant = post?.want_items[0];
+  const offerName = primaryOffer?.display_bottle_name ?? "名称未設定のボトル";
+  const wantName = primaryWant?.display_bottle_name ?? "提案歓迎";
 
   if (result.isConfigured && !result.error && !post) {
     notFound();
@@ -52,12 +63,22 @@ export default async function PostDetailPage({
       {post ? (
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="grid gap-6">
-            <section className="rounded-md border border-stone-200 bg-white/82 p-5">
+            <section className="rounded-md border border-stone-200 bg-white/82 p-5 shadow-sm">
               <p className="text-sm font-medium text-stone-500">
                 {formatDate(post.published_at ?? post.created_at)}
               </p>
-              <h1 className="mt-2 text-3xl font-semibold">
-                {post.title || post.offer_items[0]?.display_bottle_name || "交換投稿"}
+              <h1 className="mt-3 grid gap-2 text-3xl font-bold leading-tight">
+                <span className="text-xs font-bold uppercase tracking-normal text-stone-500">
+                  出る
+                </span>
+                <span>{offerName}</span>
+                <span className="flex items-center gap-3 text-xl font-semibold text-stone-500">
+                  <ArrowRight size={20} aria-hidden="true" />
+                  <span className="text-xs font-bold uppercase tracking-normal">
+                    求む
+                  </span>
+                  {wantName}
+                </span>
               </h1>
               {post.condition_note ? (
                 <div className="mt-6 border-t border-stone-100 pt-5">
@@ -218,7 +239,9 @@ function OfferDetail({ item }: { item: PublicTradePostOfferItem }) {
       </h3>
       <p className="mt-2 text-stone-700">{bottleSubline(item)}</p>
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <Info label="相場中央値" value={formatPrice(item.median_price)} />
+        {item.median_price != null ? (
+          <Info label="相場中央値" value={formatPrice(item.median_price)} />
+        ) : null}
         <Info label="箱状態" value={formatBoxCondition(item.box_condition)} />
         <Info label="ラベル" value={formatLabelCondition(item.label_condition)} />
       </div>
@@ -238,9 +261,11 @@ function WantDetail({ item }: { item: PublicTradePostWantItem }) {
         {item.display_bottle_name ?? "名称未設定のボトル"}
       </h3>
       <p className="mt-2 text-stone-700">{bottleSubline(item)}</p>
-      <div className="mt-5 max-w-xs">
-        <Info label="相場中央値" value={formatPrice(item.median_price)} />
-      </div>
+      {item.median_price != null ? (
+        <div className="mt-5 max-w-xs">
+          <Info label="相場中央値" value={formatPrice(item.median_price)} />
+        </div>
+      ) : null}
       {item.condition_note ? (
         <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-stone-700">
           {item.condition_note}

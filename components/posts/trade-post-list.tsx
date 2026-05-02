@@ -4,7 +4,7 @@ import type { PublicTradePost } from "@/lib/types/trade-posts";
 
 export function TradePostList({
   posts,
-  className = "grid gap-4 md:grid-cols-2",
+  className = "grid gap-3 lg:grid-cols-2",
 }: {
   posts: PublicTradePost[];
   className?: string;

@@ -4,10 +4,12 @@ export function SearchForm({
   action,
   placeholder,
   defaultValue,
+  submitButton = "always",
 }: {
   action: string;
   placeholder: string;
   defaultValue?: string;
+  submitButton?: "always" | "desktop";
 }) {
   return (
     <form action={action} className="flex flex-col gap-2 sm:flex-row">
@@ -26,7 +28,9 @@ export function SearchForm({
       </label>
       <button
         type="submit"
-        className="inline-flex h-12 items-center justify-center rounded-md bg-stone-950 px-5 text-sm font-semibold text-white transition hover:bg-stone-800"
+        className={`h-12 items-center justify-center rounded-md bg-stone-950 px-5 text-sm font-semibold text-white transition hover:bg-stone-800 ${
+          submitButton === "desktop" ? "hidden lg:inline-flex" : "inline-flex"
+        }`}
       >
         検索
       </button>

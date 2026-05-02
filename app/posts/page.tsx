@@ -17,8 +17,10 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
     <PageShell>
       <div className="grid gap-5 sm:gap-6">
         <div>
-          <p className="text-sm font-medium text-stone-500">Trade posts</p>
-          <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">
+          <p className="text-sm font-bold uppercase tracking-normal text-stone-500">
+            Trade posts
+          </p>
+          <h1 className="mt-1 text-2xl font-bold sm:text-3xl">
             交換投稿を探す
           </h1>
           <p className="mt-3 max-w-2xl text-stone-700">
