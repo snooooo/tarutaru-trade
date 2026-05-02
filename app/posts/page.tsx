@@ -15,10 +15,12 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
 
   return (
     <PageShell>
-      <div className="grid gap-6">
+      <div className="grid gap-5 sm:gap-6">
         <div>
           <p className="text-sm font-medium text-stone-500">Trade posts</p>
-          <h1 className="mt-1 text-3xl font-semibold">交換投稿を探す</h1>
+          <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">
+            交換投稿を探す
+          </h1>
           <p className="mt-3 max-w-2xl text-stone-700">
             「出る / 求む」が同じ投稿にまとまった公開一覧です。X IDは相談開始まで表示されません。
           </p>

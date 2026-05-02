@@ -21,9 +21,9 @@ export function TradePostCard({ post }: { post: PublicTradePost }) {
   return (
     <Link
       href={`/posts/${post.id}`}
-      className="group grid gap-4 rounded-md border border-stone-200 bg-white/82 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-md"
+      className="group grid gap-3 rounded-md border border-stone-200 bg-white/82 p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-md sm:gap-4 sm:p-4"
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2">
         <span className="inline-flex items-center gap-2 rounded bg-stone-100 px-2 py-1 text-xs font-medium text-stone-600">
           <Handshake size={13} aria-hidden="true" />
           交換投稿
@@ -34,7 +34,7 @@ export function TradePostCard({ post }: { post: PublicTradePost }) {
       </div>
 
       <div>
-        <h3 className="line-clamp-2 text-lg font-semibold text-stone-950">
+        <h3 className="line-clamp-2 text-base font-semibold text-stone-950 sm:text-lg">
           {post.title || primaryOffer?.display_bottle_name || "交換投稿"}
         </h3>
         {hints.length ? (
@@ -56,14 +56,14 @@ export function TradePostCard({ post }: { post: PublicTradePost }) {
         ) : null}
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-2 sm:gap-3 md:grid-cols-2">
         <OfferPanel items={post.offer_items} />
         <WantPanel items={post.want_items} primaryWant={primaryWant} />
       </div>
 
-      <div className="flex items-center justify-between border-t border-stone-100 pt-3 text-sm text-stone-600">
-        <span>{post.owner_display_name ?? "ななしさん"}</span>
-        <span className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-stone-100 pt-3 text-sm text-stone-600">
+        <span className="min-w-0 truncate">{post.owner_display_name ?? "ななしさん"}</span>
+        <span className="flex shrink-0 items-center gap-3">
           <span className="flex items-center gap-1">
             <Star size={14} aria-hidden="true" />
             {post.owner_average_rating?.toFixed(1) ?? "-"}

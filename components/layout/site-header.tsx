@@ -17,15 +17,15 @@ export async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-20 border-b border-stone-200/80 bg-[#f7f4ed]/92 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:px-6">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 font-semibold"
+          className="flex min-w-0 shrink items-center gap-2 font-semibold"
         >
-          <span className="flex size-9 items-center justify-center rounded-md bg-stone-950 text-white">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-stone-950 text-white">
             <Barrel size={20} aria-hidden="true" />
           </span>
-          <span className="whitespace-nowrap">TaruTaru Trade</span>
+          <span className="truncate whitespace-nowrap">TaruTaru Trade</span>
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">
           <ButtonLink href="/posts" variant="ghost">
@@ -37,8 +37,12 @@ export async function SiteHeader() {
             </ButtonLink>
           ) : null}
         </nav>
-        <div className="flex items-center gap-2">
-          <ButtonLink href="/posts" variant="secondary" className="gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <ButtonLink
+            href="/posts"
+            variant="secondary"
+            className="gap-1.5 px-3 sm:gap-2 sm:px-4"
+          >
             <Search size={16} aria-hidden="true" />
             探す
           </ButtonLink>
