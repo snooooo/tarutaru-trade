@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { ArrowRight, Minus, Plus } from "lucide-react";
 import {
   createTradePostAction,
@@ -24,18 +25,40 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
   const [wantCount, setWantCount] = useState(
     Math.min(Math.max(editableWants.length, 1), MAX_ITEMS),
   );
+  const [clientError, setClientError] = useState<string | null>(null);
   const isEdit = Boolean(post);
+  const displayError = clientError ?? error;
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    const formData = new FormData(event.currentTarget);
+    const hasOfferBottle = formData
+      .getAll("offer_manual_bottle_name")
+      .some((value) => typeof value === "string" && value.trim());
+
+    if (!hasOfferBottle) {
+      event.preventDefault();
+      setClientError("出るボトル名を1件以上入力してください。");
+      event.currentTarget
+        .querySelector<HTMLInputElement>('input[name="offer_manual_bottle_name"]')
+        ?.focus();
+      return;
+    }
+
+    setClientError(null);
+  }
 
   return (
     <form
       action={isEdit ? updateTradePostAction : createTradePostAction}
+      noValidate
+      onSubmit={handleSubmit}
       className="grid gap-6 rounded-md border border-stone-200 bg-white/82 p-5 shadow-sm"
     >
       {post ? <input type="hidden" name="trade_post_id" value={post.id} /> : null}
 
-      {error ? (
+      {displayError ? (
         <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
-          {error}
+          {displayError}
         </p>
       ) : null}
 
@@ -131,12 +154,35 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
       </section>
 
       <div className="flex justify-end border-t border-stone-100 pt-5">
-        <button className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800">
-          {isEdit ? "交換投稿を保存" : "交換投稿を公開"}
-          <ArrowRight size={16} aria-hidden="true" />
-        </button>
+        <div className="grid w-full gap-3 sm:w-auto">
+          {displayError ? (
+            <p className="text-sm font-medium text-red-700">{displayError}</p>
+          ) : null}
+          <SubmitButton isEdit={isEdit} />
+        </div>
       </div>
     </form>
+  );
+}
+
+function SubmitButton({ isEdit }: { isEdit: boolean }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:cursor-wait disabled:bg-stone-400"
+    >
+      {pending
+        ? isEdit
+          ? "保存中"
+          : "公開中"
+        : isEdit
+          ? "交換投稿を保存"
+          : "交換投稿を公開"}
+      <ArrowRight size={16} aria-hidden="true" />
+    </button>
   );
 }
 
@@ -174,7 +220,7 @@ function OfferFields({
         <span className="text-sm font-medium text-stone-700">ボトル名</span>
         <input
           name="offer_manual_bottle_name"
-          required={required}
+          aria-required={required}
           maxLength={120}
           defaultValue={item?.manual_bottle_name ?? item?.display_bottle_name ?? ""}
           className="h-11 rounded-md border border-stone-300 bg-white px-3 outline-none transition focus:border-stone-950"
