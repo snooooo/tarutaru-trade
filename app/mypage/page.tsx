@@ -91,6 +91,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
   const completedTrades = allInterests.filter(
     (interest) => interest.status === "completed",
   );
+  const hasLegacyItems = offers.data.length > 0 || wants.data.length > 0;
   const visibleTrades = [...activeTrades, ...completedTrades]
     .sort(
       (a, b) =>
@@ -182,28 +183,34 @@ export default async function MyPage({ searchParams }: MyPageProps) {
 
         <TradePostSection posts={tradePosts.data} />
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <BottleSection
-            title="旧: 自分の出品"
-            description="既存データ確認用です。今後の主導線は交換投稿です。"
-            emptyTitle="出せるボトルはまだありません"
-            emptyText="最初の1本を登録すると、相手から興味ありを受け取れるようになります。"
-            actionHref="/mypage/offers/new"
-            actionLabel="出せるボトルを登録"
-            items={offers.data}
-            kind="offer"
-          />
-          <BottleSection
-            title="旧: 自分の募集"
-            description="既存データ確認用です。今後の主導線は交換投稿です。"
-            emptyTitle="募集はまだありません"
-            emptyText="探しているボトルを登録すると、相手が候補を添えて興味ありを送れます。"
-            actionHref="/mypage/wants/new"
-            actionLabel="欲しいボトルを登録"
-            items={wants.data}
-            kind="want"
-          />
-        </div>
+        {hasLegacyItems ? (
+          <div className="grid gap-6 lg:grid-cols-2">
+            {offers.data.length ? (
+              <BottleSection
+                title="旧データ: 自分の出品"
+                description="Phase 9以前の単体出品です。新しく作る場合は交換投稿を使ってください。"
+                emptyTitle="旧出品はありません"
+                emptyText="現在の主導線は交換投稿です。"
+                actionHref="/mypage/posts/new"
+                actionLabel="交換投稿を作る"
+                items={offers.data}
+                kind="offer"
+              />
+            ) : null}
+            {wants.data.length ? (
+              <BottleSection
+                title="旧データ: 自分の募集"
+                description="Phase 9以前の単体募集です。新しく作る場合は交換投稿を使ってください。"
+                emptyTitle="旧募集はありません"
+                emptyText="現在の主導線は交換投稿です。"
+                actionHref="/mypage/posts/new"
+                actionLabel="交換投稿を作る"
+                items={wants.data}
+                kind="want"
+              />
+            ) : null}
+          </div>
+        ) : null}
 
         <InterestAccessSection
           sentInterests={sentInterests.data}

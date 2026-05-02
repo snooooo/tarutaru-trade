@@ -34,9 +34,9 @@ export function InterestCreateForm({
             興味ありを送るには、自分が出せるボトルを1本以上登録してください。
           </p>
         </div>
-        <ButtonLink href="/mypage/offers/new" className="gap-2">
+        <ButtonLink href="/mypage/posts/new" className="gap-2">
           <PlusCircle size={16} aria-hidden="true" />
-          出せるボトルを登録
+          交換投稿を作る
         </ButtonLink>
       </section>
     );
@@ -98,9 +98,9 @@ export function InterestCreateForm({
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
-        <ButtonLink href="/mypage/offers/new" variant="secondary" className="gap-2">
+        <ButtonLink href="/mypage/posts/new" variant="secondary" className="gap-2">
           <PlusCircle size={16} aria-hidden="true" />
-          出せるボトルを追加
+          交換投稿を作る
         </ButtonLink>
         <button className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800">
           トレードに興味ありを送る
