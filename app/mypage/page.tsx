@@ -17,24 +17,12 @@ import { DataStatusNote } from "@/components/ui/status-note";
 import { updateTradePostVisibilityAction } from "@/lib/actions/trade-post-actions";
 import { requireCompleteTradeProfile } from "@/lib/auth/require-user";
 import {
-  getMyOfferItems,
-  getMyWantItems,
   getReceivedInterests,
   getSentInterests,
 } from "@/lib/data/interests";
-import {
-  bottleSubline,
-  formatBoxCondition,
-  formatDate,
-  formatLabelCondition,
-  formatPrice,
-} from "@/lib/format/trade";
+import { bottleSubline, formatDate } from "@/lib/format/trade";
 import { getMyTradePosts } from "@/lib/data/trade-posts";
-import type {
-  TradeBottleSummary,
-  TradeInterestListItem,
-  TradeInterestStatus,
-} from "@/lib/types/interests";
+import type { TradeInterestListItem, TradeInterestStatus } from "@/lib/types/interests";
 import type { MyTradePost } from "@/lib/types/trade-posts";
 
 const tradeStatusLabels: Record<TradeInterestStatus, string> = {
@@ -44,16 +32,6 @@ const tradeStatusLabels: Record<TradeInterestStatus, string> = {
   canceled: "キャンセル済み",
   completion_requested: "完了確認中",
   completed: "完了",
-};
-
-const itemStatusLabels: Record<string, string> = {
-  public: "公開中",
-  private: "非公開",
-  trading: "取引中",
-  in_trade: "取引中",
-  closed: "終了",
-  traded: "交換済み",
-  archived: "終了",
 };
 
 const postStatusLabels: Record<string, string> = {
@@ -71,10 +49,8 @@ export default async function MyPage({ searchParams }: MyPageProps) {
   const params = await searchParams;
   await requireCompleteTradeProfile("/mypage");
 
-  const [tradePosts, offers, wants, sentInterests, receivedInterests] = await Promise.all([
+  const [tradePosts, sentInterests, receivedInterests] = await Promise.all([
     getMyTradePosts(),
-    getMyOfferItems(),
-    getMyWantItems(),
     getSentInterests(),
     getReceivedInterests(),
   ]);
@@ -91,7 +67,6 @@ export default async function MyPage({ searchParams }: MyPageProps) {
   const completedTrades = allInterests.filter(
     (interest) => interest.status === "completed",
   );
-  const hasLegacyItems = offers.data.length > 0 || wants.data.length > 0;
   const visibleTrades = [...activeTrades, ...completedTrades]
     .sort(
       (a, b) =>
@@ -165,15 +140,11 @@ export default async function MyPage({ searchParams }: MyPageProps) {
         <DataStatusNote
           isConfigured={
             tradePosts.isConfigured &&
-            offers.isConfigured &&
-            wants.isConfigured &&
             sentInterests.isConfigured &&
             receivedInterests.isConfigured
           }
           error={
             tradePosts.error ??
-            offers.error ??
-            wants.error ??
             sentInterests.error ??
             receivedInterests.error
           }
@@ -182,35 +153,6 @@ export default async function MyPage({ searchParams }: MyPageProps) {
         <MyItemUpdateMessage updated={params.updated} error={params.error} />
 
         <TradePostSection posts={tradePosts.data} />
-
-        {hasLegacyItems ? (
-          <div className="grid gap-6 lg:grid-cols-2">
-            {offers.data.length ? (
-              <BottleSection
-                title="旧データ: 自分の出品"
-                description="Phase 9以前の単体出品です。新しく作る場合は交換投稿を使ってください。"
-                emptyTitle="旧出品はありません"
-                emptyText="現在の主導線は交換投稿です。"
-                actionHref="/mypage/posts/new"
-                actionLabel="交換投稿を作る"
-                items={offers.data}
-                kind="offer"
-              />
-            ) : null}
-            {wants.data.length ? (
-              <BottleSection
-                title="旧データ: 自分の募集"
-                description="Phase 9以前の単体募集です。新しく作る場合は交換投稿を使ってください。"
-                emptyTitle="旧募集はありません"
-                emptyText="現在の主導線は交換投稿です。"
-                actionHref="/mypage/posts/new"
-                actionLabel="交換投稿を作る"
-                items={wants.data}
-                kind="want"
-              />
-            ) : null}
-          </div>
-        ) : null}
 
         <InterestAccessSection
           sentInterests={sentInterests.data}
@@ -410,116 +352,6 @@ function TradePostRow({ post }: { post: MyTradePost }) {
   );
 }
 
-function BottleSection({
-  title,
-  description,
-  emptyTitle,
-  emptyText,
-  actionHref,
-  actionLabel,
-  items,
-  kind,
-}: {
-  title: string;
-  description: string;
-  emptyTitle: string;
-  emptyText: string;
-  actionHref: string;
-  actionLabel: string;
-  items: TradeBottleSummary[];
-  kind: "offer" | "want";
-}) {
-  return (
-    <section className="grid gap-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold">{title}</h2>
-          <p className="mt-1 text-sm text-stone-600">{description}</p>
-        </div>
-        <ButtonLink href={actionHref} variant="secondary" className="gap-2">
-          <PlusCircle size={16} aria-hidden="true" />
-          {actionLabel}
-        </ButtonLink>
-      </div>
-
-      {items.length ? (
-        <div className="grid gap-3">
-          {items.slice(0, 5).map((item) => (
-            <BottleRow key={item.id} item={item} kind={kind} />
-          ))}
-        </div>
-      ) : (
-        <EmptyState
-          title={emptyTitle}
-          text={emptyText}
-          href={actionHref}
-          label={actionLabel}
-        />
-      )}
-    </section>
-  );
-}
-
-function BottleRow({
-  item,
-  kind,
-}: {
-  item: TradeBottleSummary;
-  kind: "offer" | "want";
-}) {
-  const subline = bottleSubline(item);
-  const editHref =
-    kind === "offer"
-      ? `/mypage/offers/${item.id}/edit`
-      : `/mypage/wants/${item.id}/edit`;
-
-  return (
-    <article className="grid gap-3 rounded-md border border-stone-200 bg-white/82 p-4 shadow-sm">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-medium text-stone-500">
-            {formatDate(item.created_at)}
-          </p>
-          <h3 className="mt-1 font-semibold">
-            {item.display_bottle_name ?? "名称未設定のボトル"}
-          </h3>
-          {subline ? (
-            <p className="mt-1 text-sm text-stone-600">{subline}</p>
-          ) : null}
-        </div>
-        <StatusBadge label={formatItemStatus(item.status)} />
-      </div>
-
-      <div className="flex flex-wrap gap-2 text-xs text-stone-700">
-        {kind === "offer" ? (
-          <>
-            <span className="rounded bg-stone-50 px-2 py-1">
-              {formatBoxCondition(item.box_condition)}
-            </span>
-            <span className="rounded bg-stone-50 px-2 py-1">
-              ラベル {formatLabelCondition(item.label_condition)}
-            </span>
-          </>
-        ) : (
-          <span className="rounded bg-stone-50 px-2 py-1">
-            {item.condition_note || "希望条件の記載なし"}
-          </span>
-        )}
-        <span className="rounded bg-stone-50 px-2 py-1">
-          {formatPrice(item.median_price)}
-        </span>
-      </div>
-
-      <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-        <ButtonLink href={editHref} variant="secondary" className="gap-2">
-          <Pencil size={15} aria-hidden="true" />
-          管理・編集
-        </ButtonLink>
-      </div>
-    </article>
-  );
-}
-
 function MyItemUpdateMessage({
   updated,
   error,
@@ -528,8 +360,6 @@ function MyItemUpdateMessage({
   error?: string;
 }) {
   const messages: Record<string, string> = {
-    offer_withdrawn: "出品を非公開にしました。",
-    want_withdrawn: "募集を非公開にしました。",
     post_private: "交換投稿の受付を停止しました。",
     post_public: "交換投稿を再公開しました。",
     post_updated: "交換投稿を更新しました。",
@@ -703,8 +533,4 @@ function StatusBadge({ label }: { label: string }) {
       {label}
     </span>
   );
-}
-
-function formatItemStatus(status: string | null | undefined) {
-  return status ? (itemStatusLabels[status] ?? status) : "状態未設定";
 }

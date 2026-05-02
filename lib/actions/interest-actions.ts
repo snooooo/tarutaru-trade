@@ -34,7 +34,7 @@ function stringValues(formData: FormData, key: string) {
 }
 
 export async function createInterestAction(formData: FormData) {
-  const returnPath = safePath(formData.get("return_path"), "/offers");
+  const returnPath = safePath(formData.get("return_path"), "/posts");
   await requireCompleteTradeProfile(returnPath);
   const supabase = await createServerSupabaseClient();
 
