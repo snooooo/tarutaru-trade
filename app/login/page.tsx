@@ -5,6 +5,7 @@ type LoginPageProps = {
   searchParams: Promise<{
     next?: string;
     error?: string;
+    signup?: string;
   }>;
 };
 
@@ -22,6 +23,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             掲載、興味あり、プロフィール編集にはログインが必要です。
           </p>
         </div>
+        {params.signup === "check_email" ? (
+          <p className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+            確認メールを送信しました。メール内のリンクを開いてからログインしてください。
+          </p>
+        ) : null}
         <AuthForm mode="login" nextPath={nextPath} error={params.error} />
       </section>
     </PageShell>

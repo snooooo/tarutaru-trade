@@ -33,6 +33,14 @@ export async function loginAction(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    if (/email.*not.*confirm|confirm/i.test(error.message)) {
+      redirectWithError(
+        "/login",
+        "確認メールのリンクを開いてからログインしてください。",
+        next,
+      );
+    }
+
     redirectWithError("/login", "メールアドレスまたはパスワードを確認してください。", next);
   }
 
@@ -50,7 +58,7 @@ export async function signupAction(formData: FormData) {
   }
 
   const origin = (await headers()).get("origin") ?? "http://localhost:3000";
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -62,6 +70,14 @@ export async function signupAction(formData: FormData) {
 
   if (error) {
     redirectWithError("/signup", error.message, next);
+  }
+
+  if (!data.session) {
+    const params = new URLSearchParams({
+      next,
+      signup: "check_email",
+    });
+    redirect(`/login?${params.toString()}`);
   }
 
   redirect(`/settings/profile?next=${encodeURIComponent(next)}&signup=1`);
