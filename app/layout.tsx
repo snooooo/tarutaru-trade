@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TaruTaru Trade",
+  title: "TaruTaruTrade",
   description: "Whisky bottle trade board powered by MaltPeri.",
 };
 

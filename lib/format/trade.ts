@@ -41,13 +41,15 @@ export function formatLabelCondition(value: string | null | undefined) {
 
 export function formatFollowersRange(value: string | null | undefined) {
   const labels: Record<string, string> = {
-    under_100: "X 100未満",
-    "100_499": "X 100-499",
-    "500_999": "X 500-999",
-    "1000_plus": "X 1000以上",
+    under_100: "Xフォロワー数100未満",
+    "100_199": "Xフォロワー数100〜199",
+    "200_plus": "Xフォロワー数200以上",
+    "100_499": "Xフォロワー数100〜199",
+    "500_999": "Xフォロワー数200以上",
+    "1000_plus": "Xフォロワー数200以上",
   };
 
-  return value ? (labels[value] ?? value) : "X 未設定";
+  return value ? (labels[value] ?? value) : "Xフォロワー数 未設定";
 }
 
 export function bottleSubline(item: {

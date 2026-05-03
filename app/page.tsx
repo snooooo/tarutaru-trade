@@ -1,4 +1,4 @@
-import { Plus, Search, ShieldCheck } from "lucide-react";
+import { Check, Plus, Search, ShieldCheck } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { TradePostList } from "@/components/posts/trade-post-list";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -18,11 +18,24 @@ export default async function Home() {
             powered by MaltPeri
           </p>
           <h1 className="text-[36px] font-bold leading-none tracking-normal text-stone-950 lg:text-5xl">
-            TaruTaru Trade
+            TaruTaruTrade
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-8 text-stone-700">
-            ウイスキー交換のための匿名プラットフォーム。相談開始後にX IDを相互開示。
-          </p>
+          <div className="mt-5 grid max-w-xl gap-2 text-base leading-7 text-stone-700">
+            <p className="flex gap-2">
+              <Check
+                className="mt-1 size-4 shrink-0 text-stone-950"
+                aria-hidden="true"
+              />
+              <span>ウイスキー交換のための半匿名プラットフォーム。</span>
+            </p>
+            <p className="flex gap-2">
+              <Check
+                className="mt-1 size-4 shrink-0 text-stone-950"
+                aria-hidden="true"
+              />
+              <span>募集は匿名OK。相談開始後にXアカウントを相互開示。</span>
+            </p>
+          </div>
         </div>
         <div className="rounded-md border border-stone-200 bg-white/86 p-4 shadow-sm">
           <SearchForm
