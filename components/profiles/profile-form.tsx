@@ -9,8 +9,8 @@ type ProfileFormProps = {
 
 const followerRanges = [
   "under_100",
-  "100_199",
-  "200_plus",
+  "100_499",
+  "500_999",
 ] as const;
 
 export function ProfileForm({ profile, nextPath }: ProfileFormProps) {

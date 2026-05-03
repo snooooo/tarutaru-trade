@@ -1,7 +1,7 @@
 export const X_FOLLOWERS_RANGES = [
   "under_100",
-  "100_199",
-  "200_plus",
+  "100_499",
+  "500_999",
 ] as const;
 
 export type XFollowersRange = (typeof X_FOLLOWERS_RANGES)[number];

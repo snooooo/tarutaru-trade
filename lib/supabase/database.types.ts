@@ -1352,13 +1352,7 @@ export type Database = {
       trade_interest_target_type: "offer" | "want"
       trade_item_status: "public" | "private" | "trading" | "closed"
       trade_label_condition: "good" | "minor_damage" | "damaged"
-      trade_x_followers_range:
-        | "under_100"
-        | "100_199"
-        | "200_plus"
-        | "100_499"
-        | "500_999"
-        | "1000_plus"
+      trade_x_followers_range: "under_100" | "100_499" | "500_999" | "1000_plus"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1514,14 +1508,7 @@ export const Constants = {
       trade_interest_target_type: ["offer", "want"],
       trade_item_status: ["public", "private", "trading", "closed"],
       trade_label_condition: ["good", "minor_damage", "damaged"],
-      trade_x_followers_range: [
-        "under_100",
-        "100_199",
-        "200_plus",
-        "100_499",
-        "500_999",
-        "1000_plus",
-      ],
+      trade_x_followers_range: ["under_100", "100_499", "500_999", "1000_plus"],
     },
   },
 } as const

@@ -42,8 +42,6 @@ export function formatLabelCondition(value: string | null | undefined) {
 export function formatFollowersRange(value: string | null | undefined) {
   const labels: Record<string, string> = {
     under_100: "Xフォロワー数100未満",
-    "100_199": "Xフォロワー数100〜199",
-    "200_plus": "Xフォロワー数200以上",
     "100_499": "Xフォロワー数100〜199",
     "500_999": "Xフォロワー数200以上",
     "1000_plus": "Xフォロワー数200以上",
