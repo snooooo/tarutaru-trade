@@ -22,10 +22,21 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <p className="mt-3 text-stone-700">
             掲載、興味あり、プロフィール編集にはログインが必要です。
           </p>
+          <p className="mt-2 text-sm text-stone-500">
+            <a
+              href="https://maltperi.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4"
+            >
+              MaltPeri
+            </a>{" "}
+            のアカウントをお持ちの方は、そのままログインできます。
+          </p>
         </div>
         {params.signup === "check_email" ? (
           <p className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
-            確認メールを送信しました。メール内のリンクを開いてからログインしてください。
+            確認メールをMaltPeri名義で送信しました。メール内のリンクを開いてからログインしてください。
           </p>
         ) : null}
         <AuthForm mode="login" nextPath={nextPath} error={params.error} />
