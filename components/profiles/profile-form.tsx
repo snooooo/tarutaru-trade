@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { upsertTradeProfileAction } from "@/lib/actions/profile-actions";
 import type { TradeProfile } from "@/lib/types/profile";
 import { formatProfileFollowersRange } from "@/lib/format/profile";
@@ -81,7 +82,26 @@ export function ProfileForm({ profile, nextPath }: ProfileFormProps) {
           defaultChecked={Boolean(profile?.terms_accepted_at)}
         />
         <span>
-          <span className="block font-medium text-stone-950">利用規約に同意</span>
+          <span className="block font-medium text-stone-950">
+            <Link
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4 hover:text-stone-700"
+            >
+              利用規約
+            </Link>
+            および
+            <Link
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4 hover:text-stone-700"
+            >
+              プライバシーポリシー
+            </Link>
+            に同意
+          </span>
           <span className="mt-1 block leading-6">
             掲載と興味ありへ進むには、X ID、フォロワー数レンジ、匿名配送可否とあわせて同意が必要です。
           </span>
