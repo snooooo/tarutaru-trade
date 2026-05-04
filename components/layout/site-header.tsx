@@ -24,7 +24,7 @@ export async function SiteHeader() {
           <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-stone-950 text-white">
             <Barrel size={19} aria-hidden="true" />
           </span>
-          <span className="truncate whitespace-nowrap">TaruTaruTrade</span>
+          <span className="whitespace-nowrap">TaruTaruTrade</span>
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">
           <ButtonLink href="/posts" variant="ghost">
@@ -39,7 +39,7 @@ export async function SiteHeader() {
         <div className="flex shrink-0 items-center gap-1.5 lg:gap-2">
           <Link
             href="/posts"
-            className="inline-flex size-10 items-center justify-center rounded-md border border-stone-300 bg-white/80 text-stone-950 transition hover:bg-white lg:h-11 lg:w-auto lg:gap-2 lg:px-3 lg:text-sm lg:font-semibold"
+            className="hidden items-center justify-center rounded-md border border-stone-300 bg-white/80 text-stone-950 transition hover:bg-white lg:inline-flex lg:h-11 lg:w-auto lg:gap-2 lg:px-3 lg:text-sm lg:font-semibold"
             aria-label="投稿を探す"
             title="投稿を探す"
           >
@@ -92,7 +92,7 @@ export async function SiteHeader() {
             <>
               <Link
                 href="/login"
-                className="inline-flex h-10 items-center justify-center rounded-md border border-stone-300 bg-white/80 px-4 text-sm font-bold leading-none text-stone-950 transition hover:bg-white lg:hidden"
+                className="inline-flex h-10 items-center justify-center px-2 text-sm font-semibold text-stone-700 transition hover:text-stone-950 lg:hidden"
               >
                 ログイン
               </Link>
