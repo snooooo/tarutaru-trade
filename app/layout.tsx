@@ -24,7 +24,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <div style={{
+          background: "#ff6b00",
+          color: "#fff",
+          textAlign: "center",
+          padding: "10px 16px",
+          fontSize: "14px",
+          fontWeight: "bold",
+          letterSpacing: "0.03em",
+          lineHeight: "1.5",
+        }}>
+          🚧 このサービスは現在試験運転中です。表示されているデータはすべてサンプルです。
+        </div>
+        {children}
+      </body>
     </html>
   );
 }
