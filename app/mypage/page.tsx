@@ -159,6 +159,16 @@ export default async function MyPage({ searchParams }: MyPageProps) {
           receivedInterests={receivedInterests.data}
         />
 
+        <section className="grid gap-2 rounded-md border border-stone-200 bg-white/82 p-4 text-sm text-stone-600 shadow-sm sm:flex sm:items-center sm:justify-between">
+          <p>アカウントを使わなくなった場合は退会できます。</p>
+          <Link
+            href="/settings/account/delete"
+            className="text-rose-700 underline underline-offset-2 hover:text-rose-900"
+          >
+            アカウントを削除する
+          </Link>
+        </section>
+
         <section id="active-trades" className="grid gap-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
