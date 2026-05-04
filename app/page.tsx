@@ -1,4 +1,4 @@
-import { Check, Plus, Search, ShieldCheck } from "lucide-react";
+import { Check, Plus, ShieldCheck } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { TradePostList } from "@/components/posts/trade-post-list";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -41,12 +41,11 @@ export default async function Home() {
           <SearchForm
             action="/posts"
             placeholder="ボトル名・蒸留所・地域・条件で検索"
-            submitButton="desktop"
+            submitButton="always"
           />
           <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-1">
             <ButtonLink href="/posts" variant="secondary" className="gap-2">
-              <Search size={16} aria-hidden="true" />
-              投稿を探す
+              投稿一覧
             </ButtonLink>
             <ButtonLink href="/mypage/posts/new" className="gap-2">
               <Plus size={16} aria-hidden="true" />
@@ -65,18 +64,18 @@ export default async function Home() {
 
       <div className="mt-9 grid gap-6">
         <section className="grid content-start gap-5">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-sm font-bold uppercase tracking-normal text-stone-500">
-                New posts
-              </p>
-              <h2 className="mt-1 text-2xl font-bold">新着交換投稿</h2>
-            </div>
+          <div>
+            <p className="text-sm font-bold uppercase tracking-normal text-stone-500">
+              New posts
+            </p>
+            <h2 className="mt-1 text-2xl font-bold">新着交換投稿</h2>
+          </div>
+          <TradePostList posts={posts.data} />
+          <div className="flex justify-center">
             <ButtonLink href="/posts" variant="ghost">
               すべて見る
             </ButtonLink>
           </div>
-          <TradePostList posts={posts.data} />
         </section>
       </div>
     </PageShell>

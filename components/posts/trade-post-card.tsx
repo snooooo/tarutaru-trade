@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Handshake, Star, Truck } from "lucide-react";
+import { ArrowRight, CheckCircle2, Star, Truck } from "lucide-react";
 import {
   bottleSubline,
   formatBoxCondition,
@@ -15,28 +15,13 @@ import type {
 
 export function TradePostCard({ post }: { post: PublicTradePost }) {
   const primaryWant = post.want_items[0];
-  const hints = buildPostHints(post);
 
   return (
     <Link
       href={`/posts/${post.id}`}
       className="group grid gap-3 rounded-md border border-stone-200 bg-white/88 p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-stone-300 hover:bg-white hover:shadow-md sm:p-4"
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-          <span className="inline-flex items-center gap-1.5 rounded bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-600">
-            <Handshake size={13} aria-hidden="true" />
-            交換投稿
-          </span>
-          {hints.map((hint) => (
-            <span
-              key={hint}
-              className="rounded bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-700"
-            >
-              {hint}
-            </span>
-          ))}
-        </div>
+      <div className="flex items-start justify-end gap-2">
         <p className="text-xs font-medium text-stone-500">
           {formatDate(post.published_at ?? post.created_at)}
         </p>
@@ -81,32 +66,6 @@ export function TradePostCard({ post }: { post: PublicTradePost }) {
   );
 }
 
-function buildPostHints(post: PublicTradePost) {
-  const hints: string[] = [];
-
-  if (!post.want_items.length) {
-    hints.push("提案歓迎");
-  } else if (post.want_items.length > 1) {
-    hints.push("求む候補複数");
-  }
-
-  if (post.offer_items.length > 1) {
-    hints.push("出る候補複数");
-  }
-
-  if (post.condition_note?.trim()) {
-    hints.push("補足あり");
-  }
-
-  if (
-    post.offer_items.some((item) => item.median_price != null) ||
-    post.want_items.some((item) => item.median_price != null)
-  ) {
-    hints.push("相場データあり");
-  }
-
-  return hints.slice(0, 4);
-}
 
 function OfferPanel({ items }: { items: PublicTradePostOfferItem[] }) {
   const visibleItems = items.slice(0, 2);

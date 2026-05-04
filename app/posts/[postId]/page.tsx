@@ -98,8 +98,9 @@ export default async function PostDetailPage({
 
             {post.condition_note ? (
               <section className="rounded-md border border-stone-200 bg-white/82 p-5">
-                <h2 className="font-semibold">補足条件</h2>
-                <p className="mt-2 whitespace-pre-wrap text-stone-700">
+                <h2 className="font-semibold">交換全体への補足</h2>
+                <p className="mt-1 text-xs text-stone-500">出る・求む両方にかかる条件や補足です</p>
+                <p className="mt-3 whitespace-pre-wrap text-stone-700">
                   {post.condition_note}
                 </p>
               </section>
