@@ -226,8 +226,8 @@ export async function getMyTradePosts(): Promise<QueryResult<MyTradePost>> {
     error: userError,
   } = await loose.auth.getUser();
 
-  if (userError || !user) {
-    return { data: [], error: userError?.message ?? null, isConfigured: true };
+  if (!user) {
+    return { data: [], error: null, isConfigured: true };
   }
 
   const postResult = await loose
