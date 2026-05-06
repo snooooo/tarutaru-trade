@@ -76,7 +76,28 @@ export default function TermsPage() {
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第3条（投稿および利用者の責任）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第3条（有料機能・サブスクリプション）</h2>
+          <ol className="grid list-decimal gap-2 pl-5 leading-7">
+            <li>
+              本サービスは、将来的に一部の機能を有料化またはサブスクリプション制（以下「有料プラン」）として提供することがあります。
+            </li>
+            <li>
+              有料プランの料金、決済方法、提供内容、解約条件等は、別途定める案内に従うものとします。
+            </li>
+            <li>
+              有料プランの料金は、事前の告知をもって変更することがあります。
+            </li>
+            <li>
+              利用者都合による解約の場合、原則として既払い料金の返金は行いません。ただし、法令に別段の定めがある場合はこの限りではありません。
+            </li>
+            <li>
+              決済に関するトラブルについては、利用者と決済事業者の間で解決するものとし、運営者は責任を負いません。
+            </li>
+          </ol>
+        </section>
+
+        <section className="grid gap-3">
+          <h2 className="text-xl font-semibold text-stone-950">第4条（投稿および利用者の責任）</h2>
           <ol className="grid list-decimal gap-2 pl-5 leading-7">
             <li>
               利用者は、自身が投稿した交換投稿、ボトル情報、画像、補足条件等の内容について一切の責任を負います。
@@ -91,7 +112,22 @@ export default function TermsPage() {
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第4条（禁止事項）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第5条（投稿コンテンツのライセンス）</h2>
+          <ol className="grid list-decimal gap-2 pl-5 leading-7">
+            <li>
+              利用者は、本サービスに投稿した画像・テキスト等のコンテンツ（以下「投稿コンテンツ」）について、自身が適法な権利を有することを保証します。
+            </li>
+            <li>
+              利用者は、運営者に対し、投稿コンテンツを本サービスの提供・運営・改善・プロモーションに必要な範囲で、無償かつ非独占的に利用する権利を許諾します。
+            </li>
+            <li>
+              前項の許諾は、利用者が当該投稿コンテンツを削除またはアカウントを退会した時点で終了します。ただし、技術的な都合上、削除後も一定期間サーバー上に残存することがあります。
+            </li>
+          </ol>
+        </section>
+
+        <section className="grid gap-3">
+          <h2 className="text-xl font-semibold text-stone-950">第6条（禁止事項）</h2>
           <p className="leading-7">利用者は、以下の行為を行ってはなりません。</p>
           <ol className="grid list-decimal gap-2 pl-5 leading-7">
             <li>法令または公序良俗に反する行為</li>
@@ -108,7 +144,19 @@ export default function TermsPage() {
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第5条（X IDの開示）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第7条（反社会的勢力の排除）</h2>
+          <ol className="grid list-decimal gap-2 pl-5 leading-7">
+            <li>
+              利用者は、現在および将来にわたり、反社会的勢力（暴力団、暴力団員、暴力団関係企業・団体、総会屋、社会運動標榜ゴロ、特殊知能暴力集団等）に該当しないことを表明し、保証します。
+            </li>
+            <li>
+              利用者が前項の表明・保証に反することが判明した場合、運営者は事前の通知なく当該利用者のアカウントを停止・削除することができます。
+            </li>
+          </ol>
+        </section>
+
+        <section className="grid gap-3">
+          <h2 className="text-xl font-semibold text-stone-950">第8条（X IDの開示）</h2>
           <ol className="grid list-decimal gap-2 pl-5 leading-7">
             <li>
               X IDは、交換投稿に対する興味ありを受け取った投稿者が「相談開始」を選択した時点で、相談相手にのみ開示されます。
@@ -120,7 +168,7 @@ export default function TermsPage() {
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第6条（取引の見送りについて）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第9条（取引の見送りについて）</h2>
           <ol className="grid list-decimal gap-2 pl-5 leading-7">
             <li>
               ユーザーは、Xアカウント開示後であっても、自己の判断により取引相談を中断し、または見送ることができます。
@@ -138,7 +186,7 @@ export default function TermsPage() {
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第7条（運営者の免責）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第10条（運営者の免責）</h2>
           <ol className="grid list-decimal gap-2 pl-5 leading-7">
             <li>
               運営者は、利用者間の取引、配送、金銭の授受、ボトルの品質・真贋・状態、引き渡しの遅延・不履行、破損、紛失、その他取引に起因する一切のトラブルについて責任を負いません。
@@ -153,7 +201,7 @@ export default function TermsPage() {
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第8条（投稿の取り扱い・アカウント停止）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第11条（投稿の取り扱い・アカウント停止）</h2>
           <ol className="grid list-decimal gap-2 pl-5 leading-7">
             <li>
               運営者は、本規約違反のおそれがあると判断した場合、利用者への事前通知なく、投稿の非公開化、アカウントの停止、本サービスの利用制限を行うことができます。
@@ -165,28 +213,35 @@ export default function TermsPage() {
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第9条（サービスの変更・終了）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第12条（サービスの変更・終了）</h2>
           <p className="leading-7">
             運営者は、利用者への事前の通知をもって、本サービスの内容を変更し、または提供を停止・終了することができます。緊急の場合は通知なく行うことがあります。
           </p>
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第10条（規約の変更）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第13条（事業譲渡等）</h2>
+          <p className="leading-7">
+            運営者は、合併、会社分割、事業譲渡その他の組織再編または事業承継を行う場合、これに関連して利用者情報（個人情報を含む）を当該取引の相手方に開示・移転することができます。この場合、運営者は可能な範囲でその旨を事前に告知するよう努めますが、事前の告知が困難な場合は事後に通知することがあります。
+          </p>
+        </section>
+
+        <section className="grid gap-3">
+          <h2 className="text-xl font-semibold text-stone-950">第14条（規約の変更）</h2>
           <p className="leading-7">
             運営者は、必要と判断した場合に本規約を変更することができます。変更後の規約は本ページに掲載した時点で効力を生じ、変更後に本サービスを継続利用した利用者は変更に同意したものとみなします。
           </p>
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第11条（準拠法・裁判管轄）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第15条（準拠法・裁判管轄）</h2>
           <p className="leading-7">
             本規約は日本法に準拠し、本サービスに関連して紛争が生じた場合は、運営者の本店所在地を管轄する裁判所を第一審の専属的合意管轄裁判所とします。
           </p>
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第12条（お問い合わせ）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第16条（お問い合わせ）</h2>
           <p className="leading-7">
             本規約および本サービスに関するお問い合わせは、運営者までご連絡ください。連絡先は
             <Link href="/privacy" className="underline underline-offset-4">
