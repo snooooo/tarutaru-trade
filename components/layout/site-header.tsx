@@ -92,7 +92,7 @@ export async function SiteHeader() {
             <>
               <Link
                 href="/login"
-                className="inline-flex h-10 items-center justify-center px-2 text-sm font-semibold text-stone-700 transition hover:text-stone-950 lg:hidden"
+                className="inline-flex h-11 items-center justify-center px-3 text-sm font-semibold text-stone-700 transition hover:text-stone-950 lg:hidden"
               >
                 ログイン
               </Link>
@@ -101,7 +101,7 @@ export async function SiteHeader() {
               </ButtonLink>
               <Link
                 href="/signup"
-                className="inline-flex h-10 items-center justify-center rounded-md bg-stone-950 px-4 text-sm font-bold leading-none text-white transition hover:bg-stone-800 lg:hidden"
+                className="inline-flex h-11 items-center justify-center rounded-md bg-stone-950 px-4 text-sm font-bold leading-none text-white transition hover:bg-stone-800 lg:hidden"
               >
                 登録
               </Link>

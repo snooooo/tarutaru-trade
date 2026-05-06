@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   description: "Whisky bottle trade board powered by MaltPeri.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,13 +34,13 @@ export default function RootLayout({
           background: "#ff6b00",
           color: "#fff",
           textAlign: "center",
-          padding: "10px 16px",
-          fontSize: "14px",
+          padding: "8px 16px",
+          fontSize: "13px",
           fontWeight: "bold",
           letterSpacing: "0.03em",
-          lineHeight: "1.5",
+          lineHeight: "1.6",
         }}>
-          🚧 このサービスは現在試験運転中です。表示されているデータはすべてサンプルです。
+          🚧 試験運転中 — 表示されているデータはすべてサンプルです
         </div>
         {children}
       </body>

@@ -72,6 +72,7 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
         <label className="grid gap-2">
           <span className="text-sm font-medium text-stone-700">タイトル</span>
           <input
+            type="text"
             name="title"
             maxLength={80}
             defaultValue={post?.title ?? ""}
@@ -207,7 +208,7 @@ function OfferFields({
           <button
             type="button"
             onClick={onRemove}
-            className="inline-flex size-9 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-700 transition hover:border-stone-950 hover:text-stone-950"
+            className="inline-flex size-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-700 transition hover:border-stone-950 hover:text-stone-950"
             aria-label={`${label}を削除`}
             title={`${label}を削除`}
           >
@@ -219,6 +220,7 @@ function OfferFields({
       <label className="grid gap-2">
         <span className="text-sm font-medium text-stone-700">ボトル名</span>
         <input
+          type="text"
           name="offer_manual_bottle_name"
           aria-required={required}
           maxLength={120}
@@ -259,6 +261,8 @@ function OfferFields({
       <label className="grid gap-2">
         <span className="text-sm font-medium text-stone-700">画像URL</span>
         <input
+          type="url"
+          inputMode="url"
           name="image_url"
           defaultValue={item?.image_url ?? ""}
           className="h-11 rounded-md border border-stone-300 bg-white px-3 outline-none transition focus:border-stone-950"
@@ -299,7 +303,7 @@ function WantFields({
           <button
             type="button"
             onClick={onRemove}
-            className="inline-flex size-9 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-700 transition hover:border-stone-950 hover:text-stone-950"
+            className="inline-flex size-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-700 transition hover:border-stone-950 hover:text-stone-950"
             aria-label={`${label}を削除`}
             title={`${label}を削除`}
           >
@@ -311,6 +315,7 @@ function WantFields({
       <label className="grid gap-2">
         <span className="text-sm font-medium text-stone-700">ボトル名</span>
         <input
+          type="text"
           name="want_manual_bottle_name"
           maxLength={120}
           defaultValue={item?.manual_bottle_name ?? item?.display_bottle_name ?? ""}

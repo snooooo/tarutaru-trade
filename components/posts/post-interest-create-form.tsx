@@ -84,7 +84,7 @@ function ProposalOfferFields({
           <button
             type="button"
             onClick={onRemove}
-            className="inline-flex size-9 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-700 transition hover:border-stone-950 hover:text-stone-950"
+            className="inline-flex size-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-700 transition hover:border-stone-950 hover:text-stone-950"
             aria-label={`${label}を削除`}
             title={`${label}を削除`}
           >
@@ -96,6 +96,7 @@ function ProposalOfferFields({
       <label className="grid gap-2">
         <span className="text-sm font-medium text-stone-700">ボトル名</span>
         <input
+          type="text"
           name="proposal_manual_bottle_name"
           required={required}
           maxLength={120}
@@ -137,6 +138,8 @@ function ProposalOfferFields({
       <label className="grid gap-2">
         <span className="text-sm font-medium text-stone-700">画像URL</span>
         <input
+          type="url"
+          inputMode="url"
           name="proposal_image_url"
           className="h-11 rounded-md border border-stone-300 bg-white px-3 outline-none transition focus:border-stone-950"
           placeholder="任意"

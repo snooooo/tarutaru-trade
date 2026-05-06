@@ -138,7 +138,7 @@ export function BottleSearchField() {
       {message ? <p className="text-sm text-stone-600">{message}</p> : null}
 
       {results.length ? (
-        <div className="max-h-72 overflow-y-auto rounded-md border border-stone-200 bg-white shadow-sm">
+        <div className="max-h-48 overflow-y-auto rounded-md border border-stone-200 bg-white shadow-sm">
           {results.map((bottle) => (
             <button
               className="grid w-full gap-1 border-b border-stone-100 px-3 py-3 text-left transition last:border-b-0 hover:bg-stone-50"
