@@ -51,10 +51,19 @@ export async function signupAction(formData: FormData) {
   const supabase = await createServerSupabaseClient();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  const termsAccepted = formData.get("terms_accepted") === "on";
   const next = safeNextPath(formData.get("next")) || "/settings/profile";
 
   if (!supabase) {
     redirectWithError("/signup", "Supabase環境変数が未設定です。", next);
+  }
+
+  if (!termsAccepted) {
+    redirectWithError(
+      "/signup",
+      "利用規約およびプライバシーポリシーへの同意が必要です。",
+      next,
+    );
   }
 
   const origin = (await headers()).get("origin") ?? "http://localhost:3000";

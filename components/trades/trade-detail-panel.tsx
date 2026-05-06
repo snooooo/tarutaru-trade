@@ -445,9 +445,11 @@ function CounterpartyPanel({
         </span>
         <span className="flex items-center gap-2">
           <Truck size={15} aria-hidden="true" />
-          {counterparty?.owner_anonymous_shipping_ok
-            ? "匿名配送OK"
-            : "匿名配送未設定"}
+          {counterparty?.owner_shipping_preference === "anonymous_only"
+            ? "匿名配送のみ希望"
+            : counterparty?.owner_shipping_preference === "disclose_preferred"
+              ? "氏名・住所を開示して取引希望"
+              : "配送方法は相談して決めたい"}
         </span>
         <span>{formatFollowersRange(counterparty?.owner_x_followers_range)}</span>
       </div>

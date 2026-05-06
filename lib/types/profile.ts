@@ -6,12 +6,20 @@ export const X_FOLLOWERS_RANGES = [
 
 export type XFollowersRange = (typeof X_FOLLOWERS_RANGES)[number];
 
+export const SHIPPING_PREFERENCES = [
+  "anonymous_only",
+  "negotiable",
+  "disclose_preferred",
+] as const;
+
+export type ShippingPreference = (typeof SHIPPING_PREFERENCES)[number];
+
 export type TradeProfile = {
   user_id: string;
   display_name: string;
   x_id: string | null;
   x_followers_range: XFollowersRange | null;
-  anonymous_shipping_ok: boolean | null;
+  shipping_preference: ShippingPreference | null;
   is_suspended: boolean;
   terms_accepted_at: string | null;
   created_at: string;
@@ -21,6 +29,6 @@ export type TradeProfile = {
 export type CompleteTradeProfile = TradeProfile & {
   x_id: string;
   x_followers_range: XFollowersRange;
-  anonymous_shipping_ok: boolean;
+  shipping_preference: ShippingPreference;
   terms_accepted_at: string;
 };

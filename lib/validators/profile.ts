@@ -1,15 +1,16 @@
 import {
   X_FOLLOWERS_RANGES,
+  SHIPPING_PREFERENCES,
   type TradeProfile,
   type XFollowersRange,
+  type ShippingPreference,
 } from "@/lib/types/profile";
 
 export type ProfileFormValues = {
   displayName: string;
   xId: string | null;
   xFollowersRange: XFollowersRange | null;
-  anonymousShippingOk: boolean;
-  termsAccepted: boolean;
+  shippingPreference: ShippingPreference | null;
 };
 
 export function normalizeXId(value: FormDataEntryValue | null) {
@@ -48,13 +49,19 @@ export function parseProfileForm(formData: FormData): {
     errors.push("X IDは英数字とアンダースコアのみ、15文字以内で入力してください。");
   }
 
+  const shippingValue = String(formData.get("shipping_preference") ?? "");
+  const shippingPreference = SHIPPING_PREFERENCES.includes(
+    shippingValue as ShippingPreference,
+  )
+    ? (shippingValue as ShippingPreference)
+    : null;
+
   return {
     values: {
       displayName,
       xId,
       xFollowersRange,
-      anonymousShippingOk: formData.get("anonymous_shipping_ok") === "on",
-      termsAccepted: formData.get("terms_accepted") === "on",
+      shippingPreference,
     },
     errors,
   };
@@ -65,7 +72,7 @@ export function isCompleteTradeProfile(
 ): profile is TradeProfile & {
   x_id: string;
   x_followers_range: XFollowersRange;
-  anonymous_shipping_ok: boolean;
+  shipping_preference: ShippingPreference;
   terms_accepted_at: string;
 } {
   return Boolean(
@@ -74,7 +81,7 @@ export function isCompleteTradeProfile(
       profile.display_name &&
       profile.x_id &&
       profile.x_followers_range &&
-      profile.anonymous_shipping_ok !== null &&
+      profile.shipping_preference !== null &&
       profile.terms_accepted_at,
   );
 }

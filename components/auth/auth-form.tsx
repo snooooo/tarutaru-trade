@@ -42,6 +42,36 @@ export function AuthForm({ mode, nextPath, error }: AuthFormProps) {
           required
         />
       </label>
+      {isLogin ? null : (
+        <label className="flex items-start gap-3 rounded-md border border-stone-200 bg-stone-50 p-3 text-sm text-stone-700">
+          <input
+            className="mt-1 size-5"
+            type="checkbox"
+            name="terms_accepted"
+            required
+          />
+          <span>
+            <Link
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-stone-950 underline underline-offset-4 hover:text-stone-700"
+            >
+              利用規約
+            </Link>
+            および
+            <Link
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-stone-950 underline underline-offset-4 hover:text-stone-700"
+            >
+              プライバシーポリシー
+            </Link>
+            に同意します
+          </span>
+        </label>
+      )}
       <button className="inline-flex h-11 items-center justify-center rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800">
         {isLogin ? "ログイン" : "新規登録"}
       </button>

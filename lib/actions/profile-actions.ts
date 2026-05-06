@@ -32,17 +32,14 @@ export async function upsertTradeProfileAction(formData: FormData) {
   }
 
   const now = new Date().toISOString();
-  const termsAcceptedAt = values.termsAccepted
-    ? (profile?.terms_accepted_at ?? now)
-    : null;
 
   const { error } = await supabase.from("trade_profiles").upsert({
     user_id: user.id,
     display_name: values.displayName,
     x_id: values.xId,
     x_followers_range: values.xFollowersRange,
-    anonymous_shipping_ok: values.anonymousShippingOk,
-    terms_accepted_at: termsAcceptedAt,
+    shipping_preference: values.shippingPreference,
+    terms_accepted_at: profile?.terms_accepted_at ?? now,
     updated_at: now,
   });
 

@@ -1,8 +1,10 @@
+import type { ShippingPreference } from "@/lib/types/profile";
+
 export type PublicOwnerStats = {
   profile_public_id: string | null;
   owner_display_name: string | null;
   owner_x_followers_range: string | null;
-  owner_anonymous_shipping_ok: boolean | null;
+  owner_shipping_preference: ShippingPreference | null;
   owner_completed_count: number | null;
   owner_review_count: number | null;
   owner_average_rating: number | null;

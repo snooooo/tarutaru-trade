@@ -860,7 +860,7 @@ export type Database = {
       }
       trade_profiles: {
         Row: {
-          anonymous_shipping_ok: boolean | null
+          shipping_preference: Database["public"]["Enums"]["trade_shipping_preference"] | null
           created_at: string
           deleted_at: string | null
           display_name: string
@@ -874,7 +874,7 @@ export type Database = {
           x_id: string | null
         }
         Insert: {
-          anonymous_shipping_ok?: boolean | null
+          shipping_preference?: Database["public"]["Enums"]["trade_shipping_preference"] | null
           created_at?: string
           deleted_at?: string | null
           display_name?: string
@@ -888,7 +888,7 @@ export type Database = {
           x_id?: string | null
         }
         Update: {
-          anonymous_shipping_ok?: boolean | null
+          shipping_preference?: Database["public"]["Enums"]["trade_shipping_preference"] | null
           created_at?: string
           deleted_at?: string | null
           display_name?: string
@@ -1515,7 +1515,7 @@ export type Database = {
           manual_bottle_name: string | null
           median_price: number | null
           note: string | null
-          owner_anonymous_shipping_ok: boolean | null
+          owner_shipping_preference: Database["public"]["Enums"]["trade_shipping_preference"] | null
           owner_average_rating: number | null
           owner_cancellation_rate: number | null
           owner_completed_count: number | null
@@ -1550,7 +1550,7 @@ export type Database = {
           created_at: string | null
           id: string | null
           offer_items: Json | null
-          owner_anonymous_shipping_ok: boolean | null
+          owner_shipping_preference: Database["public"]["Enums"]["trade_shipping_preference"] | null
           owner_average_rating: number | null
           owner_cancellation_rate: number | null
           owner_completed_count: number | null
@@ -1569,7 +1569,7 @@ export type Database = {
       }
       trade_public_profile_stats: {
         Row: {
-          anonymous_shipping_ok: boolean | null
+          shipping_preference: Database["public"]["Enums"]["trade_shipping_preference"] | null
           average_rating: number | null
           cancellation_rate: number | null
           completed_count: number | null
@@ -1584,7 +1584,7 @@ export type Database = {
       }
       trade_public_profile_stats_internal: {
         Row: {
-          anonymous_shipping_ok: boolean | null
+          shipping_preference: Database["public"]["Enums"]["trade_shipping_preference"] | null
           average_rating: number | null
           cancellation_rate: number | null
           completed_count: number | null
@@ -1622,7 +1622,7 @@ export type Database = {
           maltperi_bottle_id: string | null
           manual_bottle_name: string | null
           median_price: number | null
-          owner_anonymous_shipping_ok: boolean | null
+          owner_shipping_preference: Database["public"]["Enums"]["trade_shipping_preference"] | null
           owner_average_rating: number | null
           owner_cancellation_rate: number | null
           owner_completed_count: number | null
@@ -1653,7 +1653,7 @@ export type Database = {
       }
       trade_visible_counterparty_profiles: {
         Row: {
-          counterparty_anonymous_shipping_ok: boolean | null
+          counterparty_shipping_preference: Database["public"]["Enums"]["trade_shipping_preference"] | null
           counterparty_average_rating: number | null
           counterparty_cancellation_rate: number | null
           counterparty_completed_count: number | null
@@ -1757,6 +1757,10 @@ export type Database = {
         | "ジャパニーズ"
         | "その他"
       tours_availability_enum: "available" | "unavailable" | "N/A"
+      trade_shipping_preference:
+        | "anonymous_only"
+        | "negotiable"
+        | "disclose_preferred"
       trade_box_condition:
         | "with_box_good"
         | "with_box_minor_damage"
@@ -1912,6 +1916,7 @@ export const Constants = {
         "その他",
       ],
       tours_availability_enum: ["available", "unavailable", "N/A"],
+      trade_shipping_preference: ["anonymous_only", "negotiable", "disclose_preferred"],
       trade_box_condition: [
         "with_box_good",
         "with_box_minor_damage",

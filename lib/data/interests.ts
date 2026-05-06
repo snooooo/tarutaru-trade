@@ -12,6 +12,7 @@ import type {
   PublicTradePostWantItem,
 } from "@/lib/types/trade-posts";
 import type { PublicOfferItem, PublicWantItem } from "@/lib/types/trade";
+import type { ShippingPreference } from "@/lib/types/profile";
 
 type QueryResult<T> = {
   data: T[];
@@ -100,7 +101,7 @@ type VisibleCounterpartyRow = {
   counterparty_profile_public_id: string | null;
   counterparty_display_name: string | null;
   counterparty_x_followers_range: string | null;
-  counterparty_anonymous_shipping_ok: boolean | null;
+  counterparty_shipping_preference: ShippingPreference | null;
   counterparty_completed_count: number | null;
   counterparty_review_count: number | null;
   counterparty_average_rating: number | null;
@@ -249,7 +250,7 @@ function ownerStatsFromOffer(row: PublicOfferItem): InterestCounterpartySummary 
     display_name: row.owner_display_name,
     owner_display_name: row.owner_display_name,
     owner_x_followers_range: row.owner_x_followers_range,
-    owner_anonymous_shipping_ok: row.owner_anonymous_shipping_ok,
+    owner_shipping_preference: row.owner_shipping_preference,
     owner_completed_count: row.owner_completed_count,
     owner_review_count: row.owner_review_count,
     owner_average_rating: row.owner_average_rating,
@@ -263,7 +264,7 @@ function ownerStatsFromWant(row: PublicWantItem): InterestCounterpartySummary {
     display_name: row.owner_display_name,
     owner_display_name: row.owner_display_name,
     owner_x_followers_range: row.owner_x_followers_range,
-    owner_anonymous_shipping_ok: row.owner_anonymous_shipping_ok,
+    owner_shipping_preference: row.owner_shipping_preference,
     owner_completed_count: row.owner_completed_count,
     owner_review_count: row.owner_review_count,
     owner_average_rating: row.owner_average_rating,
@@ -279,7 +280,7 @@ function ownerStatsFromVisible(
     display_name: row.counterparty_display_name,
     owner_display_name: row.counterparty_display_name,
     owner_x_followers_range: row.counterparty_x_followers_range,
-    owner_anonymous_shipping_ok: row.counterparty_anonymous_shipping_ok,
+    owner_shipping_preference: row.counterparty_shipping_preference,
     owner_completed_count: row.counterparty_completed_count,
     owner_review_count: row.counterparty_review_count,
     owner_average_rating: row.counterparty_average_rating,
@@ -294,7 +295,7 @@ function ownerStatsFromPost(row: PublicTradePost): InterestCounterpartySummary {
     display_name: row.owner_display_name,
     owner_display_name: row.owner_display_name,
     owner_x_followers_range: row.owner_x_followers_range,
-    owner_anonymous_shipping_ok: row.owner_anonymous_shipping_ok,
+    owner_shipping_preference: row.owner_shipping_preference,
     owner_completed_count: row.owner_completed_count,
     owner_review_count: row.owner_review_count,
     owner_average_rating: row.owner_average_rating,
@@ -587,7 +588,7 @@ async function getRelatedPostMaps(
     profile_public_id: null,
     owner_display_name: null,
     owner_x_followers_range: null,
-    owner_anonymous_shipping_ok: null,
+    owner_shipping_preference: null,
     owner_completed_count: null,
     owner_review_count: null,
     owner_average_rating: null,
@@ -727,7 +728,7 @@ async function buildInterestItems(
       ? supabase
           .from("trade_visible_counterparty_profiles")
           .select(
-            "trade_interest_id,counterparty_profile_public_id,counterparty_display_name,counterparty_x_followers_range,counterparty_anonymous_shipping_ok,counterparty_completed_count,counterparty_review_count,counterparty_average_rating,counterparty_cancellation_rate",
+            "trade_interest_id,counterparty_profile_public_id,counterparty_display_name,counterparty_x_followers_range,counterparty_shipping_preference,counterparty_completed_count,counterparty_review_count,counterparty_average_rating,counterparty_cancellation_rate",
           )
           .in("trade_interest_id", interestIds)
       : Promise.resolve({ data: [], error: null }),
@@ -1057,7 +1058,7 @@ export async function getTradeInterestDetail(
     supabase
       .from("trade_visible_counterparty_profiles")
       .select(
-        "trade_interest_id,counterparty_profile_public_id,counterparty_display_name,counterparty_x_followers_range,counterparty_anonymous_shipping_ok,counterparty_completed_count,counterparty_review_count,counterparty_average_rating,counterparty_cancellation_rate,counterparty_x_id",
+        "trade_interest_id,counterparty_profile_public_id,counterparty_display_name,counterparty_x_followers_range,counterparty_shipping_preference,counterparty_completed_count,counterparty_review_count,counterparty_average_rating,counterparty_cancellation_rate,counterparty_x_id",
       )
       .eq("trade_interest_id", interestId)
       .maybeSingle(),

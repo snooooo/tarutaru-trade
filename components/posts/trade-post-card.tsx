@@ -49,10 +49,15 @@ export function TradePostCard({ post }: { post: PublicTradePost }) {
             <CheckCircle2 size={14} aria-hidden="true" />
             完了 {post.owner_completed_count ?? 0}件
           </span>
-          {post.owner_anonymous_shipping_ok ? (
+          {post.owner_shipping_preference === "anonymous_only" ? (
             <span className="flex items-center gap-1">
               <Truck size={15} aria-hidden="true" />
-              匿名配送OK
+              匿名のみ
+            </span>
+          ) : post.owner_shipping_preference === "disclose_preferred" ? (
+            <span className="flex items-center gap-1">
+              <Truck size={15} aria-hidden="true" />
+              氏名開示希望
             </span>
           ) : null}
         </span>
