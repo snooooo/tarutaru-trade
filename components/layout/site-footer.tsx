@@ -12,14 +12,17 @@ export function SiteFooter() {
           <Link href="/privacy" className="hover:text-stone-950 hover:underline underline-offset-4">
             プライバシーポリシー
           </Link>
-          <a
-            href="https://maltperi.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-stone-800 underline underline-offset-2 hover:text-stone-950"
-          >
-            powered by MaltPeri
-          </a>
+          <span>
+            powered by{" "}
+            <a
+              href="https://maltperi.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-blue-600 underline underline-offset-2 hover:text-blue-800"
+            >
+              MaltPeri
+            </a>
+          </span>
         </nav>
       </div>
     </footer>
