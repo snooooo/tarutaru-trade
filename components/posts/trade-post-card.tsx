@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Star, Truck } from "lucide-react";
+import { ArrowRight, CheckCircle2, MapPin, Star, Truck } from "lucide-react";
 import {
   bottleSubline,
   formatBoxCondition,
@@ -49,15 +49,21 @@ export function TradePostCard({ post }: { post: PublicTradePost }) {
             <CheckCircle2 size={14} aria-hidden="true" />
             完了 {post.owner_completed_count ?? 0}件
           </span>
+          {post.owner_shipping_region ? (
+            <span className="flex items-center gap-1">
+              <MapPin size={14} aria-hidden="true" />
+              {post.owner_shipping_region}
+            </span>
+          ) : null}
           {post.owner_shipping_preference === "anonymous_only" ? (
             <span className="flex items-center gap-1">
               <Truck size={15} aria-hidden="true" />
-              匿名のみ
+              匿名配送
             </span>
           ) : post.owner_shipping_preference === "disclose_preferred" ? (
             <span className="flex items-center gap-1">
               <Truck size={15} aria-hidden="true" />
-              氏名開示希望
+              配送住所等開示希望
             </span>
           ) : null}
         </span>

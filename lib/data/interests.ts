@@ -102,6 +102,7 @@ type VisibleCounterpartyRow = {
   counterparty_display_name: string | null;
   counterparty_x_followers_range: string | null;
   counterparty_shipping_preference: ShippingPreference | null;
+  counterparty_shipping_region: string | null;
   counterparty_completed_count: number | null;
   counterparty_review_count: number | null;
   counterparty_average_rating: number | null;
@@ -251,6 +252,7 @@ function ownerStatsFromOffer(row: PublicOfferItem): InterestCounterpartySummary 
     owner_display_name: row.owner_display_name,
     owner_x_followers_range: row.owner_x_followers_range,
     owner_shipping_preference: row.owner_shipping_preference,
+    owner_shipping_region: row.owner_shipping_region ?? null,
     owner_completed_count: row.owner_completed_count,
     owner_review_count: row.owner_review_count,
     owner_average_rating: row.owner_average_rating,
@@ -265,6 +267,7 @@ function ownerStatsFromWant(row: PublicWantItem): InterestCounterpartySummary {
     owner_display_name: row.owner_display_name,
     owner_x_followers_range: row.owner_x_followers_range,
     owner_shipping_preference: row.owner_shipping_preference,
+    owner_shipping_region: row.owner_shipping_region ?? null,
     owner_completed_count: row.owner_completed_count,
     owner_review_count: row.owner_review_count,
     owner_average_rating: row.owner_average_rating,
@@ -281,6 +284,7 @@ function ownerStatsFromVisible(
     owner_display_name: row.counterparty_display_name,
     owner_x_followers_range: row.counterparty_x_followers_range,
     owner_shipping_preference: row.counterparty_shipping_preference,
+    owner_shipping_region: row.counterparty_shipping_region,
     owner_completed_count: row.counterparty_completed_count,
     owner_review_count: row.counterparty_review_count,
     owner_average_rating: row.counterparty_average_rating,
@@ -296,6 +300,7 @@ function ownerStatsFromPost(row: PublicTradePost): InterestCounterpartySummary {
     owner_display_name: row.owner_display_name,
     owner_x_followers_range: row.owner_x_followers_range,
     owner_shipping_preference: row.owner_shipping_preference,
+    owner_shipping_region: row.owner_shipping_region ?? null,
     owner_completed_count: row.owner_completed_count,
     owner_review_count: row.owner_review_count,
     owner_average_rating: row.owner_average_rating,
@@ -589,6 +594,7 @@ async function getRelatedPostMaps(
     owner_display_name: null,
     owner_x_followers_range: null,
     owner_shipping_preference: null,
+    owner_shipping_region: null,
     owner_completed_count: null,
     owner_review_count: null,
     owner_average_rating: null,
@@ -727,9 +733,7 @@ async function buildInterestItems(
     interestIds.length
       ? supabase
           .from("trade_visible_counterparty_profiles")
-          .select(
-            "trade_interest_id,counterparty_profile_public_id,counterparty_display_name,counterparty_x_followers_range,counterparty_shipping_preference,counterparty_completed_count,counterparty_review_count,counterparty_average_rating,counterparty_cancellation_rate",
-          )
+          .select("*")
           .in("trade_interest_id", interestIds)
       : Promise.resolve({ data: [], error: null }),
   ]);
@@ -1057,9 +1061,7 @@ export async function getTradeInterestDetail(
     buildInterestItems(supabase, [row], userRole === "requester" ? "sent" : "received"),
     supabase
       .from("trade_visible_counterparty_profiles")
-      .select(
-        "trade_interest_id,counterparty_profile_public_id,counterparty_display_name,counterparty_x_followers_range,counterparty_shipping_preference,counterparty_completed_count,counterparty_review_count,counterparty_average_rating,counterparty_cancellation_rate,counterparty_x_id",
-      )
+      .select("*")
       .eq("trade_interest_id", interestId)
       .maybeSingle(),
     supabase

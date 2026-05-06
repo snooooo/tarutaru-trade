@@ -55,7 +55,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
         {params.reason === "complete_profile" ? (
           <p className="rounded-md border border-stone-200 bg-white/82 px-4 py-3 text-sm text-stone-700">
-            掲載・興味ありの前に、X ID、フォロワー数レンジ、配送方法の希望、規約同意を完了してください。
+            掲載・興味ありの前に、X ID、フォロワー数レンジ、配送時の住所等の開示、規約同意を完了してください。
           </p>
         ) : null}
 

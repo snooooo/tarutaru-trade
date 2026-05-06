@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import {
   CheckCircle2,
+  MapPin,
   Pencil,
   PauseCircle,
   Star,
@@ -125,12 +126,18 @@ export default async function PostDetailPage({
                   <CheckCircle2 size={16} aria-hidden="true" />
                   完了 {post.owner_completed_count ?? 0}件
                 </span>
+                {post.owner_shipping_region ? (
+                  <span className="flex items-center gap-2">
+                    <MapPin size={16} aria-hidden="true" />
+                    {post.owner_shipping_region}から発送
+                  </span>
+                ) : null}
                 <span className="flex items-center gap-2">
                   <Truck size={16} aria-hidden="true" />
                   {post.owner_shipping_preference === "anonymous_only"
-                    ? "匿名配送のみ希望"
+                    ? "配送先住所等を知らせたくない"
                     : post.owner_shipping_preference === "disclose_preferred"
-                      ? "氏名・住所を開示して取引希望"
+                      ? "住所等を開示して取引したい"
                       : "配送方法は相談して決めたい"}
                 </span>
                 <span>{formatFollowersRange(post.owner_x_followers_range)}</span>

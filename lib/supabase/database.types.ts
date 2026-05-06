@@ -861,6 +861,7 @@ export type Database = {
       trade_profiles: {
         Row: {
           shipping_preference: Database["public"]["Enums"]["trade_shipping_preference"] | null
+          shipping_region: string | null
           created_at: string
           deleted_at: string | null
           display_name: string
@@ -875,6 +876,7 @@ export type Database = {
         }
         Insert: {
           shipping_preference?: Database["public"]["Enums"]["trade_shipping_preference"] | null
+          shipping_region?: string | null
           created_at?: string
           deleted_at?: string | null
           display_name?: string
@@ -889,6 +891,7 @@ export type Database = {
         }
         Update: {
           shipping_preference?: Database["public"]["Enums"]["trade_shipping_preference"] | null
+          shipping_region?: string | null
           created_at?: string
           deleted_at?: string | null
           display_name?: string

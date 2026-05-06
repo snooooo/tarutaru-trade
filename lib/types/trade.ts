@@ -5,6 +5,7 @@ export type PublicOwnerStats = {
   owner_display_name: string | null;
   owner_x_followers_range: string | null;
   owner_shipping_preference: ShippingPreference | null;
+  owner_shipping_region: string | null;
   owner_completed_count: number | null;
   owner_review_count: number | null;
   owner_average_rating: number | null;

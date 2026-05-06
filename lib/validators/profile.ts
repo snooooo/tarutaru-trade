@@ -1,4 +1,5 @@
 import {
+  PREFECTURES,
   X_FOLLOWERS_RANGES,
   SHIPPING_PREFERENCES,
   type TradeProfile,
@@ -11,6 +12,7 @@ export type ProfileFormValues = {
   xId: string | null;
   xFollowersRange: XFollowersRange | null;
   shippingPreference: ShippingPreference | null;
+  shippingRegion: string | null;
 };
 
 export function normalizeXId(value: FormDataEntryValue | null) {
@@ -56,12 +58,18 @@ export function parseProfileForm(formData: FormData): {
     ? (shippingValue as ShippingPreference)
     : null;
 
+  const shippingRegionValue = String(formData.get("shipping_region") ?? "").trim();
+  const shippingRegion = (PREFECTURES as readonly string[]).includes(shippingRegionValue)
+    ? shippingRegionValue
+    : null;
+
   return {
     values: {
       displayName,
       xId,
       xFollowersRange,
       shippingPreference,
+      shippingRegion,
     },
     errors,
   };

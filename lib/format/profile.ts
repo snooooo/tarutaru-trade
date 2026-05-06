@@ -13,9 +13,9 @@ export function formatProfileFollowersRange(range: XFollowersRange | null) {
 export function formatShippingPreference(pref: ShippingPreference | null) {
   if (!pref) return "未設定";
   const labels: Record<ShippingPreference, string> = {
-    anonymous_only: "匿名のみ",
+    anonymous_only: "配送先住所等を知らせたくない",
     negotiable: "相談して決めたい",
-    disclose_preferred: "氏名開示希望",
+    disclose_preferred: "住所等を開示して取引したい",
   };
   return labels[pref];
 }

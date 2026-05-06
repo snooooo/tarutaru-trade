@@ -5,6 +5,7 @@ import {
   Ban,
   CheckCircle2,
   ExternalLink,
+  MapPin,
   RotateCcw,
   Star,
   Truck,
@@ -443,12 +444,18 @@ function CounterpartyPanel({
           <CheckCircle2 size={15} aria-hidden="true" />
           完了 {counterparty?.owner_completed_count ?? 0}件
         </span>
+        {counterparty?.owner_shipping_region ? (
+          <span className="flex items-center gap-2">
+            <MapPin size={15} aria-hidden="true" />
+            {counterparty.owner_shipping_region}
+          </span>
+        ) : null}
         <span className="flex items-center gap-2">
           <Truck size={15} aria-hidden="true" />
           {counterparty?.owner_shipping_preference === "anonymous_only"
-            ? "匿名配送のみ希望"
+            ? "配送先住所等を知らせたくない"
             : counterparty?.owner_shipping_preference === "disclose_preferred"
-              ? "氏名・住所を開示して取引希望"
+              ? "住所等を開示して取引したい"
               : "配送方法は相談して決めたい"}
         </span>
         <span>{formatFollowersRange(counterparty?.owner_x_followers_range)}</span>

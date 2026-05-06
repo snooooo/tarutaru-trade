@@ -39,6 +39,7 @@ export async function upsertTradeProfileAction(formData: FormData) {
     x_id: values.xId,
     x_followers_range: values.xFollowersRange,
     shipping_preference: values.shippingPreference,
+    shipping_region: values.shippingRegion,
     terms_accepted_at: profile?.terms_accepted_at ?? now,
     updated_at: now,
   });
