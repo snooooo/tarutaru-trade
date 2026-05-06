@@ -16,7 +16,7 @@ export function SiteFooter() {
             href="https://maltperi.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline underline-offset-4 hover:text-stone-950"
+            className="font-semibold text-stone-800 underline underline-offset-2 hover:text-stone-950"
           >
             powered by MaltPeri
           </a>
