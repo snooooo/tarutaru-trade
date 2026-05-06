@@ -130,7 +130,7 @@ export async function getPublicTradePosts(options?: {
   let request = supabase
     .from("trade_public_posts")
     .select("*")
-    .order("created_at", { ascending: false })
+    .order("published_at", { ascending: false })
     .limit(options?.limit ?? PAGE_SIZE);
 
   if (pattern) {

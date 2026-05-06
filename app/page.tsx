@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Check, Plus, ShieldCheck } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { TradePostList } from "@/components/posts/trade-post-list";
@@ -6,9 +7,34 @@ import { SearchForm } from "@/components/ui/search-form";
 import { DataStatusNote } from "@/components/ui/status-note";
 import { getPublicTradePosts } from "@/lib/data/trade-posts";
 
-export default async function Home() {
+async function NewPosts() {
   const posts = await getPublicTradePosts({ limit: 8 });
+  return (
+    <>
+      <div className="grid gap-3">
+        <DataStatusNote isConfigured={posts.isConfigured} error={posts.error} />
+      </div>
+      <div className="mt-9 grid gap-6">
+        <section className="grid content-start gap-5">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-normal text-stone-500">
+              New posts
+            </p>
+            <h2 className="mt-1 text-2xl font-bold">新着交換投稿</h2>
+          </div>
+          <TradePostList posts={posts.data} />
+          <div className="flex justify-center">
+            <ButtonLink href="/posts" variant="ghost">
+              すべて見る
+            </ButtonLink>
+          </div>
+        </section>
+      </div>
+    </>
+  );
+}
 
+export default function Home() {
   return (
     <PageShell>
       <section className="grid gap-6 py-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-end lg:py-10">
@@ -54,30 +80,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
-
-      <div className="grid gap-3">
-        <DataStatusNote
-          isConfigured={posts.isConfigured}
-          error={posts.error}
-        />
-      </div>
-
-      <div className="mt-9 grid gap-6">
-        <section className="grid content-start gap-5">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-normal text-stone-500">
-              New posts
-            </p>
-            <h2 className="mt-1 text-2xl font-bold">新着交換投稿</h2>
-          </div>
-          <TradePostList posts={posts.data} />
-          <div className="flex justify-center">
-            <ButtonLink href="/posts" variant="ghost">
-              すべて見る
-            </ButtonLink>
-          </div>
-        </section>
-      </div>
+      <Suspense>
+        <NewPosts />
+      </Suspense>
     </PageShell>
   );
 }

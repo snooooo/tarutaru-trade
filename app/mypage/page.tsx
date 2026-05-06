@@ -3,27 +3,27 @@ import {
   ArrowRight,
   CheckCircle2,
   Clock,
-  Handshake,
   HandHeart,
   Inbox,
-  Pencil,
+  LogOut,
   PlusCircle,
   Send,
+  Settings,
   Star,
 } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
+import { MyTradePostList } from "@/components/posts/my-trade-post-list";
 import { ButtonLink } from "@/components/ui/button-link";
 import { DataStatusNote } from "@/components/ui/status-note";
-import { updateTradePostVisibilityAction } from "@/lib/actions/trade-post-actions";
+import { logoutAction } from "@/lib/actions/auth-actions";
 import { requireCompleteTradeProfile } from "@/lib/auth/require-user";
 import {
   getReceivedInterests,
   getSentInterests,
 } from "@/lib/data/interests";
-import { bottleSubline, formatDate } from "@/lib/format/trade";
+import { formatDate } from "@/lib/format/trade";
 import { getMyTradePosts } from "@/lib/data/trade-posts";
 import type { TradeInterestListItem, TradeInterestStatus } from "@/lib/types/interests";
-import type { MyTradePost } from "@/lib/types/trade-posts";
 
 const tradeStatusLabels: Record<TradeInterestStatus, string> = {
   interested: "確認待ち",
@@ -32,13 +32,6 @@ const tradeStatusLabels: Record<TradeInterestStatus, string> = {
   canceled: "キャンセル済み",
   completion_requested: "完了確認中",
   completed: "完了",
-};
-
-const postStatusLabels: Record<string, string> = {
-  public: "公開中",
-  private: "非公開",
-  consulting: "相談中",
-  closed: "終了",
 };
 
 type MyPageProps = {
@@ -152,21 +145,69 @@ export default async function MyPage({ searchParams }: MyPageProps) {
 
         <MyItemUpdateMessage updated={params.updated} error={params.error} />
 
-        <TradePostSection posts={tradePosts.data} />
+        <section className="grid gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-medium text-stone-500">Trade posts</p>
+              <h2 className="mt-1 text-2xl font-semibold">自分の交換投稿</h2>
+              <p className="mt-1 text-sm text-stone-600">
+                出る / 求むを1つの投稿として管理します。
+              </p>
+            </div>
+            <ButtonLink href="/mypage/posts/new" variant="secondary" className="gap-2">
+              <PlusCircle size={16} aria-hidden="true" />
+              交換投稿を作る
+            </ButtonLink>
+          </div>
+
+          {tradePosts.data.length ? (
+            <MyTradePostList posts={tradePosts.data} />
+          ) : (
+            <EmptyState
+              title="交換投稿はまだありません"
+              text="出るボトルと求む条件をまとめて、最初の交換投稿を作りましょう。"
+              href="/mypage/posts/new"
+              label="交換投稿を作る"
+            />
+          )}
+        </section>
 
         <InterestAccessSection
           sentInterests={sentInterests.data}
           receivedInterests={receivedInterests.data}
         />
 
-        <section className="grid gap-2 rounded-md border border-stone-200 bg-white/82 p-4 text-sm text-stone-600 shadow-sm sm:flex sm:items-center sm:justify-between">
-          <p>アカウントを使わなくなった場合は退会できます。</p>
-          <Link
-            href="/settings/account/delete"
-            className="text-rose-700 underline underline-offset-2 hover:text-rose-900"
-          >
-            アカウントを削除する
-          </Link>
+        <section className="grid gap-3 rounded-md border border-stone-200 bg-white/82 p-5 shadow-sm">
+          <div>
+            <p className="text-sm font-medium text-stone-500">Account</p>
+            <h2 className="mt-1 text-2xl font-semibold">アカウント</h2>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Link
+              href="/settings/profile"
+              className="flex items-center gap-3 rounded-md border border-stone-200 bg-stone-50 p-4 text-sm font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-white"
+            >
+              <Settings size={16} aria-hidden="true" />
+              プロフィール設定
+            </Link>
+            <form action={logoutAction}>
+              <button
+                className="flex w-full items-center gap-3 rounded-md border border-stone-200 bg-stone-50 p-4 text-sm font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-white"
+              >
+                <LogOut size={16} aria-hidden="true" />
+                ログアウト
+              </button>
+            </form>
+          </div>
+          <p className="flex items-center justify-between text-sm text-stone-500">
+            <span>アカウントを使わなくなった場合は退会できます。</span>
+            <Link
+              href="/settings/account/delete"
+              className="text-rose-700 underline underline-offset-2 hover:text-rose-900"
+            >
+              アカウントを削除する
+            </Link>
+          </p>
         </section>
 
         <section id="active-trades" className="grid gap-4">
@@ -233,134 +274,7 @@ function SummaryLink({
   );
 }
 
-function TradePostSection({ posts }: { posts: MyTradePost[] }) {
-  return (
-    <section className="grid gap-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm font-medium text-stone-500">Trade posts</p>
-          <h2 className="mt-1 text-2xl font-semibold">自分の交換投稿</h2>
-          <p className="mt-1 text-sm text-stone-600">
-            出る / 求むを1つの投稿として管理します。
-          </p>
-        </div>
-        <ButtonLink href="/mypage/posts/new" variant="secondary" className="gap-2">
-          <PlusCircle size={16} aria-hidden="true" />
-          交換投稿を作る
-        </ButtonLink>
-      </div>
 
-      {posts.length ? (
-        <div className="grid gap-3">
-          {posts.slice(0, 6).map((post) => (
-            <TradePostRow key={post.id} post={post} />
-          ))}
-        </div>
-      ) : (
-        <EmptyState
-          title="交換投稿はまだありません"
-          text="出るボトルと求む条件をまとめて、最初の交換投稿を作りましょう。"
-          href="/mypage/posts/new"
-          label="交換投稿を作る"
-        />
-      )}
-    </section>
-  );
-}
-
-function TradePostRow({ post }: { post: MyTradePost }) {
-  const offer = post.offer_items[0];
-  const want = post.want_items[0];
-  const canToggleVisibility = post.status === "public" || post.status === "private";
-
-  return (
-    <article className="grid gap-4 rounded-md border border-stone-200 bg-white/82 p-4 shadow-sm">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-medium text-stone-500">
-            {formatDate(post.published_at ?? post.created_at)}
-          </p>
-          <h3 className="mt-1 font-semibold">
-            {post.title || offer?.display_bottle_name || "交換投稿"}
-          </h3>
-          {post.condition_note ? (
-            <p className="mt-1 line-clamp-2 text-sm text-stone-600">
-              {post.condition_note}
-            </p>
-          ) : null}
-        </div>
-        <StatusBadge label={postStatusLabels[post.status] ?? post.status} />
-      </div>
-
-      <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-md bg-stone-50 p-3">
-          <p className="text-xs font-medium text-stone-500">出る</p>
-          <p className="mt-1 font-semibold">
-            {offer?.display_bottle_name ?? "名称未設定のボトル"}
-          </p>
-          {offer ? (
-            <p className="mt-1 text-sm text-stone-600">
-              {bottleSubline(offer) || "MaltPeri情報なし"}
-            </p>
-          ) : null}
-          {post.offer_items.length > 1 ? (
-            <p className="mt-1 text-xs text-stone-500">
-              ほか {post.offer_items.length - 1}件
-            </p>
-          ) : null}
-        </div>
-        <div className="rounded-md bg-stone-50 p-3">
-          <p className="text-xs font-medium text-stone-500">求む</p>
-          <p className="mt-1 font-semibold">
-            {want?.display_bottle_name ?? "提案歓迎"}
-          </p>
-          {want ? (
-            <p className="mt-1 text-sm text-stone-600">
-              {bottleSubline(want) || "MaltPeri情報なし"}
-            </p>
-          ) : null}
-          {post.want_items.length > 1 ? (
-            <p className="mt-1 text-xs text-stone-500">
-              ほか {post.want_items.length - 1}件
-            </p>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-        {post.status === "public" ? (
-          <ButtonLink href={`/posts/${post.id}`} variant="secondary" className="gap-2">
-            <Handshake size={15} aria-hidden="true" />
-            公開表示を見る
-          </ButtonLink>
-        ) : null}
-        {canToggleVisibility ? (
-          <ButtonLink
-            href={`/mypage/posts/${post.id}/edit`}
-            variant="secondary"
-            className="gap-2"
-          >
-            <Pencil size={15} aria-hidden="true" />
-            編集
-          </ButtonLink>
-        ) : null}
-        {canToggleVisibility ? (
-          <form action={updateTradePostVisibilityAction}>
-            <input type="hidden" name="trade_post_id" value={post.id} />
-            <input
-              type="hidden"
-              name="next_status"
-              value={post.status === "public" ? "private" : "public"}
-            />
-            <button className="inline-flex h-11 w-full items-center justify-center rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-950 transition hover:border-stone-950 sm:w-auto">
-              {post.status === "public" ? "受付停止にする" : "再公開する"}
-            </button>
-          </form>
-        ) : null}
-      </div>
-    </article>
-  );
-}
 
 function MyItemUpdateMessage({
   updated,

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import type { User } from "@supabase/supabase-js";
 import { getMyTradeProfile } from "@/lib/data/profiles";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -6,6 +7,7 @@ import type { CompleteTradeProfile } from "@/lib/types/profile";
 import { isCompleteTradeProfile } from "@/lib/validators/profile";
 
 export async function getCurrentUser(): Promise<User | null> {
+  await connection();
   const supabase = await createServerSupabaseClient();
 
   if (!supabase) {

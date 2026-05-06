@@ -1,13 +1,12 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  ArrowLeft,
   CheckCircle2,
   Pencil,
   PauseCircle,
   Star,
   Truck,
 } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
 import { PageShell } from "@/components/layout/page-shell";
 import { ButtonLink } from "@/components/ui/button-link";
 import { DataStatusNote } from "@/components/ui/status-note";
@@ -53,13 +52,7 @@ export default async function PostDetailPage({
 
   return (
     <PageShell>
-      <Link
-        href="/posts"
-        className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition hover:text-stone-950"
-      >
-        <ArrowLeft size={16} aria-hidden="true" />
-        投稿一覧に戻る
-      </Link>
+      <BackButton fallbackHref="/posts" />
       <DataStatusNote isConfigured={result.isConfigured} error={result.error} />
       <DataStatusNote
         isConfigured={myPostResult.isConfigured}
