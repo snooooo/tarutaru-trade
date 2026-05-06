@@ -14,6 +14,7 @@ import { updateTradePostVisibilityAction } from "@/lib/actions/trade-post-action
 import { getMyTradePost, getPublicTradePost } from "@/lib/data/trade-posts";
 import { getCurrentUser } from "@/lib/auth/require-user";
 import { ReportButton } from "@/components/posts/report-button";
+import { YahooAuctionLink } from "@/components/ui/yahoo-auction-link";
 import {
   bottleSubline,
   formatBoxCondition,
@@ -238,6 +239,9 @@ function OfferDetail({ item }: { item: PublicTradePostOfferItem }) {
         <Info label="箱状態" value={formatBoxCondition(item.box_condition)} />
         <Info label="ラベル" value={formatLabelCondition(item.label_condition)} />
       </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <YahooAuctionLink bottleName={item.display_bottle_name} />
+      </div>
       {item.note ? (
         <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-stone-700">
           {item.note}
@@ -259,6 +263,9 @@ function WantDetail({ item }: { item: PublicTradePostWantItem }) {
           <Info label="相場中央値" value={formatPrice(item.median_price)} />
         </div>
       ) : null}
+      <div className="mt-3 flex flex-wrap gap-2">
+        <YahooAuctionLink bottleName={item.display_bottle_name} />
+      </div>
       {item.condition_note ? (
         <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-stone-700">
           {item.condition_note}

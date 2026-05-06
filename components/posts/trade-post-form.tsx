@@ -7,6 +7,7 @@ import {
   createTradePostAction,
   updateTradePostAction,
 } from "@/lib/actions/trade-post-actions";
+import { YahooAuctionLink } from "@/components/ui/yahoo-auction-link";
 import type { MyTradePost } from "@/lib/types/trade-posts";
 
 const MAX_ITEMS = 3;
@@ -199,6 +200,8 @@ function OfferFields({
   onRemove?: () => void;
 }) {
   const label = `出る ${index + 1}`;
+  const initialName = item?.manual_bottle_name ?? item?.display_bottle_name ?? "";
+  const [bottleName, setBottleName] = useState(initialName);
 
   return (
     <fieldset className="grid gap-4 rounded-md border border-stone-200 bg-stone-50/60 p-4">
@@ -217,18 +220,24 @@ function OfferFields({
         ) : null}
       </div>
       <input type="hidden" name="offer_item_id" value={item?.id ?? ""} />
-      <label className="grid gap-2">
-        <span className="text-sm font-medium text-stone-700">ボトル名</span>
-        <input
-          type="text"
-          name="offer_manual_bottle_name"
-          aria-required={required}
-          maxLength={120}
-          defaultValue={item?.manual_bottle_name ?? item?.display_bottle_name ?? ""}
-          className="h-11 rounded-md border border-stone-300 bg-white px-3 outline-none transition focus:border-stone-950"
-          placeholder={required ? "例: グレンリベット12年" : "任意"}
-        />
-      </label>
+      <div className="grid gap-2">
+        <label className="grid gap-2">
+          <span className="text-sm font-medium text-stone-700">ボトル名</span>
+          <input
+            type="text"
+            name="offer_manual_bottle_name"
+            aria-required={required}
+            maxLength={120}
+            defaultValue={initialName}
+            onChange={(e) => setBottleName(e.target.value)}
+            className="h-11 rounded-md border border-stone-300 bg-white px-3 outline-none transition focus:border-stone-950"
+            placeholder={required ? "例: グレンリベット12年" : "任意"}
+          />
+        </label>
+        {bottleName.trim() ? (
+          <YahooAuctionLink bottleName={bottleName.trim()} />
+        ) : null}
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="grid gap-2">
           <span className="text-sm font-medium text-stone-700">箱状態</span>
@@ -294,6 +303,8 @@ function WantFields({
   onRemove?: () => void;
 }) {
   const label = `求む ${index + 1}`;
+  const initialName = item?.manual_bottle_name ?? item?.display_bottle_name ?? "";
+  const [bottleName, setBottleName] = useState(initialName);
 
   return (
     <fieldset className="grid gap-4 rounded-md border border-stone-200 bg-stone-50/60 p-4">
@@ -312,17 +323,23 @@ function WantFields({
         ) : null}
       </div>
       <input type="hidden" name="want_item_id" value={item?.id ?? ""} />
-      <label className="grid gap-2">
-        <span className="text-sm font-medium text-stone-700">ボトル名</span>
-        <input
-          type="text"
-          name="want_manual_bottle_name"
-          maxLength={120}
-          defaultValue={item?.manual_bottle_name ?? item?.display_bottle_name ?? ""}
-          className="h-11 rounded-md border border-stone-300 bg-white px-3 outline-none transition focus:border-stone-950"
-          placeholder={index === 0 ? "例: グレンフィディック15年" : "任意"}
-        />
-      </label>
+      <div className="grid gap-2">
+        <label className="grid gap-2">
+          <span className="text-sm font-medium text-stone-700">ボトル名</span>
+          <input
+            type="text"
+            name="want_manual_bottle_name"
+            maxLength={120}
+            defaultValue={initialName}
+            onChange={(e) => setBottleName(e.target.value)}
+            className="h-11 rounded-md border border-stone-300 bg-white px-3 outline-none transition focus:border-stone-950"
+            placeholder={index === 0 ? "例: グレンフィディック15年" : "任意"}
+          />
+        </label>
+        {bottleName.trim() ? (
+          <YahooAuctionLink bottleName={bottleName.trim()} />
+        ) : null}
+      </div>
       <label className="grid gap-2">
         <span className="text-sm font-medium text-stone-700">希望条件</span>
         <textarea
