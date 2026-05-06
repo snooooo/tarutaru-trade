@@ -17,7 +17,7 @@ async function SignupContent({ searchParams }: SignupPageProps) {
     <section className="mx-auto grid max-w-md gap-6">
       <div>
         <p className="text-sm font-medium text-stone-500">Signup</p>
-        <h1 className="mt-1 text-3xl font-semibold">新規登録</h1>
+        <h1 className="mt-1 text-3xl font-semibold">MaltPeri ID 新規登録</h1>
         <p className="mt-3 text-stone-700">
           登録後にプロフィール欄を記入すると、トレードの準備ができるようになります。
         </p>
@@ -28,7 +28,7 @@ async function SignupContent({ searchParams }: SignupPageProps) {
               <path d="M4.5 8l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span>
-              アカウントは{" "}
+              MaltPeri ID は{" "}
               <a
                 href="https://maltperi.com/"
                 target="_blank"
@@ -37,7 +37,7 @@ async function SignupContent({ searchParams }: SignupPageProps) {
               >
                 MaltPeri
               </a>{" "}
-              と共通。登録するとMaltPeriにもログインできます。
+              と TaruTaruTrade で共通のアカウントです。
             </span>
           </li>
           <li className="flex items-start gap-2">
@@ -46,7 +46,7 @@ async function SignupContent({ searchParams }: SignupPageProps) {
               <path d="M4.5 8l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span>
-              MaltPeriをすでにお使いの方は新規登録不要です。{" "}
+              MaltPeri ID をお持ちの方は新規登録不要です。{" "}
               <a href="/login" className="underline underline-offset-4">
                 ログインへどうぞ。
               </a>
@@ -57,7 +57,7 @@ async function SignupContent({ searchParams }: SignupPageProps) {
               <circle cx="8" cy="8" r="8" className="fill-emerald-100" />
               <path d="M4.5 8l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span>確認メールはMaltPeri名義で届きます。</span>
+            <span>確認メールは MaltPeri ID 名義で届きます。</span>
           </li>
         </ul>
       </div>

@@ -5,6 +5,7 @@ import {
   Clock,
   HandHeart,
   Inbox,
+  KeyRound,
   LogOut,
   PlusCircle,
   Send,
@@ -189,6 +190,13 @@ export default async function MyPage({ searchParams }: MyPageProps) {
             >
               <Settings size={16} aria-hidden="true" />
               プロフィール設定
+            </Link>
+            <Link
+              href="/settings/account/password"
+              className="flex items-center gap-3 rounded-md border border-stone-200 bg-stone-50 p-4 text-sm font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-white"
+            >
+              <KeyRound size={16} aria-hidden="true" />
+              パスワード変更
             </Link>
             <form action={logoutAction}>
               <button
