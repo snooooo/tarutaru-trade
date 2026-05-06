@@ -32,6 +32,32 @@ export type Database = {
         }
         Relationships: []
       }
+      app_user_activity: {
+        Row: {
+          app: string
+          last_active_at: string
+          user_id: string
+        }
+        Insert: {
+          app: string
+          last_active_at?: string
+          user_id: string
+        }
+        Update: {
+          app?: string
+          last_active_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_user_activity_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       auction_price_data: {
         Row: {
           auction_end_date: string
@@ -262,7 +288,15 @@ export type Database = {
           submitted_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_user"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       distilleries: {
         Row: {
@@ -538,7 +572,7 @@ export type Database = {
           created_at: string
           dismissed_at: string | null
           id: string
-          proposed_offer_item_id: string
+          proposed_offer_item_id: string | null
           proposed_offer_item_previous_status:
             | Database["public"]["Enums"]["trade_item_status"]
             | null
@@ -551,7 +585,13 @@ export type Database = {
           target_offer_item_previous_status:
             | Database["public"]["Enums"]["trade_item_status"]
             | null
-          target_type: Database["public"]["Enums"]["trade_interest_target_type"]
+          target_trade_post_id: string | null
+          target_trade_post_previous_status:
+            | Database["public"]["Enums"]["trade_post_status"]
+            | null
+          target_type:
+            | Database["public"]["Enums"]["trade_interest_target_type"]
+            | null
           target_want_item_id: string | null
           target_want_item_previous_status:
             | Database["public"]["Enums"]["trade_item_status"]
@@ -565,7 +605,7 @@ export type Database = {
           created_at?: string
           dismissed_at?: string | null
           id?: string
-          proposed_offer_item_id: string
+          proposed_offer_item_id?: string | null
           proposed_offer_item_previous_status?:
             | Database["public"]["Enums"]["trade_item_status"]
             | null
@@ -578,7 +618,13 @@ export type Database = {
           target_offer_item_previous_status?:
             | Database["public"]["Enums"]["trade_item_status"]
             | null
-          target_type: Database["public"]["Enums"]["trade_interest_target_type"]
+          target_trade_post_id?: string | null
+          target_trade_post_previous_status?:
+            | Database["public"]["Enums"]["trade_post_status"]
+            | null
+          target_type?:
+            | Database["public"]["Enums"]["trade_interest_target_type"]
+            | null
           target_want_item_id?: string | null
           target_want_item_previous_status?:
             | Database["public"]["Enums"]["trade_item_status"]
@@ -592,7 +638,7 @@ export type Database = {
           created_at?: string
           dismissed_at?: string | null
           id?: string
-          proposed_offer_item_id?: string
+          proposed_offer_item_id?: string | null
           proposed_offer_item_previous_status?:
             | Database["public"]["Enums"]["trade_item_status"]
             | null
@@ -605,7 +651,13 @@ export type Database = {
           target_offer_item_previous_status?:
             | Database["public"]["Enums"]["trade_item_status"]
             | null
-          target_type?: Database["public"]["Enums"]["trade_interest_target_type"]
+          target_trade_post_id?: string | null
+          target_trade_post_previous_status?:
+            | Database["public"]["Enums"]["trade_post_status"]
+            | null
+          target_type?:
+            | Database["public"]["Enums"]["trade_interest_target_type"]
+            | null
           target_want_item_id?: string | null
           target_want_item_previous_status?:
             | Database["public"]["Enums"]["trade_item_status"]
@@ -628,6 +680,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "trade_interests_receiver_user_id_fkey"
+            columns: ["receiver_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trade_interests_requester_user_id_fkey"
+            columns: ["requester_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "trade_interests_target_offer_item_id_fkey"
             columns: ["target_offer_item_id"]
             isOneToOne: false
@@ -639,6 +705,20 @@ export type Database = {
             columns: ["target_offer_item_id"]
             isOneToOne: false
             referencedRelation: "trade_public_offer_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_interests_target_trade_post_id_fkey"
+            columns: ["target_trade_post_id"]
+            isOneToOne: false
+            referencedRelation: "trade_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_interests_target_trade_post_id_fkey"
+            columns: ["target_trade_post_id"]
+            isOneToOne: false
+            referencedRelation: "trade_public_posts"
             referencedColumns: ["id"]
           },
           {
@@ -667,7 +747,9 @@ export type Database = {
           maltperi_bottle_id: string | null
           manual_bottle_name: string | null
           note: string | null
+          sort_order: number
           status: Database["public"]["Enums"]["trade_item_status"]
+          trade_post_id: string | null
           updated_at: string
           user_id: string
         }
@@ -680,7 +762,9 @@ export type Database = {
           maltperi_bottle_id?: string | null
           manual_bottle_name?: string | null
           note?: string | null
+          sort_order?: number
           status?: Database["public"]["Enums"]["trade_item_status"]
+          trade_post_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -693,7 +777,9 @@ export type Database = {
           maltperi_bottle_id?: string | null
           manual_bottle_name?: string | null
           note?: string | null
+          sort_order?: number
           status?: Database["public"]["Enums"]["trade_item_status"]
+          trade_post_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -705,12 +791,78 @@ export type Database = {
             referencedRelation: "bottles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "trade_offer_items_trade_post_id_fkey"
+            columns: ["trade_post_id"]
+            isOneToOne: false
+            referencedRelation: "trade_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_offer_items_trade_post_id_fkey"
+            columns: ["trade_post_id"]
+            isOneToOne: false
+            referencedRelation: "trade_public_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_offer_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      trade_posts: {
+        Row: {
+          closed_at: string | null
+          condition_note: string | null
+          created_at: string
+          id: string
+          published_at: string | null
+          status: Database["public"]["Enums"]["trade_post_status"]
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          closed_at?: string | null
+          condition_note?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["trade_post_status"]
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          closed_at?: string | null
+          condition_note?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["trade_post_status"]
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       trade_profiles: {
         Row: {
           anonymous_shipping_ok: boolean | null
           created_at: string
+          deleted_at: string | null
           display_name: string
           is_suspended: boolean
           terms_accepted_at: string | null
@@ -724,6 +876,7 @@ export type Database = {
         Insert: {
           anonymous_shipping_ok?: boolean | null
           created_at?: string
+          deleted_at?: string | null
           display_name?: string
           is_suspended?: boolean
           terms_accepted_at?: string | null
@@ -737,6 +890,7 @@ export type Database = {
         Update: {
           anonymous_shipping_ok?: boolean | null
           created_at?: string
+          deleted_at?: string | null
           display_name?: string
           is_suspended?: boolean
           terms_accepted_at?: string | null
@@ -747,7 +901,144 @@ export type Database = {
             | null
           x_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trade_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      trade_proposal_offer_items: {
+        Row: {
+          box_condition: Database["public"]["Enums"]["trade_box_condition"]
+          created_at: string
+          id: string
+          image_url: string | null
+          label_condition: Database["public"]["Enums"]["trade_label_condition"]
+          maltperi_bottle_id: string | null
+          manual_bottle_name: string | null
+          note: string | null
+          sort_order: number
+          status: string
+          trade_interest_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          box_condition?: Database["public"]["Enums"]["trade_box_condition"]
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          label_condition?: Database["public"]["Enums"]["trade_label_condition"]
+          maltperi_bottle_id?: string | null
+          manual_bottle_name?: string | null
+          note?: string | null
+          sort_order?: number
+          status?: string
+          trade_interest_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          box_condition?: Database["public"]["Enums"]["trade_box_condition"]
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          label_condition?: Database["public"]["Enums"]["trade_label_condition"]
+          maltperi_bottle_id?: string | null
+          manual_bottle_name?: string | null
+          note?: string | null
+          sort_order?: number
+          status?: string
+          trade_interest_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_proposal_offer_items_maltperi_bottle_id_fkey"
+            columns: ["maltperi_bottle_id"]
+            isOneToOne: false
+            referencedRelation: "bottles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_proposal_offer_items_trade_interest_id_fkey"
+            columns: ["trade_interest_id"]
+            isOneToOne: false
+            referencedRelation: "trade_interests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_proposal_offer_items_trade_interest_id_fkey"
+            columns: ["trade_interest_id"]
+            isOneToOne: false
+            referencedRelation: "trade_visible_counterparty_profiles"
+            referencedColumns: ["trade_interest_id"]
+          },
+          {
+            foreignKeyName: "trade_proposal_offer_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      trade_reports: {
+        Row: {
+          admin_note: string | null
+          created_at: string
+          id: string
+          reason: string | null
+          reporter_user_id: string
+          status: string
+          trade_post_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          reporter_user_id: string
+          status?: string
+          trade_post_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          reporter_user_id?: string
+          status?: string
+          trade_post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_reports_reporter_user_id_fkey"
+            columns: ["reporter_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trade_reports_trade_post_id_fkey"
+            columns: ["trade_post_id"]
+            isOneToOne: false
+            referencedRelation: "trade_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_reports_trade_post_id_fkey"
+            columns: ["trade_post_id"]
+            isOneToOne: false
+            referencedRelation: "trade_public_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trade_reviews: {
         Row: {
@@ -779,6 +1070,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "trade_reviews_reviewee_user_id_fkey"
+            columns: ["reviewee_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trade_reviews_reviewer_user_id_fkey"
+            columns: ["reviewer_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "trade_reviews_trade_interest_id_fkey"
             columns: ["trade_interest_id"]
             isOneToOne: false
@@ -801,7 +1106,9 @@ export type Database = {
           id: string
           maltperi_bottle_id: string | null
           manual_bottle_name: string | null
+          sort_order: number
           status: Database["public"]["Enums"]["trade_item_status"]
+          trade_post_id: string | null
           updated_at: string
           user_id: string
         }
@@ -811,7 +1118,9 @@ export type Database = {
           id?: string
           maltperi_bottle_id?: string | null
           manual_bottle_name?: string | null
+          sort_order?: number
           status?: Database["public"]["Enums"]["trade_item_status"]
+          trade_post_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -821,7 +1130,9 @@ export type Database = {
           id?: string
           maltperi_bottle_id?: string | null
           manual_bottle_name?: string | null
+          sort_order?: number
           status?: Database["public"]["Enums"]["trade_item_status"]
+          trade_post_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -832,6 +1143,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "bottles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_want_items_trade_post_id_fkey"
+            columns: ["trade_post_id"]
+            isOneToOne: false
+            referencedRelation: "trade_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_want_items_trade_post_id_fkey"
+            columns: ["trade_post_id"]
+            isOneToOne: false
+            referencedRelation: "trade_public_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_want_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -964,6 +1296,13 @@ export type Database = {
             referencedRelation: "distilleries"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_bottles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       user_challenge_progress: {
@@ -1062,6 +1401,13 @@ export type Database = {
             referencedRelation: "distilleries"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_distillery_interactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       user_distillery_notes: {
@@ -1106,10 +1452,27 @@ export type Database = {
             referencedRelation: "distilleries"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_distillery_notes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
     }
     Views: {
+      app_active_users: {
+        Row: {
+          email: string | null
+          maltperi_last_active_at: string | null
+          service_usage: string | null
+          tarutaru_last_active_at: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       trade_bottle_auction_price_stats: {
         Row: {
           bottle_id: string | null
@@ -1181,6 +1544,29 @@ export type Database = {
           },
         ]
       }
+      trade_public_posts: {
+        Row: {
+          condition_note: string | null
+          created_at: string | null
+          id: string | null
+          offer_items: Json | null
+          owner_anonymous_shipping_ok: boolean | null
+          owner_average_rating: number | null
+          owner_cancellation_rate: number | null
+          owner_completed_count: number | null
+          owner_display_name: string | null
+          owner_review_count: number | null
+          owner_x_followers_range:
+            | Database["public"]["Enums"]["trade_x_followers_range"]
+            | null
+          profile_public_id: string | null
+          published_at: string | null
+          search_text: string | null
+          title: string | null
+          want_items: Json | null
+        }
+        Relationships: []
+      }
       trade_public_profile_stats: {
         Row: {
           anonymous_shipping_ok: boolean | null
@@ -1210,7 +1596,15 @@ export type Database = {
             | Database["public"]["Enums"]["trade_x_followers_range"]
             | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trade_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "app_active_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       trade_public_want_items: {
         Row: {
@@ -1280,6 +1674,7 @@ export type Database = {
         Args: { challenge_id: string; user_id: string }
         Returns: number
       }
+      touch_app_active: { Args: { p_app: string }; Returns: undefined }
       trade_cancel_interest: {
         Args: { p_interest_id: string }
         Returns: undefined
@@ -1292,10 +1687,35 @@ export type Database = {
         }
         Returns: string
       }
+      trade_create_post: {
+        Args: {
+          p_condition_note: string
+          p_offer_items: Json
+          p_title: string
+          p_want_items?: Json
+        }
+        Returns: string
+      }
+      trade_create_post_interest:
+        | {
+            Args: {
+              p_proposal_offer_items: Json
+              p_target_trade_post_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_proposed_offer_item_id: string
+              p_target_trade_post_id: string
+            }
+            Returns: string
+          }
       trade_create_review: {
         Args: { p_comment?: string; p_interest_id: string; p_rating: number }
         Returns: string
       }
+      trade_delete_account: { Args: never; Returns: Json }
       trade_dismiss_interest: {
         Args: { p_interest_id: string }
         Returns: undefined
@@ -1352,6 +1772,7 @@ export type Database = {
       trade_interest_target_type: "offer" | "want"
       trade_item_status: "public" | "private" | "trading" | "closed"
       trade_label_condition: "good" | "minor_damage" | "damaged"
+      trade_post_status: "public" | "private" | "consulting" | "closed"
       trade_x_followers_range: "under_100" | "100_499" | "500_999" | "1000_plus"
     }
     CompositeTypes: {
@@ -1508,6 +1929,7 @@ export const Constants = {
       trade_interest_target_type: ["offer", "want"],
       trade_item_status: ["public", "private", "trading", "closed"],
       trade_label_condition: ["good", "minor_damage", "damaged"],
+      trade_post_status: ["public", "private", "consulting", "closed"],
       trade_x_followers_range: ["under_100", "100_499", "500_999", "1000_plus"],
     },
   },

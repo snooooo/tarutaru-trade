@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ActivityTracker } from "@/components/auth/activity-tracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default function RootLayout({
           🚧 試験運転中 — 表示されているデータはすべてサンプルです
         </div>
         {children}
+        <ActivityTracker />
       </body>
     </html>
   );
