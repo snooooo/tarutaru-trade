@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { PostInterestCreateForm } from "@/components/posts/post-interest-create-form";
 import { DataStatusNote } from "@/components/ui/status-note";
@@ -26,6 +28,13 @@ export default async function PostInterestPage({
   return (
     <PageShell>
       <div className="grid gap-6">
+        <Link
+          href={`/posts/${postId}`}
+          className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition hover:text-stone-950"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          投稿詳細に戻る
+        </Link>
         <div>
           <p className="text-sm font-medium text-stone-500">Interest</p>
           <h1 className="mt-1 text-3xl font-semibold">トレードに興味あり</h1>

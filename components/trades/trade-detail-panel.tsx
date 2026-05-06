@@ -113,7 +113,20 @@ export function TradeDetailPanel({
 
       <CounterpartyPanel counterparty={trade.counterparty} canShowXId={canShowXId} />
 
-      <section className="flex flex-col gap-2 rounded-md border border-stone-200 bg-white/82 p-5 sm:flex-row sm:flex-wrap">
+      <section className="grid gap-4 rounded-md border border-stone-200 bg-white/82 p-5">
+        {canStartConsulting ? (
+          <div className="rounded-md bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+            <p className="font-semibold">取引を始める前に</p>
+            <p className="mt-1">
+              まずは相手のXアカウントを確認し、取引を進めるかどうかご自身で判断してください。
+            </p>
+            <p className="mt-1">
+              見送りになっても、急な体調不良や仕事の都合など、それぞれに事情があります。
+              理由を聞いたり責めたりせず、寛大にご対応願います。
+            </p>
+          </div>
+        ) : null}
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         {canStartConsulting ? (
           <ActionForm
             action={startConsultingInterestAction}
@@ -175,6 +188,7 @@ export function TradeDetailPanel({
             評価済みです。
           </p>
         ) : null}
+        </div>
       </section>
     </article>
   );

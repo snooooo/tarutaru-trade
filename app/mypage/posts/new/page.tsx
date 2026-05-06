@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { TradePostForm } from "@/components/posts/trade-post-form";
 import { requireCompleteTradeProfile } from "@/lib/auth/require-user";
@@ -15,6 +17,13 @@ export default async function NewTradePostPage({
   return (
     <PageShell>
       <div className="grid gap-6">
+        <Link
+          href="/mypage"
+          className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition hover:text-stone-950"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          マイページに戻る
+        </Link>
         <div>
           <p className="text-sm font-medium text-stone-500">New trade post</p>
           <h1 className="mt-1 text-3xl font-semibold">交換投稿を作る</h1>

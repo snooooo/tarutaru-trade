@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  ArrowLeft,
   CheckCircle2,
   Pencil,
   PauseCircle,
@@ -48,6 +50,13 @@ export default async function PostDetailPage({
 
   return (
     <PageShell>
+      <Link
+        href="/posts"
+        className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition hover:text-stone-950"
+      >
+        <ArrowLeft size={16} aria-hidden="true" />
+        投稿一覧に戻る
+      </Link>
       <DataStatusNote isConfigured={result.isConfigured} error={result.error} />
       <DataStatusNote
         isConfigured={myPostResult.isConfigured}

@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { ReviewForm } from "@/components/trades/review-form";
 import { DataStatusNote } from "@/components/ui/status-note";
@@ -27,6 +29,13 @@ export default async function ReviewPage({ params, searchParams }: ReviewPagePro
   return (
     <PageShell>
       <section className="grid gap-6">
+        <Link
+          href={`/trades/${interestId}`}
+          className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition hover:text-stone-950"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          取引詳細に戻る
+        </Link>
         <DataStatusNote isConfigured={trade.isConfigured} error={trade.error} />
         {search.error ? (
           <p className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">

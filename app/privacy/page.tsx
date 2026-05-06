@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 
 export const metadata: Metadata = {
@@ -11,6 +12,13 @@ export default function PrivacyPage() {
   return (
     <PageShell>
       <article className="mx-auto grid max-w-2xl gap-6 text-stone-800">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition hover:text-stone-950"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          トップに戻る
+        </Link>
         <header>
           <p className="text-sm font-medium text-stone-500">Privacy Policy</p>
           <h1 className="mt-1 text-3xl font-semibold text-stone-950">プライバシーポリシー</h1>

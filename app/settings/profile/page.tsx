@@ -1,4 +1,5 @@
-import { CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { ProfileForm } from "@/components/profiles/profile-form";
 import { DataStatusNote } from "@/components/ui/status-note";
@@ -26,6 +27,13 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   return (
     <PageShell>
       <section className="mx-auto grid max-w-3xl gap-6">
+        <Link
+          href="/mypage"
+          className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition hover:text-stone-950"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          マイページに戻る
+        </Link>
         <div>
           <p className="text-sm font-medium text-stone-500">Settings</p>
           <h1 className="mt-1 text-3xl font-semibold">取引用プロフィール</h1>

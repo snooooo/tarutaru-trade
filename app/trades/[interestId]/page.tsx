@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { ArrowLeft } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { TradeDetailPanel } from "@/components/trades/trade-detail-panel";
 import { DataStatusNote } from "@/components/ui/status-note";
@@ -8,7 +10,7 @@ import { getTradeInterestDetail } from "@/lib/data/interests";
 
 type TradeDetailPageProps = {
   params: Promise<{ interestId: string }>;
-  searchParams: Promise<{ updated?: string; error?: string }>;
+  searchParams: Promise<{ updated?: string; error?: string; from?: string }>;
 };
 
 export default async function TradeDetailPage({
@@ -17,6 +19,14 @@ export default async function TradeDetailPage({
 }: TradeDetailPageProps) {
   const { interestId } = await params;
   const search = await searchParams;
+  const backHref =
+    search.from === "sent"
+      ? "/mypage/interests/sent"
+      : search.from === "received"
+        ? "/mypage/interests/received"
+        : "/mypage/interests/sent";
+  const backLabel =
+    search.from === "received" ? "届いた興味ありに戻る" : "送った興味ありに戻る";
   await requireCompleteTradeProfile(`/trades/${interestId}`);
   const trade = await getTradeInterestDetail(interestId);
 
@@ -27,6 +37,13 @@ export default async function TradeDetailPage({
   return (
     <PageShell>
       <section className="grid gap-6">
+        <Link
+          href={backHref}
+          className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition hover:text-stone-950"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          {backLabel}
+        </Link>
         <DataStatusNote isConfigured={trade.isConfigured} error={trade.error} />
 
         {search.updated === "consulting" ? (

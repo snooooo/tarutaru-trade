@@ -162,7 +162,7 @@ export function InterestListCards({
           {interest.status !== "interested" ? (
             <div className="border-t border-stone-100 pt-4">
               <Link
-                href={`/trades/${interest.id}`}
+                href={`/trades/${interest.id}?from=${direction}`}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white/70 px-4 text-sm font-semibold text-stone-950 transition hover:bg-white"
               >
                 取引詳細へ
