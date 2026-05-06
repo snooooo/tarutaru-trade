@@ -10,6 +10,7 @@ import {
   Star,
   Truck,
 } from "lucide-react";
+import { XIdCopyButton } from "./x-id-copy-button";
 import {
   cancelInterestAction,
   dismissInterestAction,
@@ -462,20 +463,28 @@ function CounterpartyPanel({
       </div>
 
       {canShowXId && normalizedXId ? (
-        <div className="mt-5 flex flex-col gap-3 rounded-md bg-stone-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs font-medium text-stone-500">X ID</p>
-            <p className="mt-1 text-lg font-semibold">@{normalizedXId}</p>
-          </div>
+        <div className="mt-5 rounded-md bg-stone-50 p-4">
+          <p className="text-xs font-medium text-stone-500">X ID</p>
           <a
             href={`https://x.com/${encodeURIComponent(normalizedXId)}`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800"
+            className="mt-1 inline-block text-lg font-semibold underline-offset-2 hover:underline"
           >
-            XプロフィールでDMへ
-            <ExternalLink size={16} aria-hidden="true" />
+            @{normalizedXId}
           </a>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <XIdCopyButton xId={normalizedXId} />
+            <a
+              href={`https://x.com/${encodeURIComponent(normalizedXId)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800"
+            >
+              XプロフィールでDMへ
+              <ExternalLink size={16} aria-hidden="true" />
+            </a>
+          </div>
         </div>
       ) : (
         <p className="mt-4 rounded-md bg-stone-50 p-4 text-sm text-stone-600">
