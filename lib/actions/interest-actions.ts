@@ -55,7 +55,7 @@ export async function createInterestAction(formData: FormData) {
   }
 
   if (typeof proposedOfferItemId !== "string" || !proposedOfferItemId) {
-    redirectWithError(returnPath, "交換候補ボトルを選んでください。");
+    redirectWithError(returnPath, "トレード候補ボトルを選んでください。");
   }
 
   const { error } = await supabase.rpc("trade_create_interest", {
@@ -90,11 +90,11 @@ export async function createPostInterestAction(formData: FormData) {
   const notes = stringValues(formData, "proposal_note");
 
   if (typeof targetPostId !== "string" || !targetPostId) {
-    redirectWithError(returnPath, "交換投稿が見つかりません。");
+    redirectWithError(returnPath, "トレード投稿が見つかりません。");
   }
 
   if (!manualBottleNames.some(Boolean)) {
-    redirectWithError(returnPath, "交換候補ボトル名を入力してください。");
+    redirectWithError(returnPath, "トレード候補ボトル名を入力してください。");
   }
 
   const proposalOfferItems = manualBottleNames.flatMap((manualBottleName, index) =>

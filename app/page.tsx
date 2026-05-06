@@ -20,7 +20,7 @@ async function NewPosts() {
             <p className="text-sm font-bold uppercase tracking-normal text-stone-500">
               New posts
             </p>
-            <h2 className="mt-1 text-2xl font-bold">新着交換投稿</h2>
+            <h2 className="mt-1 text-2xl font-bold">新着トレード投稿</h2>
           </div>
           <TradePostList posts={posts.data} />
           <div className="flex justify-center">
@@ -52,7 +52,7 @@ export default function Home() {
                 className="mt-1 size-4 shrink-0 text-stone-950"
                 aria-hidden="true"
               />
-              <span>ウイスキー交換のための半匿名プラットフォーム。</span>
+              <span>ウイスキートレードのための半匿名プラットフォーム。</span>
             </p>
             <p className="flex gap-2">
               <Check

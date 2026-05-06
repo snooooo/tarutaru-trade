@@ -25,7 +25,7 @@ async function PostsList({
       <DataStatusNote isConfigured={posts.isConfigured} error={posts.error} />
       {params.created === "post" ? (
         <p className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
-          交換投稿を公開しました。一覧に反映されています。
+          トレード投稿を公開しました。一覧に反映されています。
         </p>
       ) : null}
       <PaginatedTradePostList posts={posts.data} />
@@ -46,7 +46,7 @@ export default function PostsPage({
             Trade posts
           </p>
           <h1 className="mt-1 text-2xl font-bold sm:text-3xl">
-            交換投稿を探す
+            トレード投稿を探す
           </h1>
           <p className="mt-3 max-w-2xl text-stone-700">
             「出る / 求む」が同じ投稿にまとまった公開一覧です。X IDは相談開始まで表示されません。

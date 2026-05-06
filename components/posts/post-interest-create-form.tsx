@@ -27,7 +27,7 @@ export function PostInterestCreateForm({
       <div>
         <h2 className="text-lg font-semibold">この相談で出せる候補</h2>
         <p className="mt-2 text-sm leading-6 text-stone-700">
-          候補は確定交換品ではありません。相手が相談開始したら、この候補すべてが相談中として扱われ、X IDが相互開示されます。
+          候補は確定トレード品ではありません。相手が相談開始したら、この候補すべてが相談中として扱われ、X IDが相互開示されます。
         </p>
       </div>
 

@@ -67,7 +67,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
           </div>
           <ButtonLink href="/mypage/posts/new" className="gap-2">
             <PlusCircle size={16} aria-hidden="true" />
-            交換投稿を作る
+            トレード投稿を作る
           </ButtonLink>
         </div>
 
@@ -117,14 +117,14 @@ function PostsTab({ posts }: { posts: Parameters<typeof MyTradePostList>[0]["pos
     <section className="grid gap-4 pt-2">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold">自分の交換投稿</h2>
+          <h2 className="text-xl font-semibold">自分のトレード投稿</h2>
           <p className="mt-1 text-sm text-stone-600">
             出る / 求むを1つの投稿として管理します。
           </p>
         </div>
         <ButtonLink href="/mypage/posts/new" variant="secondary" className="gap-2">
           <PlusCircle size={16} aria-hidden="true" />
-          交換投稿を作る
+          トレード投稿を作る
         </ButtonLink>
       </div>
 
@@ -132,10 +132,10 @@ function PostsTab({ posts }: { posts: Parameters<typeof MyTradePostList>[0]["pos
         <MyTradePostList posts={posts} />
       ) : (
         <EmptyState
-          title="交換投稿はまだありません"
-          text="出るボトルと求む条件をまとめて、最初の交換投稿を作りましょう。"
+          title="トレード投稿はまだありません"
+          text="出るボトルと求む条件をまとめて、最初のトレード投稿を作りましょう。"
           href="/mypage/posts/new"
-          label="交換投稿を作る"
+          label="トレード投稿を作る"
         />
       )}
     </section>
@@ -165,9 +165,9 @@ function InteractionsTab({
       ) : (
         <EmptyState
           title="やりとりはまだありません"
-          text="気になる交換投稿に興味ありを送ると、ここに表示されます。"
+          text="気になるトレード投稿に興味ありを送ると、ここに表示されます。"
           href="/posts"
-          label="交換投稿を探す"
+          label="トレード投稿を探す"
         />
       )}
     </section>
@@ -225,9 +225,9 @@ function MyItemUpdateMessage({
   error?: string;
 }) {
   const messages: Record<string, string> = {
-    post_private: "交換投稿の受付を停止しました。",
-    post_public: "交換投稿を再公開しました。",
-    post_updated: "交換投稿を更新しました。",
+    post_private: "トレード投稿の受付を停止しました。",
+    post_public: "トレード投稿を再公開しました。",
+    post_updated: "トレード投稿を更新しました。",
   };
 
   if (!updated && !error) {

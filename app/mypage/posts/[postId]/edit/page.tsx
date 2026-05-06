@@ -42,7 +42,7 @@ export default async function EditTradePostPage({
 
         <div>
           <p className="text-sm font-medium text-stone-500">Edit post</p>
-          <h1 className="mt-1 text-3xl font-semibold">交換投稿を編集</h1>
+          <h1 className="mt-1 text-3xl font-semibold">トレード投稿を編集</h1>
           <p className="mt-3 text-stone-700">
             相談開始前の公開中/非公開投稿だけ編集できます。相談中になった投稿は取引履歴として固定します。
           </p>
@@ -54,7 +54,7 @@ export default async function EditTradePostPage({
 
         {post && !canEdit ? (
           <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
-            相談中または終了済みの交換投稿は編集できません。
+            相談中または終了済みのトレード投稿は編集できません。
           </div>
         ) : null}
       </section>

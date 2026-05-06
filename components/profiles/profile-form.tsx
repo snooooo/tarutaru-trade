@@ -78,7 +78,7 @@ export function ProfileForm({ profile, nextPath }: ProfileFormProps) {
           ))}
         </select>
         <span className="text-xs leading-5 text-stone-500">
-          💡 交換投稿の一覧カードに表示されます。送料の見込みを相手が判断しやすくなります。
+          💡 トレード投稿の一覧カードに表示されます。送料の見込みを相手が判断しやすくなります。
         </span>
       </label>
 

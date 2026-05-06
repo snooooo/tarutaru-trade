@@ -28,7 +28,7 @@ export async function SiteHeader() {
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">
           <ButtonLink href="/posts" variant="ghost">
-            交換投稿を探す
+            トレード投稿を探す
           </ButtonLink>
           {user ? (
             <ButtonLink href="/mypage" variant="ghost">

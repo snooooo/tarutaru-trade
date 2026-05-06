@@ -39,7 +39,7 @@ export default async function PostInterestPage({
           <p className="text-sm font-medium text-stone-500">Interest</p>
           <h1 className="mt-1 text-3xl font-semibold">トレードに興味あり</h1>
           <p className="mt-3 max-w-2xl text-stone-700">
-            相手の交換投稿に対して、この相談で自分が出せる候補を送ります。
+            相手のトレード投稿に対して、この相談で自分が出せる候補を送ります。
           </p>
         </div>
         <DataStatusNote

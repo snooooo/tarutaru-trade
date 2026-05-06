@@ -26,7 +26,7 @@ export default async function NewTradePostPage({
         </Link>
         <div>
           <p className="text-sm font-medium text-stone-500">New trade post</p>
-          <h1 className="mt-1 text-3xl font-semibold">交換投稿を作る</h1>
+          <h1 className="mt-1 text-3xl font-semibold">トレード投稿を作る</h1>
           <p className="mt-3 max-w-2xl text-stone-700">
             「出る」と「求む」を1つの投稿として公開します。X IDは相談開始まで表示されません。
           </p>

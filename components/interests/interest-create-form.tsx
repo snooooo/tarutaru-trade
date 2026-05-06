@@ -29,14 +29,14 @@ export function InterestCreateForm({
     return (
       <section className="grid gap-4 rounded-md border border-stone-200 bg-white/82 p-5 shadow-sm">
         <div>
-          <h2 className="text-lg font-semibold">交換候補のボトルがありません</h2>
+          <h2 className="text-lg font-semibold">トレード候補のボトルがありません</h2>
           <p className="mt-2 text-sm leading-6 text-stone-700">
             興味ありを送るには、自分が出せるボトルを1本以上登録してください。
           </p>
         </div>
         <ButtonLink href="/mypage/posts/new" className="gap-2">
           <PlusCircle size={16} aria-hidden="true" />
-          交換投稿を作る
+          トレード投稿を作る
         </ButtonLink>
       </section>
     );
@@ -52,7 +52,7 @@ export function InterestCreateForm({
       <input type="hidden" name="return_path" value={returnPath} />
 
       <div>
-        <h2 className="text-lg font-semibold">交換候補として出せるボトル</h2>
+        <h2 className="text-lg font-semibold">トレード候補として出せるボトル</h2>
         <p className="mt-2 text-sm leading-6 text-stone-700">
           相手に見せる候補を1本選んでください。自由記述メッセージとX IDは送信されません。
         </p>
@@ -100,7 +100,7 @@ export function InterestCreateForm({
       <div className="flex flex-col gap-2 sm:flex-row">
         <ButtonLink href="/mypage/posts/new" variant="secondary" className="gap-2">
           <PlusCircle size={16} aria-hidden="true" />
-          交換投稿を作る
+          トレード投稿を作る
         </ButtonLink>
         <button className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800">
           トレードに興味ありを送る

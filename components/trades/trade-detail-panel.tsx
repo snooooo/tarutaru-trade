@@ -284,7 +284,7 @@ function TradePostPanel({
     <section className="rounded-md border border-stone-200 bg-white/82 p-5">
       <p className="text-xs font-medium text-stone-500">{label}</p>
       <h2 className="mt-1 text-xl font-semibold">
-        {post.title || offer?.display_bottle_name || "交換投稿"}
+        {post.title || offer?.display_bottle_name || "トレード投稿"}
       </h2>
       <div className="mt-4 grid gap-3">
         <div className="rounded-md bg-stone-50 p-3">

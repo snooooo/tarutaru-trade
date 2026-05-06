@@ -50,15 +50,15 @@ export function InterestListCards({
           </h2>
           <p className="mt-1 text-sm">
             {direction === "sent"
-              ? "気になる交換投稿から、交換候補のボトルを選んで興味ありを送れます。"
-              : "自分の交換投稿に興味ありが届くと、ここから相談開始または見送りを選べます。"}
+              ? "気になるトレード投稿から、トレード候補のボトルを選んで興味ありを送れます。"
+              : "自分のトレード投稿に興味ありが届くと、ここから相談開始または見送りを選べます。"}
           </p>
         </div>
         <Link
           href={direction === "sent" ? "/posts" : "/mypage"}
           className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-stone-300 bg-white/70 px-4 text-sm font-semibold text-stone-950 transition hover:bg-white sm:w-fit"
         >
-          {direction === "sent" ? "交換投稿を探す" : "マイページへ戻る"}
+          {direction === "sent" ? "トレード投稿を探す" : "マイページへ戻る"}
           <ArrowRight size={16} aria-hidden="true" />
         </Link>
       </div>
@@ -190,7 +190,7 @@ function TradePostPanel({
     <section className="rounded-md bg-stone-50 p-4">
       <p className="text-xs font-medium text-stone-500">{label}</p>
       <h3 className="mt-1 font-semibold">
-        {post.title || offer?.display_bottle_name || "交換投稿"}
+        {post.title || offer?.display_bottle_name || "トレード投稿"}
       </h3>
       <div className="mt-3 grid gap-2 text-sm">
         <div>

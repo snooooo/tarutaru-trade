@@ -24,7 +24,7 @@ export function PaginatedTradePostList({
       <div className="grid gap-4 rounded-md border border-dashed border-stone-300 bg-white/62 p-6 text-stone-700">
         <div>
           <h2 className="font-semibold text-stone-950">
-            交換投稿はまだありません
+            トレード投稿はまだありません
           </h2>
           <p className="mt-1 text-sm">
             出る / 求むをまとめた投稿が公開されると、ここに表示されます。

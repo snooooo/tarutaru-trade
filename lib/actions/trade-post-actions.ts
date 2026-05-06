@@ -222,7 +222,7 @@ export async function updateTradePostAction(formData: FormData) {
   }
 
   if (typeof postId !== "string" || !postId) {
-    redirectWithError("/mypage", "交換投稿が見つかりません。");
+    redirectWithError("/mypage", "トレード投稿が見つかりません。");
   }
 
   const title = stringValue(formData, "title");
@@ -259,11 +259,11 @@ export async function updateTradePostAction(formData: FormData) {
   const post = postResult.data as { id: string; status: string } | null;
 
   if (!post) {
-    redirectWithError("/mypage", "交換投稿が見つかりません。");
+    redirectWithError("/mypage", "トレード投稿が見つかりません。");
   }
 
   if (post.status !== "public" && post.status !== "private") {
-    redirectWithError(path, "相談中または終了済みの交換投稿は編集できません。");
+    redirectWithError(path, "相談中または終了済みのトレード投稿は編集できません。");
   }
 
   const { error: postError } = await loose
@@ -296,7 +296,7 @@ export async function updateTradePostAction(formData: FormData) {
       path,
       existingOffersResult.error?.message ??
         existingWantsResult.error?.message ??
-        "交換投稿の明細を読み込めませんでした。",
+        "トレード投稿の明細を読み込めませんでした。",
     );
   }
 
@@ -438,11 +438,11 @@ export async function updateTradePostVisibilityAction(formData: FormData) {
   const nextStatus = formData.get("next_status");
 
   if (typeof postId !== "string" || !postId) {
-    redirectWithError(redirectTo, "交換投稿が見つかりません。");
+    redirectWithError(redirectTo, "トレード投稿が見つかりません。");
   }
 
   if (nextStatus !== "public" && nextStatus !== "private") {
-    redirectWithError(redirectTo, "交換投稿の状態が不正です。");
+    redirectWithError(redirectTo, "トレード投稿の状態が不正です。");
   }
 
   const loose = supabase as unknown as LoosePostUpdateSupabase;

@@ -178,7 +178,7 @@ export default async function PostDetailPage({
 function OwnerPostActions({ postId }: { postId: string }) {
   return (
     <section className="rounded-md border border-stone-200 bg-white/82 p-5">
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">自分の交換投稿</h2>
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">自分のトレード投稿</h2>
       <p className="mt-2 text-sm leading-6 text-stone-700">
         公開中の内容を確認しながら、編集や受付停止ができます。
       </p>
@@ -213,8 +213,8 @@ function PostUpdateMessage({
   error?: string;
 }) {
   const messages: Record<string, string> = {
-    post_private: "交換投稿の受付を停止しました。",
-    post_public: "交換投稿を再公開しました。",
+    post_private: "トレード投稿の受付を停止しました。",
+    post_public: "トレード投稿を再公開しました。",
   };
 
   if (!updated && !error) {
@@ -229,7 +229,7 @@ function PostUpdateMessage({
           : "border-emerald-200 bg-emerald-50 text-emerald-800"
       }`}
     >
-      {error ?? messages[updated ?? ""] ?? "交換投稿を更新しました。"}
+      {error ?? messages[updated ?? ""] ?? "トレード投稿を更新しました。"}
     </div>
   );
 }

@@ -78,7 +78,7 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
             maxLength={80}
             defaultValue={post?.title ?? ""}
             className="h-11 rounded-md border border-stone-300 bg-white px-3 outline-none transition focus:border-stone-950"
-            placeholder="例: スペイサイド同士で交換希望"
+            placeholder="例: スペイサイド同士でトレード希望"
           />
         </label>
         <label className="grid gap-2">
@@ -100,7 +100,7 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
         <div>
           <h2 className="text-lg font-semibold">出る</h2>
           <p className="mt-1 text-sm text-stone-600">
-            交換に出せる候補を最大3件までまとめられます。どれか1本か、まとめて希望かは補足条件に書いてください。1件目は必須です。
+            トレードに出せる候補を最大3件までまとめられます。どれか1本か、まとめて希望かは補足条件に書いてください。1件目は必須です。
           </p>
         </div>
         {Array.from({ length: offerCount }, (_, index) => (
@@ -181,8 +181,8 @@ function SubmitButton({ isEdit }: { isEdit: boolean }) {
           ? "保存中"
           : "公開中"
         : isEdit
-          ? "交換投稿を保存"
-          : "交換投稿を公開"}
+          ? "トレード投稿を保存"
+          : "トレード投稿を公開"}
       <ArrowRight size={16} aria-hidden="true" />
     </button>
   );
