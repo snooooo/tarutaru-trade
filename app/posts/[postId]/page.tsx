@@ -13,6 +13,8 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { DataStatusNote } from "@/components/ui/status-note";
 import { updateTradePostVisibilityAction } from "@/lib/actions/trade-post-actions";
 import { getMyTradePost, getPublicTradePost } from "@/lib/data/trade-posts";
+import { getCurrentUser } from "@/lib/auth/require-user";
+import { ReportButton } from "@/components/posts/report-button";
 import {
   bottleSubline,
   formatBoxCondition,
@@ -37,9 +39,10 @@ export default async function PostDetailPage({
 }: PostDetailPageProps) {
   const { postId } = await params;
   const query = await searchParams;
-  const [result, myPostResult] = await Promise.all([
+  const [result, myPostResult, currentUser] = await Promise.all([
     getPublicTradePost(postId),
     getMyTradePost(postId),
+    getCurrentUser(),
   ]);
   const post = result.data[0];
   const myPost = myPostResult.data[0];
@@ -72,11 +75,8 @@ export default async function PostDetailPage({
               </p>
             </header>
 
-            <section className="grid gap-4">
-              <div>
-                <p className="text-sm font-medium text-stone-500">Outgoing</p>
-                <h1 className="mt-1 text-2xl font-semibold">出る</h1>
-              </div>
+            <section className="grid gap-3">
+              <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">出る</h2>
               <div className="grid gap-3">
                 {post.offer_items.map((item) => (
                   <OfferDetail key={item.id} item={item} />
@@ -84,11 +84,8 @@ export default async function PostDetailPage({
               </div>
             </section>
 
-            <section className="grid gap-4">
-              <div>
-                <p className="text-sm font-medium text-stone-500">Wanted</p>
-                <h2 className="mt-1 text-2xl font-semibold">求む</h2>
-              </div>
+            <section className="grid gap-3">
+              <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">求む</h2>
               {post.want_items.length ? (
                 <div className="grid gap-3">
                   {post.want_items.map((item) => (
@@ -97,7 +94,7 @@ export default async function PostDetailPage({
                 </div>
               ) : (
                 <div className="rounded-md border border-stone-200 bg-white/82 p-5">
-                  <h3 className="font-semibold">提案歓迎</h3>
+                  <p className="font-semibold">提案歓迎</p>
                   <p className="mt-2 text-sm leading-6 text-stone-700">
                     求むボトルは未指定です。条件に合いそうな候補で相談できます。
                   </p>
@@ -106,19 +103,21 @@ export default async function PostDetailPage({
             </section>
 
             {post.condition_note ? (
-              <section className="rounded-md border border-stone-200 bg-white/82 p-5">
-                <h2 className="font-semibold">交換全体への補足</h2>
-                <p className="mt-1 text-xs text-stone-500">出る・求む両方にかかる条件や補足です</p>
-                <p className="mt-3 whitespace-pre-wrap text-stone-700">
-                  {post.condition_note}
-                </p>
+              <section className="grid gap-3">
+                <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">補足</h2>
+                <div className="rounded-md border border-stone-200 bg-white/82 p-5">
+                  <p className="text-xs text-stone-500">出る・求む両方にかかる条件や補足です</p>
+                  <p className="mt-3 whitespace-pre-wrap text-stone-700">
+                    {post.condition_note}
+                  </p>
+                </div>
               </section>
             ) : null}
           </div>
 
           <aside className="grid content-start gap-4">
             <section className="rounded-md border border-stone-200 bg-white/82 p-5">
-              <h2 className="text-lg font-semibold">投稿者</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">投稿者</h2>
               <p className="mt-2 text-xl font-semibold">
                 {post.owner_display_name ?? "ななしさん"}
               </p>
@@ -144,18 +143,27 @@ export default async function PostDetailPage({
             {isMyPost ? (
               <OwnerPostActions postId={post.id} />
             ) : (
-              <section className="rounded-md border border-stone-200 bg-white/82 p-5">
-                <h2 className="font-semibold">トレードに興味あり</h2>
-                <p className="mt-2 text-sm leading-6 text-stone-700">
-                  興味あり時点ではX IDと自由記述メッセージは送信されません。相談開始後にX IDを相互開示します。
-                </p>
-                <ButtonLink
-                  href={`/posts/${post.id}/interest`}
-                  className="mt-4 w-full"
-                >
-                  興味ありへ進む
-                </ButtonLink>
-              </section>
+              <>
+                <section className="rounded-md border border-stone-200 bg-white/82 p-5">
+                  <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">トレードに興味あり</h2>
+                  <p className="mt-2 text-sm leading-6 text-stone-700">
+                    興味あり時点ではX IDと自由記述メッセージは送信されません。相談開始後にX IDを相互開示します。
+                  </p>
+                  <ButtonLink
+                    href={`/posts/${post.id}/interest`}
+                    className="mt-4 w-full"
+                  >
+                    興味ありへ進む
+                  </ButtonLink>
+                </section>
+                <section className="rounded-md border border-stone-200 bg-white/82 p-4">
+                  <ReportButton
+                    postId={post.id}
+                    loginHref={`/login?next=${encodeURIComponent(`/posts/${post.id}`)}`}
+                    isLoggedIn={Boolean(currentUser)}
+                  />
+                </section>
+              </>
             )}
           </aside>
         </div>
@@ -167,7 +175,7 @@ export default async function PostDetailPage({
 function OwnerPostActions({ postId }: { postId: string }) {
   return (
     <section className="rounded-md border border-stone-200 bg-white/82 p-5">
-      <h2 className="font-semibold">自分の交換投稿</h2>
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">自分の交換投稿</h2>
       <p className="mt-2 text-sm leading-6 text-stone-700">
         公開中の内容を確認しながら、編集や受付停止ができます。
       </p>
