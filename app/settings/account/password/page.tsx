@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
@@ -8,12 +9,11 @@ type PasswordPageProps = {
   searchParams: Promise<{ error?: string; updated?: string }>;
 };
 
-export default async function PasswordPage({ searchParams }: PasswordPageProps) {
+async function PasswordContent({ searchParams }: PasswordPageProps) {
   const params = await searchParams;
   await requireUser("/settings/account/password");
 
   return (
-    <PageShell>
       <section className="mx-auto grid max-w-2xl gap-6">
         <div>
           <Link
@@ -79,6 +79,15 @@ export default async function PasswordPage({ searchParams }: PasswordPageProps) 
           </div>
         </form>
       </section>
+  );
+}
+
+export default function PasswordPage(props: PasswordPageProps) {
+  return (
+    <PageShell>
+      <Suspense>
+        <PasswordContent {...props} />
+      </Suspense>
     </PageShell>
   );
 }
