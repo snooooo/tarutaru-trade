@@ -45,6 +45,7 @@ export default function Home() {
           </p>
           <h1 className="text-[36px] font-bold leading-none tracking-normal text-stone-950 lg:text-5xl">
             TaruTaruTrade
+            <sup className="ml-2 text-xl font-normal text-stone-500">β</sup>
           </h1>
           <div className="mt-5 grid max-w-xl gap-2 text-base leading-7 text-stone-700">
             <p className="flex gap-2">

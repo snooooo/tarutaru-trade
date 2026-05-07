@@ -24,7 +24,12 @@ export async function SiteHeader() {
           <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-stone-950 text-white">
             <Barrel size={19} aria-hidden="true" />
           </span>
-          <span className="whitespace-nowrap">TaruTaruTrade</span>
+          <span className="flex items-center gap-1.5 whitespace-nowrap">
+            TaruTaruTrade
+            <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-amber-800">
+              BETA
+            </span>
+          </span>
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">
           <ButtonLink href="/posts" variant="ghost">
