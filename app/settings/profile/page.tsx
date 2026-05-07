@@ -19,8 +19,11 @@ type ProfilePageProps = {
 
 export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   const params = await searchParams;
-  const nextPath = params.next?.startsWith("/") ? params.next : "/settings/profile";
-  await requireUser(`/settings/profile?next=${encodeURIComponent(nextPath)}`);
+  const hasNext = typeof params.next === "string" && params.next.startsWith("/");
+  const nextPath = hasNext ? (params.next as string) : "/settings/profile";
+  await requireUser(
+    hasNext ? `/settings/profile?next=${encodeURIComponent(nextPath)}` : "/settings/profile",
+  );
   const { profile, error, isConfigured } = await getMyTradeProfile();
   const isComplete = isCompleteTradeProfile(profile);
 

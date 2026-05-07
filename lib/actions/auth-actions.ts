@@ -71,7 +71,7 @@ export async function signupAction(formData: FormData) {
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(
+      emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(
         "/settings/profile",
       )}`,
     },
