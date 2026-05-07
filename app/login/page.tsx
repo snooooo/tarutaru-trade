@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { ArrowLeft } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { AuthForm } from "@/components/auth/auth-form";
+import { CheckEmailNotice } from "@/components/auth/check-email-notice";
 
 type LoginPageProps = {
   searchParams: Promise<{
@@ -14,6 +15,7 @@ type LoginPageProps = {
 async function LoginContent({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const nextPath = params.next?.startsWith("/") ? params.next : "/";
+  const isCheckEmail = params.signup === "check_email";
 
   return (
     <section className="mx-auto grid max-w-md gap-6">
@@ -27,21 +29,28 @@ async function LoginContent({ searchParams }: LoginPageProps) {
         </a>
       ) : null}
       <div>
-        <p className="text-sm font-medium text-stone-500">Login</p>
-        <h1 className="mt-1 text-3xl font-semibold">ログイン</h1>
-        <p className="mt-3 text-stone-700">
-          掲載、興味あり、プロフィール編集にはログインが必要です。
+        <p className="text-sm font-medium text-stone-500">
+          {isCheckEmail ? "Signup" : "Login"}
         </p>
-        <p className="mt-2 text-sm text-stone-500">
-          MaltPeri ID をお持ちの方は、そのままログインできます。
-        </p>
+        <h1 className="mt-1 text-3xl font-semibold">
+          {isCheckEmail ? "確認メールを送信しました" : "ログイン"}
+        </h1>
+        {!isCheckEmail && (
+          <>
+            <p className="mt-3 text-stone-700">
+              掲載、興味あり、プロフィール編集にはログインが必要です。
+            </p>
+            <p className="mt-2 text-sm text-stone-500">
+              MaltPeri ID をお持ちの方は、そのままログインできます。
+            </p>
+          </>
+        )}
       </div>
-      {params.signup === "check_email" ? (
-        <p className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
-          確認メールを MaltPeri ID 名義で送信しました。メール内のリンクを開いてからログインしてください。
-        </p>
-      ) : null}
-      <AuthForm mode="login" nextPath={nextPath} error={params.error} />
+      {isCheckEmail ? (
+        <CheckEmailNotice nextPath={nextPath} error={params.error} />
+      ) : (
+        <AuthForm mode="login" nextPath={nextPath} error={params.error} />
+      )}
     </section>
   );
 }
