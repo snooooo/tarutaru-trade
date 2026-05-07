@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { upsertTradeProfileAction } from "@/lib/actions/profile-actions";
 import { PREFECTURES, type ShippingPreference, type TradeProfile } from "@/lib/types/profile";
 import { formatProfileFollowersRange } from "@/lib/format/profile";
@@ -13,7 +16,61 @@ const followerRanges = [
   "500_999",
 ] as const;
 
+function XIdHelpPopup({ onClose }: { onClose: () => void }) {
+  return (
+    <>
+      {/* オーバーレイ */}
+      <div
+        className="fixed inset-0 z-40"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      {/* ポップアップ本体 */}
+      <div className="absolute left-0 top-8 z-50 w-72 rounded-lg border border-stone-200 bg-white p-4 shadow-xl">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-sm font-semibold text-stone-800">X ID の入力について</span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-stone-400 hover:text-stone-600"
+            aria-label="閉じる"
+          >
+            ✕
+          </button>
+        </div>
+        <ul className="grid gap-2.5 text-xs leading-5 text-stone-600">
+          <li>
+            <span className="font-medium text-stone-800">🔍 スマホでの確認手順</span>
+            <ol className="mt-1 grid gap-1 pl-3 list-decimal text-stone-600">
+              <li>画面左上の<span className="font-medium text-stone-700">プロフィールアイコン</span>をタップ</li>
+              <li>サイドメニューの<span className="font-medium text-stone-700">「設定とプライバシー」</span>をタップ<br/>
+                <span className="text-[10px] text-stone-500">※「設定とサポート」の中にある場合があります</span>
+              </li>
+              <li><span className="font-medium text-stone-700">「アカウント」</span>をタップ</li>
+              <li><span className="font-medium text-stone-700">「アカウント情報」</span>をタップ</li>
+              <li><span className="font-medium text-stone-700">「ユーザー名」</span>に記載されている<br/>
+                <code className="rounded bg-stone-100 px-1 py-0.5 text-stone-700">@</code> より後の部分がX IDです
+              </li>
+            </ol>
+          </li>
+          <li>
+            <span className="font-medium text-stone-800">📌 @ は付けずに入力</span><br />
+            <span className="text-stone-500">例：</span>
+            <code className="rounded bg-stone-100 px-1 py-0.5 text-stone-700">tarutaru_whisky</code>
+          </li>
+          <li>
+            <span className="font-medium text-stone-800">💬 何に使われますか？</span><br />
+            トレードが成立すると、相手のX IDが開示されます。XのDMで連絡を取るために使います。
+          </li>
+        </ul>
+      </div>
+    </>
+  );
+}
+
 export function ProfileForm({ profile, nextPath }: ProfileFormProps) {
+  const [showXIdHelp, setShowXIdHelp] = useState(false);
+
   return (
     <form
       action={upsertTradeProfileAction}
@@ -32,20 +89,33 @@ export function ProfileForm({ profile, nextPath }: ProfileFormProps) {
         />
       </label>
 
-      <label className="grid gap-2 text-sm font-medium text-stone-700">
-        X ID
+      <div className="grid gap-2">
+        <div className="relative flex items-center gap-1.5">
+          <span className="text-sm font-medium text-stone-700">X ID</span>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowXIdHelp((v) => !v)}
+              className="flex size-5 items-center justify-center rounded-full border border-stone-300 bg-stone-100 text-xs font-bold text-stone-500 transition hover:border-stone-400 hover:bg-stone-200 hover:text-stone-700"
+              aria-label="X IDの入力ガイドを表示"
+            >
+              ?
+            </button>
+            {showXIdHelp && <XIdHelpPopup onClose={() => setShowXIdHelp(false)} />}
+          </div>
+        </div>
         <input
           type="text"
           className="h-11 rounded-md border border-stone-300 bg-white px-3 text-base text-stone-950 outline-none transition focus:border-stone-950"
           name="x_id"
-          placeholder="tarutaru_whisky"
+          placeholder="tarutaru_whisky（@なしで入力）"
           defaultValue={profile?.x_id ?? ""}
           maxLength={80}
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
         />
-      </label>
+      </div>
 
       <label className="grid gap-2 text-sm font-medium text-stone-700">
         フォロワー数レンジ
