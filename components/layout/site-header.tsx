@@ -56,7 +56,7 @@ export async function SiteHeader() {
               <ButtonLink
                 href="/mypage"
                 variant="secondary"
-                className="size-10 px-0 lg:hidden"
+                className="inline-flex size-10 px-0 lg:hidden"
                 aria-label="マイページ"
                 title="マイページ"
               >
