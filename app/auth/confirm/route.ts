@@ -11,16 +11,25 @@ const ALLOWED_TYPES: EmailOtpType[] = [
   "email",
 ];
 
+const DEFAULT_NEXT_BY_TYPE: Record<EmailOtpType, string> = {
+  signup: "/settings/profile",
+  magiclink: "/mypage",
+  recovery: "/settings/account/password",
+  invite: "/settings/profile",
+  email_change: "/settings/profile",
+  email: "/mypage",
+};
+
 function safeNext(value: string | null) {
-  if (!value) return "/settings/profile";
-  return value.startsWith("/") && !value.startsWith("//") ? value : "/settings/profile";
+  if (!value) return null;
+  return value.startsWith("/") && !value.startsWith("//") ? value : null;
 }
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const tokenHash = requestUrl.searchParams.get("token_hash");
   const typeParam = requestUrl.searchParams.get("type");
-  const next = safeNext(requestUrl.searchParams.get("next"));
+  const overrideNext = safeNext(requestUrl.searchParams.get("next"));
 
   const type = ALLOWED_TYPES.includes(typeParam as EmailOtpType)
     ? (typeParam as EmailOtpType)
@@ -47,5 +56,6 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const next = overrideNext ?? DEFAULT_NEXT_BY_TYPE[type] ?? "/mypage";
   return NextResponse.redirect(new URL(next, requestUrl.origin));
 }
