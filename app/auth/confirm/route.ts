@@ -94,5 +94,25 @@ export async function GET(request: NextRequest) {
     next,
   );
 
+  console.log(
+    "[auth/confirm] outgoing response cookies:",
+    response.cookies.getAll().map((c) => ({
+      name: c.name,
+      hasValue: Boolean(c.value),
+      path: c.path,
+      domain: c.domain,
+      sameSite: c.sameSite,
+      secure: c.secure,
+      httpOnly: c.httpOnly,
+      maxAge: c.maxAge,
+    })),
+  );
+  console.log(
+    "[auth/confirm] outgoing response status:",
+    response.status,
+    "location:",
+    response.headers.get("location"),
+  );
+
   return response;
 }

@@ -11,12 +11,25 @@ export async function updateSession(request: NextRequest) {
     return response;
   }
 
+  console.log(
+    "[proxy] incoming",
+    request.nextUrl.pathname,
+    "cookies:",
+    request.cookies.getAll().map((c) => c.name),
+  );
+
   const supabase = createServerClient<Database>(url, anonKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
+        console.log(
+          "[proxy] setAll on",
+          request.nextUrl.pathname,
+          "cookies:",
+          cookiesToSet.map((c) => c.name),
+        );
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) => {
@@ -26,7 +39,15 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getUser();
+  console.log(
+    "[proxy] getUser on",
+    request.nextUrl.pathname,
+    "userId=",
+    data.user?.id ?? null,
+    "error=",
+    error?.message ?? null,
+  );
 
   return response;
 }
