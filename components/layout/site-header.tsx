@@ -56,11 +56,11 @@ export async function SiteHeader() {
               <ButtonLink
                 href="/mypage"
                 variant="secondary"
-                className="inline-flex size-10 px-0 lg:hidden"
+                className="inline-flex size-14 px-0 lg:hidden"
                 aria-label="マイページ"
                 title="マイページ"
               >
-                <UserRound size={16} aria-hidden="true" />
+                <UserRound size={56} aria-hidden="true" />
               </ButtonLink>
               <ButtonLink
                 href="/mypage"

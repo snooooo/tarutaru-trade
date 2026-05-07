@@ -135,8 +135,6 @@ function PostsTab({ posts }: { posts: Parameters<typeof MyTradePostList>[0]["pos
         <EmptyState
           title="トレード投稿はまだありません"
           text="出るボトルと求む条件をまとめて、最初のトレード投稿を作りましょう。"
-          href="/mypage/posts/new"
-          label="トレード投稿を作る"
         />
       )}
     </section>
@@ -266,8 +264,8 @@ function EmptyState({
 }: {
   title: string;
   text: string;
-  href: string;
-  label: string;
+  href?: string;
+  label?: string;
 }) {
   return (
     <div className="rounded-md border border-dashed border-stone-300 bg-white/62 p-5">
@@ -278,9 +276,11 @@ function EmptyState({
         <div className="min-w-0">
           <h3 className="font-semibold">{title}</h3>
           <p className="mt-1 text-sm text-stone-600">{text}</p>
-          <ButtonLink href={href} variant="secondary" className="mt-4 gap-2">
-            {label}
-          </ButtonLink>
+          {href && label && (
+            <ButtonLink href={href} variant="secondary" className="mt-4 gap-2">
+              {label}
+            </ButtonLink>
+          )}
         </div>
       </div>
     </div>
