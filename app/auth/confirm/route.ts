@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 import type { EmailOtpType } from "@supabase/supabase-js";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/database.types";
 
 const ALLOWED_TYPES: EmailOtpType[] = [
   "signup",
@@ -41,12 +42,33 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const supabase = await createServerSupabaseClient();
-  if (!supabase) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !anonKey) {
     return NextResponse.redirect(
-      new URL(`/login?error=${encodeURIComponent("Supabase環境変数が未設定です。")}`, requestUrl.origin),
+      new URL(
+        `/login?error=${encodeURIComponent("Supabase環境変数が未設定です。")}`,
+        requestUrl.origin,
+      ),
     );
   }
+
+  // Cookieをこのレスポンスに直接書くため、先に成功時のレスポンスを作る
+  const next = overrideNext ?? DEFAULT_NEXT_BY_TYPE[type] ?? "/mypage";
+  const response = NextResponse.redirect(new URL(next, requestUrl.origin));
+
+  const supabase = createServerClient<Database>(supabaseUrl, anonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
 
   const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
   if (error) {
@@ -56,6 +78,5 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const next = overrideNext ?? DEFAULT_NEXT_BY_TYPE[type] ?? "/mypage";
-  return NextResponse.redirect(new URL(next, requestUrl.origin));
+  return response;
 }
