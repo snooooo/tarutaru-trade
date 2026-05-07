@@ -29,7 +29,7 @@ type MyPageProps = {
 
 export default async function MyPage({ searchParams }: MyPageProps) {
   const params = await searchParams;
-  await requireCompleteTradeProfile("/mypage");
+  const { user } = await requireCompleteTradeProfile("/mypage");
 
   const [tradePosts, sentInterests, receivedInterests] = await Promise.all([
     getMyTradePosts(),
@@ -102,7 +102,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
                   received={receivedInterests.data}
                 />
               ),
-              account: <AccountTab />,
+              account: <AccountTab email={user.email ?? ""} />,
             }}
           </MyPageTabs>
         </Suspense>
@@ -173,10 +173,18 @@ function InteractionsTab({
   );
 }
 
-function AccountTab() {
+function AccountTab({ email }: { email: string }) {
   return (
     <section className="grid gap-3 pt-2">
       <h2 className="text-xl font-semibold">アカウント</h2>
+      {/* ログイン中のメールアドレス */}
+      <div className="flex items-center gap-3 rounded-md border border-stone-200 bg-stone-50 px-4 py-3">
+        <Mail size={15} className="shrink-0 text-stone-400" aria-hidden="true" />
+        <div className="min-w-0">
+          <p className="text-xs text-stone-500">ログイン中のメールアドレス（MaltPeri ID）</p>
+          <p className="mt-0.5 truncate text-sm font-medium text-stone-700">{email}</p>
+        </div>
+      </div>
       <div className="grid gap-2 sm:grid-cols-2">
         <Link
           href="/settings/profile"
