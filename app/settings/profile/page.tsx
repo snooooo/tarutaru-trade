@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
@@ -69,7 +70,11 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           </p>
         ) : null}
 
-        <ProfileForm profile={profile} nextPath={nextPath} />
+        <Suspense fallback={
+          <div className="h-96 animate-pulse rounded-md border border-stone-200 bg-stone-100" />
+        }>
+          <ProfileForm profile={profile} nextPath={nextPath} />
+        </Suspense>
       </section>
     </PageShell>
   );
