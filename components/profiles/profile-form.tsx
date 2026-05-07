@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useFormStatus } from "react-dom";
+import { useRouter, useSearchParams } from "next/navigation";
 import { upsertTradeProfileAction } from "@/lib/actions/profile-actions";
 import { PREFECTURES, type ShippingPreference, type TradeProfile } from "@/lib/types/profile";
 import { formatProfileFollowersRange } from "@/lib/format/profile";
@@ -15,6 +17,42 @@ const followerRanges = [
   "100_499",
   "500_999",
 ] as const;
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      {pending && (
+        <svg
+          className="size-4 animate-spin"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
+        </svg>
+      )}
+      {pending ? "保存中…" : "プロフィールを保存"}
+    </button>
+  );
+}
 
 function XIdHelpPopup({ onClose }: { onClose: () => void }) {
   return (
@@ -40,7 +78,8 @@ function XIdHelpPopup({ onClose }: { onClose: () => void }) {
         </div>
         <ul className="grid gap-3 text-sm leading-6 text-stone-600">
           <li>
-            <span className="font-medium text-stone-800">🔍 スマホでの確認手順</span>
+            <span className="font-medium text-stone-800">🔍 Xアプリでの確認手順</span>
+            <p className="mt-1 text-xs text-stone-500">以下はXアプリ（旧Twitter）の操作です</p>
             <ol className="mt-1.5 grid gap-1.5 pl-4 list-decimal text-stone-600">
               <li>画面左上の<span className="font-medium text-stone-700">プロフィールアイコン</span>をタップ</li>
               <li>サイドメニューの<span className="font-medium text-stone-700">「設定とプライバシー」</span>をタップ<br/>
@@ -70,12 +109,49 @@ function XIdHelpPopup({ onClose }: { onClose: () => void }) {
 
 export function ProfileForm({ profile, nextPath }: ProfileFormProps) {
   const [showXIdHelp, setShowXIdHelp] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (searchParams.get("profile_saved") === "1") {
+      setShowSaved(true);
+      // クエリパラメータを履歴から消す
+      const url = new URL(window.location.href);
+      url.searchParams.delete("profile_saved");
+      router.replace(url.pathname + (url.search || ""), { scroll: false });
+      // 4秒後にバナーを自動非表示
+      const timer = setTimeout(() => setShowSaved(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, router]);
 
   return (
-    <form
-      action={upsertTradeProfileAction}
-      className="grid gap-5 rounded-md border border-stone-200 bg-white/82 p-5 shadow-sm"
-    >
+    <>
+      {showSaved && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-sm animate-fade-in"
+        >
+          <svg
+            className="size-5 shrink-0"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          プロフィールを保存しました
+        </div>
+      )}
+      <form
+        action={upsertTradeProfileAction}
+        className="grid gap-5 rounded-md border border-stone-200 bg-white/82 p-5 shadow-sm"
+      >
       <input type="hidden" name="next" value={nextPath} />
       <label className="grid gap-2 text-sm font-medium text-stone-700">
         表示名
@@ -181,10 +257,9 @@ export function ProfileForm({ profile, nextPath }: ProfileFormProps) {
       </fieldset>
 
 
-      <button className="inline-flex h-11 items-center justify-center rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800">
-        プロフィールを保存
-      </button>
+      <SubmitButton />
     </form>
+    </>
   );
 }
 
