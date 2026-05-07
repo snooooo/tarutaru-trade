@@ -119,12 +119,14 @@ export function TradeDetailPanel({
       <CounterpartyPanel counterparty={trade.counterparty} canShowXId={canShowXId} />
 
       <section className="grid gap-4 rounded-md border border-stone-200 bg-white/82 p-5">
-        {canStartConsulting ? (
+        {trade.status === "interested" ? (
           <div className="rounded-md bg-amber-50 p-4 text-sm leading-6 text-amber-900">
             <p className="font-semibold">取引を始める前に</p>
-            <p className="mt-1">
-              まずは相手のXアカウントを確認し、取引を進めるかどうかご自身で判断してください。
-            </p>
+            {trade.user_role === "receiver" ? (
+              <p className="mt-1">
+                まずは相手のXアカウントを確認し、取引を進めるかどうかご自身で判断してください。
+              </p>
+            ) : null}
             <p className="mt-1">
               見送りになっても、急な体調不良や仕事の都合など、それぞれに事情があります。
               理由を聞いたり責めたりせず、寛大にご対応願います。
