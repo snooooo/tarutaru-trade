@@ -63,10 +63,6 @@ export async function GET(request: NextRequest) {
         return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
-        console.log(
-          "[auth/confirm] setAll cookies:",
-          cookiesToSet.map((c) => c.name),
-        );
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });
@@ -74,45 +70,13 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  const { data, error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
+  const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
   if (error) {
-    console.error("[auth/confirm] verifyOtp error:", error.message);
+    console.error("Auth confirm error:", error.message);
     return NextResponse.redirect(
       new URL(`/login?error=${encodeURIComponent(error.message)}`, requestUrl.origin),
     );
   }
-
-  console.log(
-    "[auth/confirm] verifyOtp success:",
-    "userId=",
-    data.user?.id,
-    "hasSession=",
-    Boolean(data.session),
-    "type=",
-    type,
-    "redirectTo=",
-    next,
-  );
-
-  console.log(
-    "[auth/confirm] outgoing response cookies:",
-    response.cookies.getAll().map((c) => ({
-      name: c.name,
-      hasValue: Boolean(c.value),
-      path: c.path,
-      domain: c.domain,
-      sameSite: c.sameSite,
-      secure: c.secure,
-      httpOnly: c.httpOnly,
-      maxAge: c.maxAge,
-    })),
-  );
-  console.log(
-    "[auth/confirm] outgoing response status:",
-    response.status,
-    "location:",
-    response.headers.get("location"),
-  );
 
   return response;
 }
