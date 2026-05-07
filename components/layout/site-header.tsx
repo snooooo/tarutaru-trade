@@ -10,9 +10,23 @@ import {
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { ButtonLink } from "@/components/ui/button-link";
 import { getCurrentUser } from "@/lib/auth/require-user";
+import { getPendingActionCount } from "@/lib/data/interests";
+
+function PendingActionBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <span
+      aria-label={`対応待ち ${count}件`}
+      className="pointer-events-none absolute -top-1 -right-1 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-bold leading-none text-white shadow-sm ring-2 ring-[#f7f4ed]"
+    >
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
 
 export async function SiteHeader() {
   const user = await getCurrentUser();
+  const pendingCount = user ? await getPendingActionCount() : 0;
 
   return (
     <header className="sticky top-0 z-20 border-b border-stone-200/80 bg-[#f7f4ed]/94 backdrop-blur">
@@ -36,9 +50,12 @@ export async function SiteHeader() {
             トレード投稿を探す
           </ButtonLink>
           {user ? (
-            <ButtonLink href="/mypage" variant="ghost">
-              マイページ
-            </ButtonLink>
+            <span className="relative inline-flex">
+              <ButtonLink href="/mypage" variant="ghost">
+                マイページ
+              </ButtonLink>
+              <PendingActionBadge count={pendingCount} />
+            </span>
           ) : null}
         </nav>
         <div className="flex shrink-0 items-center gap-1.5 lg:gap-2">
@@ -53,22 +70,28 @@ export async function SiteHeader() {
           </Link>
           {user ? (
             <>
-              <ButtonLink
-                href="/mypage"
-                variant="secondary"
-                className="inline-flex size-14 px-0 lg:hidden"
-                aria-label="マイページ"
-                title="マイページ"
-              >
-                <UserRound size={56} aria-hidden="true" />
-              </ButtonLink>
-              <ButtonLink
-                href="/mypage"
-                variant="secondary"
-                className="hidden gap-2 sm:flex lg:hidden"
-              >
-                マイページ
-              </ButtonLink>
+              <span className="relative inline-flex lg:hidden">
+                <ButtonLink
+                  href="/mypage"
+                  variant="secondary"
+                  className="inline-flex size-14 px-0"
+                  aria-label="マイページ"
+                  title="マイページ"
+                >
+                  <UserRound size={56} aria-hidden="true" />
+                </ButtonLink>
+                <PendingActionBadge count={pendingCount} />
+              </span>
+              <span className="relative hidden sm:inline-flex lg:hidden">
+                <ButtonLink
+                  href="/mypage"
+                  variant="secondary"
+                  className="gap-2"
+                >
+                  マイページ
+                </ButtonLink>
+                <PendingActionBadge count={pendingCount} />
+              </span>
               <ButtonLink
                 href="/mypage/posts/new"
                 className="hidden gap-2 lg:flex"

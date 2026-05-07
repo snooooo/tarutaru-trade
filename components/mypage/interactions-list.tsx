@@ -213,6 +213,17 @@ function InteractionRow({ item }: { item: InteractionItem }) {
           <ArrowRight size={12} aria-hidden="true" />
         </span>
       </div>
+
+      {/* Consulting CTA: prompt to mark trade complete after exchange */}
+      {item.status === "consulting" ? (
+        <div className="-mx-1 mt-1 flex items-center justify-between gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">
+          <span>交換は完了しましたか？完了後は完了申請が必要です</span>
+          <span className="inline-flex shrink-0 items-center gap-1 text-amber-800 group-hover:text-amber-950">
+            完了申請へ
+            <ArrowRight size={12} aria-hidden="true" />
+          </span>
+        </div>
+      ) : null}
     </Link>
   );
 }

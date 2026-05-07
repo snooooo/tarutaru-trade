@@ -994,6 +994,39 @@ export async function getReceivedInterests(): Promise<
   };
 }
 
+export async function getPendingActionCount(): Promise<number> {
+  const supabase = await createServerSupabaseClient();
+
+  if (!supabase) {
+    return 0;
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return 0;
+  }
+
+  const [received, completion] = await Promise.all([
+    supabase
+      .from("trade_interests")
+      .select("id", { count: "exact", head: true })
+      .eq("receiver_user_id", user.id)
+      .eq("status", "interested"),
+    supabase
+      .from("trade_interests")
+      .select("id", { count: "exact", head: true })
+      .or(
+        `receiver_user_id.eq.${user.id},requester_user_id.eq.${user.id}`,
+      )
+      .eq("status", "completion_requested"),
+  ]);
+
+  return (received.count ?? 0) + (completion.count ?? 0);
+}
+
 type DetailResult = {
   data: TradeInterestDetailItem | null;
   error: string | null;
