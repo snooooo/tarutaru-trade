@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowRight, Minus, Plus } from "lucide-react";
 import { createPostInterestAction } from "@/lib/actions/interest-actions";
+import { SubmitButton } from "@/components/ui/submit-button";
 import type { PublicTradePost } from "@/lib/types/trade-posts";
 
 const MAX_ITEMS = 3;
@@ -56,10 +57,10 @@ export function PostInterestCreateForm({
       ) : null}
 
       <div className="flex flex-col gap-2 border-t border-stone-100 pt-5 sm:flex-row">
-        <button className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800">
+        <SubmitButton pendingLabel="送信中…">
           トレードに興味ありを送る
           <ArrowRight size={16} aria-hidden="true" />
-        </button>
+        </SubmitButton>
       </div>
     </form>
   );

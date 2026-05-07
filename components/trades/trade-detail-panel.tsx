@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -32,6 +34,7 @@ import type {
   TradeInterestStatus,
 } from "@/lib/types/interests";
 import type { PublicTradePost } from "@/lib/types/trade-posts";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 const statusLabels: Record<TradeInterestStatus, string> = {
   interested: "確認待ち",
@@ -514,8 +517,9 @@ function ActionForm({
     <form action={action}>
       <input type="hidden" name="interest_id" value={interestId} />
       <input type="hidden" name="redirect_to" value={redirectTo} />
-      <button
-        className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition sm:w-auto ${
+      <SubmitButton
+        pendingLabel="処理中…"
+        className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto ${
           primary
             ? "bg-stone-950 text-white hover:bg-stone-800"
             : "border border-stone-300 bg-white/70 text-stone-950 hover:bg-white"
@@ -523,7 +527,7 @@ function ActionForm({
       >
         {icon}
         {label}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

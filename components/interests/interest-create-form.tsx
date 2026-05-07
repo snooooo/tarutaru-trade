@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowRight, PlusCircle } from "lucide-react";
 import { createInterestAction } from "@/lib/actions/interest-actions";
 import {
@@ -11,6 +13,7 @@ import type {
   TradeBottleSummary,
 } from "@/lib/types/interests";
 import { ButtonLink } from "@/components/ui/button-link";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 type InterestCreateFormProps = {
   targetType: InterestTargetType;
@@ -102,10 +105,10 @@ export function InterestCreateForm({
           <PlusCircle size={16} aria-hidden="true" />
           トレード投稿を作る
         </ButtonLink>
-        <button className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800">
+        <SubmitButton pendingLabel="送信中…">
           トレードに興味ありを送る
           <ArrowRight size={16} aria-hidden="true" />
-        </button>
+        </SubmitButton>
       </div>
     </form>
   );

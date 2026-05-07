@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Ban, CheckCircle2, Clock, MapPin, RotateCcw, Star, Truck } from "lucide-react";
 import {
@@ -20,6 +22,7 @@ import type {
   TradeInterestStatus,
 } from "@/lib/types/interests";
 import type { PublicTradePost } from "@/lib/types/trade-posts";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 type InterestListCardsProps = {
   interests: TradeInterestListItem[];
@@ -122,10 +125,10 @@ export function InterestListCards({
                   name="redirect_to"
                   value="/mypage/interests/received"
                 />
-                <button className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800 sm:w-auto">
+                <SubmitButton pendingLabel="処理中…" className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
                   トレード相談フェーズに進む
                   <ArrowRight size={16} aria-hidden="true" />
-                </button>
+                </SubmitButton>
               </form>
               <form action={dismissInterestAction}>
                 <input type="hidden" name="interest_id" value={interest.id} />
@@ -134,10 +137,10 @@ export function InterestListCards({
                   name="redirect_to"
                   value="/mypage/interests/received"
                 />
-                <button className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-stone-300 bg-white/70 px-4 text-sm font-semibold text-stone-950 transition hover:bg-white sm:w-auto">
+                <SubmitButton pendingLabel="処理中…" variant="secondary" className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-stone-300 bg-white/70 px-4 text-sm font-semibold text-stone-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
                   <Ban size={16} aria-hidden="true" />
                   見送る
-                </button>
+                </SubmitButton>
               </form>
             </div>
           ) : null}
@@ -151,10 +154,10 @@ export function InterestListCards({
                   name="redirect_to"
                   value="/mypage/interests/sent"
                 />
-                <button className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white/70 px-4 text-sm font-semibold text-stone-950 transition hover:bg-white">
+                <SubmitButton pendingLabel="処理中…" variant="secondary" className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white/70 px-4 text-sm font-semibold text-stone-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60">
                   <RotateCcw size={16} aria-hidden="true" />
                   取り下げる
-                </button>
+                </SubmitButton>
               </form>
             </div>
           ) : null}

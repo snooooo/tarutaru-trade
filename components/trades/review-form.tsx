@@ -1,6 +1,9 @@
+"use client";
+
 import { Star } from "lucide-react";
 import { createTradeReviewAction } from "@/lib/actions/interest-actions";
 import type { TradeInterestDetailItem } from "@/lib/types/interests";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 export function ReviewForm({ trade }: { trade: TradeInterestDetailItem }) {
   return (
@@ -51,10 +54,10 @@ export function ReviewForm({ trade }: { trade: TradeInterestDetailItem }) {
         />
       </label>
 
-      <button className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800 sm:w-auto">
+      <SubmitButton pendingLabel="登録中…" className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-stone-950 px-4 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
         <Star size={16} aria-hidden="true" />
         評価を登録する
-      </button>
+      </SubmitButton>
     </form>
   );
 }
