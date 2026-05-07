@@ -71,7 +71,7 @@ export default async function PostDetailPage({
             </header>
 
             <section className="grid gap-3">
-              <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">出る</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-stone-400">出</h2>
               <div className="grid gap-3">
                 {post.offer_items.map((item) => (
                   <OfferDetail key={item.id} item={item} />
@@ -80,7 +80,7 @@ export default async function PostDetailPage({
             </section>
 
             <section className="grid gap-3">
-              <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">求む</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-stone-400">求</h2>
               {post.want_items.length ? (
                 <div className="grid gap-3">
                   {post.want_items.map((item) => (
@@ -91,7 +91,7 @@ export default async function PostDetailPage({
                 <div className="rounded-md border border-stone-200 bg-white/82 p-5">
                   <p className="font-semibold">提案歓迎</p>
                   <p className="mt-2 text-sm leading-6 text-stone-700">
-                    求むボトルは未指定です。条件に合いそうな候補で相談できます。
+                    求のボトルは未指定です。条件に合いそうな候補で相談できます。
                   </p>
                 </div>
               )}
@@ -101,7 +101,7 @@ export default async function PostDetailPage({
               <section className="grid gap-3">
                 <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">補足</h2>
                 <div className="rounded-md border border-stone-200 bg-white/82 p-5">
-                  <p className="text-xs text-stone-500">出る・求む両方にかかる条件や補足です</p>
+                  <p className="text-xs text-stone-500">出・求両方にかかる条件や補足です</p>
                   <p className="mt-3 whitespace-pre-wrap text-stone-700">
                     {post.condition_note}
                   </p>

@@ -38,7 +38,7 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
 
     if (!hasOfferBottle) {
       event.preventDefault();
-      setClientError("出るボトル名を1件以上入力してください。");
+      setClientError("出のボトル名を1件以上入力してください。");
       event.currentTarget
         .querySelector<HTMLInputElement>('input[name="offer_manual_bottle_name"]')
         ?.focus();
@@ -67,7 +67,7 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
         <div>
           <h2 className="text-lg font-semibold">投稿全体</h2>
           <p className="mt-1 text-sm text-stone-600">
-            タイトルは任意です。出る / 求むが読めれば空でも構いません。
+            タイトルは任意です。出 / 求が読めれば空でも構いません。
           </p>
         </div>
         <label className="grid gap-2">
@@ -90,7 +90,7 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
             defaultValue={post?.condition_note ?? ""}
             className="rounded-md border border-stone-300 bg-white px-3 py-2 outline-none transition focus:border-stone-950"
             placeholder={
-              "例:\n出る候補はどれか1本で相談したいです。\n2本まとめてなら◯◯希望です。\n求む候補以外でも近い価格帯なら相談したいです。\n都内手渡し優先です。"
+              "例:\n出の候補はどれか1本で相談したいです。\n2本まとめてなら◯◯希望です。\n求の候補以外でも近い価格帯なら相談したいです。\n都内手渡し優先です。"
             }
           />
         </label>
@@ -98,7 +98,7 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
 
       <section className="grid gap-4 border-t border-stone-100 pt-5">
         <div>
-          <h2 className="text-lg font-semibold">出る</h2>
+          <h2 className="text-xl font-semibold">出</h2>
           <p className="mt-1 text-sm text-stone-600">
             トレードに出せる候補を最大3件までまとめられます。どれか1本か、まとめて希望かは補足条件に書いてください。1件目は必須です。
           </p>
@@ -121,14 +121,14 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-950 transition hover:border-stone-950 sm:w-fit"
           >
             <Plus size={16} aria-hidden="true" />
-            出る候補を追加
+            出の候補を追加
           </button>
         ) : null}
       </section>
 
       <section className="grid gap-4 border-t border-stone-100 pt-5">
         <div>
-          <h2 className="text-lg font-semibold">求む</h2>
+          <h2 className="text-xl font-semibold">求</h2>
           <p className="mt-1 text-sm text-stone-600">
             欲しい候補を最大3件まで書けます。未指定にすると提案歓迎として表示されます。
           </p>
@@ -150,7 +150,7 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-950 transition hover:border-stone-950 sm:w-fit"
           >
             <Plus size={16} aria-hidden="true" />
-            求む候補を追加
+            求の候補を追加
           </button>
         ) : null}
       </section>
@@ -199,7 +199,7 @@ function OfferFields({
   required?: boolean;
   onRemove?: () => void;
 }) {
-  const label = `出る ${index + 1}`;
+  const label = `出 ${index + 1}`;
   const initialName = item?.manual_bottle_name ?? item?.display_bottle_name ?? "";
   const [bottleName, setBottleName] = useState(initialName);
 
@@ -302,7 +302,7 @@ function WantFields({
   item?: MyTradePost["want_items"][number];
   onRemove?: () => void;
 }) {
-  const label = `求む ${index + 1}`;
+  const label = `求 ${index + 1}`;
   const initialName = item?.manual_bottle_name ?? item?.display_bottle_name ?? "";
   const [bottleName, setBottleName] = useState(initialName);
 

@@ -49,7 +49,7 @@ export default function PostsPage({
             トレード投稿を探す
           </h1>
           <p className="mt-3 max-w-2xl text-stone-700">
-            「出る / 求む」が同じ投稿にまとまった公開一覧です。X IDは相談開始まで表示されません。
+            「出 / 求」が同じ投稿にまとまった公開一覧です。X IDは相談開始まで表示されません。
           </p>
         </div>
         <Suspense>

@@ -194,13 +194,13 @@ function TradePostPanel({
       </h3>
       <div className="mt-3 grid gap-2 text-sm">
         <div>
-          <p className="text-xs font-medium text-stone-500">出る</p>
+          <p className="text-sm font-medium text-stone-500">出</p>
           <p className="mt-0.5 font-semibold">
             {offer?.display_bottle_name ?? "名称未設定のボトル"}
           </p>
         </div>
         <div>
-          <p className="text-xs font-medium text-stone-500">求む</p>
+          <p className="text-sm font-medium text-stone-500">求</p>
           <p className="mt-0.5 font-semibold">
             {want?.display_bottle_name ?? "提案歓迎"}
           </p>

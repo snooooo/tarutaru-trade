@@ -120,7 +120,7 @@ function PostsTab({ posts }: { posts: Parameters<typeof MyTradePostList>[0]["pos
         <div>
           <h2 className="text-xl font-semibold">自分のトレード投稿</h2>
           <p className="mt-1 text-sm text-stone-600">
-            出る / 求むを1つの投稿として管理します。
+            出 / 求を1つの投稿として管理します。
           </p>
         </div>
         <ButtonLink href="/mypage/posts/new" variant="secondary" className="gap-2">
@@ -134,7 +134,7 @@ function PostsTab({ posts }: { posts: Parameters<typeof MyTradePostList>[0]["pos
       ) : (
         <EmptyState
           title="トレード投稿はまだありません"
-          text="出るボトルと求む条件をまとめて、最初のトレード投稿を作りましょう。"
+          text="出のボトルと求の条件をまとめて、最初のトレード投稿を作りましょう。"
         />
       )}
     </section>

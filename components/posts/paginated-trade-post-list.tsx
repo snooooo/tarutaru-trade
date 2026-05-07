@@ -27,7 +27,7 @@ export function PaginatedTradePostList({
             トレード投稿はまだありません
           </h2>
           <p className="mt-1 text-sm">
-            出る / 求むをまとめた投稿が公開されると、ここに表示されます。
+            出 / 求をまとめた投稿が公開されると、ここに表示されます。
           </p>
         </div>
       </div>

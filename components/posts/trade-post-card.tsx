@@ -84,7 +84,7 @@ function OfferPanel({ items }: { items: PublicTradePostOfferItem[] }) {
 
   return (
     <section className="grid gap-2 rounded-md bg-stone-50 p-3">
-      <p className="text-xs font-bold text-stone-500">出る</p>
+      <p className="text-sm font-bold text-stone-500">出</p>
       {visibleItems.map((item) => (
         <BottleLine key={item.id} item={item} kind="offer" />
       ))}
@@ -107,7 +107,7 @@ function WantPanel({
 
   return (
     <section className="grid gap-2 rounded-md bg-stone-50 p-3">
-      <p className="text-xs font-bold text-stone-500">求む</p>
+      <p className="text-sm font-bold text-stone-500">求</p>
       {visibleItems.length ? (
         visibleItems.map((item) => (
           <BottleLine key={item.id} item={item} kind="want" />

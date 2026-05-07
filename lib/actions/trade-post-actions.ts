@@ -158,7 +158,7 @@ export async function createTradePostAction(formData: FormData) {
   const builtWantItems = buildWantItems(formData);
 
   if (!builtOfferItems.some((item) => item.manualBottleName)) {
-    redirectWithError(path, "出るボトル名を入力してください。");
+    redirectWithError(path, "出のボトル名を入力してください。");
   }
 
   const offerItems = builtOfferItems.flatMap((item) =>
@@ -232,7 +232,7 @@ export async function updateTradePostAction(formData: FormData) {
   const activeOfferItems = offerItems.filter((item) => item.manualBottleName);
 
   if (!activeOfferItems.length) {
-    redirectWithError(path, "出るボトル名を1件以上入力してください。");
+    redirectWithError(path, "出のボトル名を1件以上入力してください。");
   }
 
   const loose = supabase as unknown as LooseTradePostEditSupabase;

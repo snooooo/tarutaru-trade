@@ -289,7 +289,7 @@ function TradePostPanel({
       </h2>
       <div className="mt-4 grid gap-3">
         <div className="rounded-md bg-stone-50 p-3">
-          <p className="text-xs font-medium text-stone-500">出る</p>
+          <p className="text-sm font-medium text-stone-500">出</p>
           <p className="mt-1 font-semibold">
             {offer?.display_bottle_name ?? "名称未設定のボトル"}
           </p>
@@ -300,7 +300,7 @@ function TradePostPanel({
           ) : null}
         </div>
         <div className="rounded-md bg-stone-50 p-3">
-          <p className="text-xs font-medium text-stone-500">求む</p>
+          <p className="text-sm font-medium text-stone-500">求</p>
           <p className="mt-1 font-semibold">
             {want?.display_bottle_name ?? "提案歓迎"}
           </p>
