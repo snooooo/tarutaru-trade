@@ -37,15 +37,17 @@ export default async function MyPage({ searchParams }: MyPageProps) {
     getReceivedInterests(),
   ]);
 
-  // Count items needing user action
+  // Count items needing user action — match getPendingActionCount() in lib/data/interests.ts
   const receivedWaitingCount = receivedInterests.data.filter(
     (i) => i.status === "interested",
   ).length;
-  const completionPendingCount = [
+  const inProgressCount = [
     ...sentInterests.data,
     ...receivedInterests.data,
-  ].filter((i) => i.status === "completion_requested").length;
-  const actionCount = receivedWaitingCount + completionPendingCount;
+  ].filter(
+    (i) => i.status === "consulting" || i.status === "completion_requested",
+  ).length;
+  const actionCount = receivedWaitingCount + inProgressCount;
 
   return (
     <PageShell>

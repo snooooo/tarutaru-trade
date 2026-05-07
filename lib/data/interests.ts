@@ -1009,7 +1009,7 @@ export async function getPendingActionCount(): Promise<number> {
     return 0;
   }
 
-  const [received, completion] = await Promise.all([
+  const [received, inProgress] = await Promise.all([
     supabase
       .from("trade_interests")
       .select("id", { count: "exact", head: true })
@@ -1021,10 +1021,10 @@ export async function getPendingActionCount(): Promise<number> {
       .or(
         `receiver_user_id.eq.${user.id},requester_user_id.eq.${user.id}`,
       )
-      .eq("status", "completion_requested"),
+      .in("status", ["consulting", "completion_requested"]),
   ]);
 
-  return (received.count ?? 0) + (completion.count ?? 0);
+  return (received.count ?? 0) + (inProgress.count ?? 0);
 }
 
 type DetailResult = {
