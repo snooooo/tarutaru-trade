@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Package, MessageSquare, Settings } from "lucide-react";
 
 export type TabKey = "posts" | "interactions" | "account";
@@ -28,14 +29,18 @@ export function MyPageTabs({
 }: {
   children: Record<TabKey, React.ReactNode>;
 }) {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const active = (searchParams.get("tab") as TabKey) || "posts";
+  const [active, setActive] = useState<TabKey>(
+    () => (searchParams.get("tab") as TabKey) || "posts",
+  );
 
   function handleTabChange(key: TabKey) {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("tab", key);
-    router.replace(`?${params.toString()}`, { scroll: false });
+    setActive(key);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      params.set("tab", key);
+      window.history.replaceState(null, "", `?${params.toString()}`);
+    }
   }
 
   return (
