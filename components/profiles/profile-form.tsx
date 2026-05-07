@@ -26,9 +26,9 @@ function XIdHelpPopup({ onClose }: { onClose: () => void }) {
         aria-hidden="true"
       />
       {/* ポップアップ本体 */}
-      <div className="absolute left-0 top-8 z-50 w-72 rounded-lg border border-stone-200 bg-white p-4 shadow-xl">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-sm font-semibold text-stone-800">X ID の入力について</span>
+      <div className="absolute left-0 top-9 z-50 w-80 rounded-lg border border-stone-200 bg-white p-4 shadow-xl">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-base font-semibold text-stone-800">X ID の入力について</span>
           <button
             type="button"
             onClick={onClose}
@@ -38,13 +38,13 @@ function XIdHelpPopup({ onClose }: { onClose: () => void }) {
             ✕
           </button>
         </div>
-        <ul className="grid gap-2.5 text-xs leading-5 text-stone-600">
+        <ul className="grid gap-3 text-sm leading-6 text-stone-600">
           <li>
             <span className="font-medium text-stone-800">🔍 スマホでの確認手順</span>
-            <ol className="mt-1 grid gap-1 pl-3 list-decimal text-stone-600">
+            <ol className="mt-1.5 grid gap-1.5 pl-4 list-decimal text-stone-600">
               <li>画面左上の<span className="font-medium text-stone-700">プロフィールアイコン</span>をタップ</li>
               <li>サイドメニューの<span className="font-medium text-stone-700">「設定とプライバシー」</span>をタップ<br/>
-                <span className="text-[10px] text-stone-500">※「設定とサポート」の中にある場合があります</span>
+                <span className="text-xs text-stone-500">※「設定とサポート」の中にある場合があります</span>
               </li>
               <li><span className="font-medium text-stone-700">「アカウント」</span>をタップ</li>
               <li><span className="font-medium text-stone-700">「アカウント情報」</span>をタップ</li>
@@ -96,7 +96,7 @@ export function ProfileForm({ profile, nextPath }: ProfileFormProps) {
             <button
               type="button"
               onClick={() => setShowXIdHelp((v) => !v)}
-              className="flex size-5 items-center justify-center rounded-full border border-stone-300 bg-stone-100 text-xs font-bold text-stone-500 transition hover:border-stone-400 hover:bg-stone-200 hover:text-stone-700"
+              className="flex size-7 items-center justify-center rounded-full border border-stone-300 bg-stone-100 text-sm font-bold text-stone-500 transition hover:border-stone-400 hover:bg-stone-200 hover:text-stone-700"
               aria-label="X IDの入力ガイドを表示"
             >
               ?
