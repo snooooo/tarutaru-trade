@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>お問い合わせ（Netlify Forms 検出用）</title>
+  </head>
+  <body>
+    <!--
+      このファイルは Netlify Forms がフォームを検出するための静的 HTML です。
+      実際のフォームは /contact ページ（Next.js）に実装されており、
+      このファイルは直接ユーザーには表示されません。
+    -->
+    <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="contact" />
+      <input name="bot-field" />
+      <select name="subject"></select>
+      <input type="email" name="email" />
+      <textarea name="message"></textarea>
+      <button type="submit">送信</button>
+    </form>
+  </body>
+</html>

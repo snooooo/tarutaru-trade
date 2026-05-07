@@ -4,6 +4,7 @@ import {
   AlertCircle,
   KeyRound,
   LogOut,
+  Mail,
   PlusCircle,
   Settings,
   Star,
@@ -192,6 +193,13 @@ function AccountTab() {
         >
           <KeyRound size={16} aria-hidden="true" />
           パスワード変更
+        </Link>
+        <Link
+          href="/contact"
+          className="flex items-center gap-3 rounded-md border border-stone-200 bg-white/82 p-4 text-sm font-semibold text-stone-700 shadow-sm transition hover:border-stone-300 hover:bg-white"
+        >
+          <Mail size={16} aria-hidden="true" />
+          お問い合わせ
         </Link>
         <form action={logoutAction}>
           <button

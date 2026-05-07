@@ -12,6 +12,9 @@ export function SiteFooter() {
           <Link href="/privacy" className="hover:text-stone-950 hover:underline underline-offset-4">
             プライバシーポリシー
           </Link>
+          <Link href="/contact" className="hover:text-stone-950 hover:underline underline-offset-4">
+            お問い合わせ
+          </Link>
           <span>
             powered by{" "}
             <a
