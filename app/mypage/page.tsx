@@ -91,7 +91,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
 
         {/* Tabs */}
         <Suspense>
-          <MyPageTabs>
+          <MyPageTabs interactionsPendingCount={actionCount}>
             {{
               posts: (
                 <PostsTab
