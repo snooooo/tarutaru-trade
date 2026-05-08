@@ -6,7 +6,7 @@ import type {
   TradeInterestListItem,
   TradeInterestStatus,
 } from "@/lib/types/interests";
-import type { PublicTradePost } from "@/lib/types/trade-posts";
+import type { PublicTradePost, TradePostStatus } from "@/lib/types/trade-posts";
 import type {
   PublicTradePostOfferItem,
   PublicTradePostWantItem,
@@ -82,8 +82,10 @@ type RelatedPostRow = {
   id: string;
   title: string | null;
   condition_note: string | null;
+  status: TradePostStatus;
   created_at: string;
   published_at: string | null;
+  closed_at: string | null;
 };
 
 type RelatedPostOfferRow = OfferRow & {
@@ -525,7 +527,7 @@ async function getRelatedPostMaps(
   const [postResult, offerResult, wantResult] = await Promise.all([
     loose
       .from("trade_posts")
-      .select("id,title,condition_note,created_at,published_at")
+      .select("id,title,condition_note,status,created_at,published_at,closed_at")
       .in("id", postIds),
     loose
       .from("trade_offer_items")
@@ -586,10 +588,12 @@ async function getRelatedPostMaps(
   }
   const posts = postRows.map((post) => ({
     id: post.id,
+    status: post.status,
     title: post.title,
     condition_note: post.condition_note,
     created_at: post.created_at,
     published_at: post.published_at,
+    closed_at: post.closed_at,
     profile_public_id: null,
     owner_display_name: null,
     owner_x_followers_range: null,

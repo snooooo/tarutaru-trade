@@ -47,10 +47,12 @@ export type PublicTradePostWantItem = {
 
 export type PublicTradePost = PublicOwnerStats & {
   id: string;
+  status: TradePostStatus;
   title: string | null;
   condition_note: string | null;
   created_at: string;
   published_at: string | null;
+  closed_at: string | null;
   offer_items: PublicTradePostOfferItem[];
   want_items: PublicTradePostWantItem[];
   search_text?: string | null;

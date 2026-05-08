@@ -48,6 +48,7 @@ export default async function PostDetailPage({
   const post = result.data[0];
   const myPost = myPostResult.data[0];
   const isMyPost = Boolean(myPost);
+  const isClosed = post?.status === "closed";
   if (result.isConfigured && !result.error && !post) {
     notFound();
   }
@@ -64,10 +65,15 @@ export default async function PostDetailPage({
       {post ? (
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="grid gap-6">
-            <header>
+            <header className="flex flex-wrap items-center gap-3">
               <p className="text-sm font-medium text-stone-500">
                 {formatDate(post.published_at ?? post.created_at)}
               </p>
+              {isClosed ? (
+                <span className="rounded bg-stone-200 px-2 py-0.5 text-xs font-semibold text-stone-700">
+                  {formatDate(post.closed_at ?? post.published_at ?? post.created_at)}に取引終了
+                </span>
+              ) : null}
             </header>
 
             <section className="grid gap-3">
@@ -97,7 +103,7 @@ export default async function PostDetailPage({
               )}
             </section>
 
-            {post.condition_note ? (
+            {!isClosed && post.condition_note ? (
               <section className="grid gap-3">
                 <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">補足</h2>
                 <div className="rounded-md border border-stone-200 bg-white/82 p-5">
@@ -111,6 +117,7 @@ export default async function PostDetailPage({
           </div>
 
           <aside className="grid content-start gap-4">
+            {isClosed ? null : (
             <section className="rounded-md border border-stone-200 bg-white/82 p-5">
               <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">投稿者</h2>
               <p className="mt-2 text-xl font-semibold">
@@ -143,9 +150,10 @@ export default async function PostDetailPage({
                 <span>{formatFollowersRange(post.owner_x_followers_range)}</span>
               </div>
             </section>
+            )}
             {isMyPost ? (
               <OwnerPostActions postId={post.id} />
-            ) : (
+            ) : isClosed ? null : (
               <>
                 <section className="rounded-md border border-stone-200 bg-white/82 p-5">
                   <h2 className="text-xs font-semibold uppercase tracking-widest text-stone-400">トレードに興味あり</h2>

@@ -15,13 +15,21 @@ import type {
 
 export function TradePostCard({ post }: { post: PublicTradePost }) {
   const primaryWant = post.want_items[0];
+  const isClosed = post.status === "closed";
 
   return (
     <Link
       href={`/posts/${post.id}`}
       className="group grid gap-3 rounded-md border border-stone-200 bg-white/88 p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-stone-300 hover:bg-white hover:shadow-md sm:p-4"
     >
-      <div className="flex items-start justify-end gap-2">
+      <div className="flex items-start justify-between gap-2">
+        {isClosed ? (
+          <span className="rounded bg-stone-200 px-2 py-0.5 text-xs font-semibold text-stone-700">
+            取引終了
+          </span>
+        ) : (
+          <span />
+        )}
         <p className="text-xs font-medium text-stone-500">
           {formatDate(post.published_at ?? post.created_at)}
         </p>
@@ -32,41 +40,49 @@ export function TradePostCard({ post }: { post: PublicTradePost }) {
         <WantPanel items={post.want_items} primaryWant={primaryWant} />
       </div>
 
-      {post.condition_note ? (
+      {!isClosed && post.condition_note ? (
         <p className="line-clamp-2 text-sm leading-6 text-stone-700">
           {post.condition_note}
         </p>
       ) : null}
 
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-stone-100 pt-3 text-sm text-stone-600">
-        <span className="min-w-0 truncate">{post.owner_display_name ?? "ななしさん"}</span>
-        <span className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="flex items-center gap-1">
-            <Star size={14} aria-hidden="true" />
-            評価 {post.owner_average_rating?.toFixed(1) ?? "-"}
+        {isClosed ? (
+          <span className="min-w-0 truncate text-stone-500">
+            {formatDate(post.closed_at ?? post.published_at ?? post.created_at)}に取引終了
           </span>
-          <span className="flex items-center gap-1">
-            <CheckCircle2 size={14} aria-hidden="true" />
-            完了 {post.owner_completed_count ?? 0}件
-          </span>
-          {post.owner_shipping_region ? (
-            <span className="flex items-center gap-1">
-              <MapPin size={14} aria-hidden="true" />
-              {post.owner_shipping_region}
+        ) : (
+          <>
+            <span className="min-w-0 truncate">{post.owner_display_name ?? "ななしさん"}</span>
+            <span className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="flex items-center gap-1">
+                <Star size={14} aria-hidden="true" />
+                評価 {post.owner_average_rating?.toFixed(1) ?? "-"}
+              </span>
+              <span className="flex items-center gap-1">
+                <CheckCircle2 size={14} aria-hidden="true" />
+                完了 {post.owner_completed_count ?? 0}件
+              </span>
+              {post.owner_shipping_region ? (
+                <span className="flex items-center gap-1">
+                  <MapPin size={14} aria-hidden="true" />
+                  {post.owner_shipping_region}
+                </span>
+              ) : null}
+              {post.owner_shipping_preference === "anonymous_only" ? (
+                <span className="flex items-center gap-1">
+                  <Truck size={15} aria-hidden="true" />
+                  匿名配送
+                </span>
+              ) : post.owner_shipping_preference === "disclose_preferred" ? (
+                <span className="flex items-center gap-1">
+                  <Truck size={15} aria-hidden="true" />
+                  配送住所等開示希望
+                </span>
+              ) : null}
             </span>
-          ) : null}
-          {post.owner_shipping_preference === "anonymous_only" ? (
-            <span className="flex items-center gap-1">
-              <Truck size={15} aria-hidden="true" />
-              匿名配送
-            </span>
-          ) : post.owner_shipping_preference === "disclose_preferred" ? (
-            <span className="flex items-center gap-1">
-              <Truck size={15} aria-hidden="true" />
-              配送住所等開示希望
-            </span>
-          ) : null}
-        </span>
+          </>
+        )}
       </div>
 
       <div className="flex items-center justify-end gap-1 text-sm font-semibold text-stone-950">
