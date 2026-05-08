@@ -130,6 +130,7 @@ export async function getPublicTradePosts(options?: {
   let request = supabase
     .from("trade_public_posts")
     .select("*")
+    .order("is_closed", { ascending: true })
     .order("published_at", { ascending: false })
     .limit(options?.limit ?? PAGE_SIZE);
 

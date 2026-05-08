@@ -34,7 +34,7 @@ export default async function MyLikesPage() {
             いいねした投稿
           </h1>
           <p className="mt-2 text-sm text-stone-600">
-            いいねを押した投稿が新しい順に並びます。取引終了後の投稿は匿名化されて表示されます。
+            いいねを押した投稿が新しい順に並びます。トレード完了後の投稿は匿名化されて表示されます。
           </p>
         </header>
 

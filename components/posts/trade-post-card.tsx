@@ -32,13 +32,13 @@ export function TradePostCard({
   return (
     <Link
       href={`/posts/${post.id}`}
-      className="group grid gap-3 rounded-md border border-stone-200 bg-white/88 p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-stone-300 hover:bg-white hover:shadow-md sm:p-4"
+      className={`group grid gap-3 rounded-md border p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-4 ${isClosed ? "border-stone-300 bg-stone-200/70 hover:border-stone-400 hover:bg-stone-200" : "border-stone-200 bg-white/88 hover:border-stone-300 hover:bg-white"}`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
           {isClosed ? (
             <span className="rounded bg-stone-200 px-2 py-0.5 text-xs font-semibold text-stone-700">
-              取引終了
+              トレード完了
             </span>
           ) : null}
           <p className="text-xs font-medium text-stone-500">
@@ -72,7 +72,7 @@ export function TradePostCard({
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-stone-100 pt-3 text-sm text-stone-600">
         {isClosed ? (
           <span className="min-w-0 truncate text-stone-500">
-            {formatDate(post.closed_at ?? post.published_at ?? post.created_at)}に取引終了
+            {formatDate(post.closed_at ?? post.published_at ?? post.created_at)}にトレード完了
           </span>
         ) : (
           <>

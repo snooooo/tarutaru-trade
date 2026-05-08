@@ -77,7 +77,7 @@ export default async function PostDetailPage({
                 </p>
                 {isClosed ? (
                   <span className="rounded bg-stone-200 px-2 py-0.5 text-xs font-semibold text-stone-700">
-                    {formatDate(post.closed_at ?? post.published_at ?? post.created_at)}に取引終了
+                    {formatDate(post.closed_at ?? post.published_at ?? post.created_at)}にトレード完了
                   </span>
                 ) : null}
               </div>
