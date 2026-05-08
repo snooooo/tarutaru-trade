@@ -14,8 +14,10 @@ import { DataStatusNote } from "@/components/ui/status-note";
 import { updateTradePostVisibilityAction } from "@/lib/actions/trade-post-actions";
 import { getMyTradePost, getPublicTradePost } from "@/lib/data/trade-posts";
 import { getCurrentUser } from "@/lib/auth/require-user";
+import { LikeButton } from "@/components/posts/like-button";
 import { ReportButton } from "@/components/posts/report-button";
 import { YahooAuctionLink } from "@/components/ui/yahoo-auction-link";
+import { getLikeStatusForPost } from "@/lib/data/likes";
 import {
   bottleSubline,
   formatBoxCondition,
@@ -40,15 +42,18 @@ export default async function PostDetailPage({
 }: PostDetailPageProps) {
   const { postId } = await params;
   const query = await searchParams;
-  const [result, myPostResult, currentUser] = await Promise.all([
+  const [result, myPostResult, currentUser, likeStatus] = await Promise.all([
     getPublicTradePost(postId),
     getMyTradePost(postId),
     getCurrentUser(),
+    getLikeStatusForPost(postId),
   ]);
   const post = result.data[0];
   const myPost = myPostResult.data[0];
   const isMyPost = Boolean(myPost);
   const isClosed = post?.status === "closed";
+  const showLike = post && !isMyPost && (!isClosed || likeStatus.liked);
+  const loginHref = `/login?next=${encodeURIComponent(`/posts/${postId}`)}`;
   if (result.isConfigured && !result.error && !post) {
     notFound();
   }
@@ -65,14 +70,25 @@ export default async function PostDetailPage({
       {post ? (
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="grid gap-6">
-            <header className="flex flex-wrap items-center gap-3">
-              <p className="text-sm font-medium text-stone-500">
-                {formatDate(post.published_at ?? post.created_at)}
-              </p>
-              {isClosed ? (
-                <span className="rounded bg-stone-200 px-2 py-0.5 text-xs font-semibold text-stone-700">
-                  {formatDate(post.closed_at ?? post.published_at ?? post.created_at)}に取引終了
-                </span>
+            <header className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-sm font-medium text-stone-500">
+                  {formatDate(post.published_at ?? post.created_at)}
+                </p>
+                {isClosed ? (
+                  <span className="rounded bg-stone-200 px-2 py-0.5 text-xs font-semibold text-stone-700">
+                    {formatDate(post.closed_at ?? post.published_at ?? post.created_at)}に取引終了
+                  </span>
+                ) : null}
+              </div>
+              {showLike ? (
+                <LikeButton
+                  postId={post.id}
+                  initialLiked={likeStatus.liked}
+                  initialCount={likeStatus.count}
+                  loginHref={loginHref}
+                  disabled={isClosed && !likeStatus.liked}
+                />
               ) : null}
             </header>
 

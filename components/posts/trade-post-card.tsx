@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, MapPin, Star, Truck } from "lucide-react";
+import { LikeButton } from "@/components/posts/like-button";
 import {
   bottleSubline,
   formatBoxCondition,
@@ -13,9 +14,20 @@ import type {
   PublicTradePostWantItem,
 } from "@/lib/types/trade-posts";
 
-export function TradePostCard({ post }: { post: PublicTradePost }) {
+export function TradePostCard({
+  post,
+  likeCount = 0,
+  isLiked = false,
+}: {
+  post: PublicTradePost;
+  likeCount?: number;
+  isLiked?: boolean;
+}) {
   const primaryWant = post.want_items[0];
   const isClosed = post.status === "closed";
+  // closed 投稿では新規いいね不可。既いいねの場合のみハートを出して解除を許可。
+  const showLike = !isClosed || isLiked;
+  const loginHref = `/login?next=${encodeURIComponent(`/posts/${post.id}`)}`;
 
   return (
     <Link
@@ -23,16 +35,27 @@ export function TradePostCard({ post }: { post: PublicTradePost }) {
       className="group grid gap-3 rounded-md border border-stone-200 bg-white/88 p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-stone-300 hover:bg-white hover:shadow-md sm:p-4"
     >
       <div className="flex items-start justify-between gap-2">
-        {isClosed ? (
-          <span className="rounded bg-stone-200 px-2 py-0.5 text-xs font-semibold text-stone-700">
-            取引終了
-          </span>
-        ) : (
-          <span />
-        )}
-        <p className="text-xs font-medium text-stone-500">
-          {formatDate(post.published_at ?? post.created_at)}
-        </p>
+        <div className="flex items-center gap-2">
+          {isClosed ? (
+            <span className="rounded bg-stone-200 px-2 py-0.5 text-xs font-semibold text-stone-700">
+              取引終了
+            </span>
+          ) : null}
+          <p className="text-xs font-medium text-stone-500">
+            {formatDate(post.published_at ?? post.created_at)}
+          </p>
+        </div>
+        {showLike ? (
+          <LikeButton
+            postId={post.id}
+            initialLiked={isLiked}
+            initialCount={likeCount}
+            loginHref={loginHref}
+            disabled={isClosed && !isLiked}
+            stopPropagation
+            size="sm"
+          />
+        ) : null}
       </div>
 
       <div className="grid grid-cols-2 gap-2">

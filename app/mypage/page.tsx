@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import Link from "next/link";
 import {
   AlertCircle,
+  ChevronRight,
+  Heart,
   KeyRound,
   LogOut,
   Mail,
@@ -88,6 +90,18 @@ export default async function MyPage({ searchParams }: MyPageProps) {
         />
 
         <MyItemUpdateMessage updated={params.updated} error={params.error} />
+
+        {/* Quick links */}
+        <Link
+          href="/mypage/likes"
+          className="flex items-center justify-between rounded-md border border-stone-200 bg-white/82 px-4 py-3 text-sm font-semibold text-stone-700 shadow-sm transition hover:border-stone-300 hover:bg-white"
+        >
+          <span className="flex items-center gap-2">
+            <Heart size={16} aria-hidden="true" className="fill-rose-500 text-rose-500" />
+            いいねした投稿
+          </span>
+          <ChevronRight size={16} aria-hidden="true" className="text-stone-400" />
+        </Link>
 
         {/* Tabs */}
         <Suspense>

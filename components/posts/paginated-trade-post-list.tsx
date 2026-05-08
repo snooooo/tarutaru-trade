@@ -11,10 +11,15 @@ const LOAD_MORE_COUNT = 8;
 export function PaginatedTradePostList({
   posts,
   className = "grid gap-3 lg:grid-cols-2",
+  likeCounts,
+  likedPostIds,
 }: {
   posts: PublicTradePost[];
   className?: string;
+  likeCounts?: Record<string, number>;
+  likedPostIds?: string[];
 }) {
+  const likedSet = new Set(likedPostIds ?? []);
   const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
   const visible = posts.slice(0, visibleCount);
   const remaining = posts.length - visibleCount;
@@ -38,7 +43,12 @@ export function PaginatedTradePostList({
     <div className="grid gap-4">
       <div className={className}>
         {visible.map((post) => (
-          <TradePostCard key={post.id} post={post} />
+          <TradePostCard
+            key={post.id}
+            post={post}
+            likeCount={likeCounts?.[post.id] ?? 0}
+            isLiked={likedSet.has(post.id)}
+          />
         ))}
       </div>
       {remaining > 0 ? (

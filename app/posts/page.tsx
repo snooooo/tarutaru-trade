@@ -3,6 +3,10 @@ import { PageShell } from "@/components/layout/page-shell";
 import { PaginatedTradePostList } from "@/components/posts/paginated-trade-post-list";
 import { SearchForm } from "@/components/ui/search-form";
 import { DataStatusNote } from "@/components/ui/status-note";
+import {
+  getLikeCountsByPostIds,
+  getMyLikedPostIdSet,
+} from "@/lib/data/likes";
 import { getPublicTradePosts } from "@/lib/data/trade-posts";
 
 type SearchParams = { q?: string; created?: string };
@@ -15,6 +19,13 @@ async function PostsList({
   const params = await searchParamsPromise;
   const query = params.q ?? "";
   const posts = await getPublicTradePosts({ query });
+  const postIds = posts.data.map((p) => p.id);
+  const [likeCountsMap, likedSet] = await Promise.all([
+    getLikeCountsByPostIds(postIds),
+    getMyLikedPostIdSet(postIds),
+  ]);
+  const likeCounts: Record<string, number> = {};
+  for (const [id, n] of likeCountsMap) likeCounts[id] = n;
   return (
     <>
       <SearchForm
@@ -28,7 +39,11 @@ async function PostsList({
           トレード投稿を公開しました。一覧に反映されています。
         </p>
       ) : null}
-      <PaginatedTradePostList posts={posts.data} />
+      <PaginatedTradePostList
+        posts={posts.data}
+        likeCounts={likeCounts}
+        likedPostIds={Array.from(likedSet)}
+      />
     </>
   );
 }
