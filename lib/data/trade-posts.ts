@@ -103,6 +103,10 @@ function publicPostsClient() {
   return supabase ? (supabase as unknown as LooseSupabase) : null;
 }
 
+function isMissingAuthSession(error?: { message: string } | null) {
+  return error?.message === "Auth session missing!";
+}
+
 async function executeList(
   query: PublicPostsQuery,
 ): Promise<PostgrestListResult> {
@@ -231,7 +235,11 @@ export async function getMyTradePosts(): Promise<QueryResult<MyTradePost>> {
   } = await loose.auth.getUser();
 
   if (userError || !user) {
-    return { data: [], error: userError?.message ?? null, isConfigured: true };
+    return {
+      data: [],
+      error: isMissingAuthSession(userError) ? null : (userError?.message ?? null),
+      isConfigured: true,
+    };
   }
 
   const postResult = await loose
