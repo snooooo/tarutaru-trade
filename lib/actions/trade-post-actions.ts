@@ -167,7 +167,6 @@ export async function createTradePostAction(formData: FormData) {
     redirectWithError(path, "Supabase環境変数が未設定です。");
   }
 
-  const title = stringValue(formData, "title");
   const conditionNote = stringValue(formData, "condition_note");
   const builtOfferItems = buildOfferItems(formData);
   const builtWantItems = buildWantItems(formData);
@@ -205,7 +204,7 @@ export async function createTradePostAction(formData: FormData) {
   const { error } = await (supabase as unknown as LooseRpcSupabase).rpc(
     "trade_create_post",
     {
-      p_title: title,
+      p_title: null,
       p_condition_note: conditionNote,
       p_offer_items: offerItems,
       p_want_items: wantItems,
@@ -240,7 +239,6 @@ export async function updateTradePostAction(formData: FormData) {
     redirectWithError("/mypage", "トレード投稿が見つかりません。");
   }
 
-  const title = stringValue(formData, "title");
   const conditionNote = stringValue(formData, "condition_note");
   const offerItems = buildOfferItems(formData);
   const wantItems = buildWantItems(formData);
@@ -283,7 +281,7 @@ export async function updateTradePostAction(formData: FormData) {
 
   const { error: postError } = await loose
     .from("trade_posts")
-    .update({ title, condition_note: conditionNote })
+    .update({ title: null, condition_note: conditionNote })
     .eq("id", postId)
     .eq("user_id", user.id);
 

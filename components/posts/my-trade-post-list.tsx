@@ -130,7 +130,6 @@ function CompactPostRow({ post }: { post: MyTradePost }) {
   const config = statusConfig[post.status] ?? statusConfig.public;
   const offerLabel = bottleLabel(post.offer_items, "名称未設定");
   const wantLabel = bottleLabel(post.want_items, "提案歓迎");
-  const title = post.title || offerLabel;
   const dateStr = formatShortDate(post.published_at ?? post.created_at);
   const canEdit =
     !post.admin_hidden_at &&
@@ -147,7 +146,7 @@ function CompactPostRow({ post }: { post: MyTradePost }) {
           {post.admin_hidden_at ? "管理者非公開" : config.label}
         </span>
         <h3 className="min-w-0 flex-1 truncate text-sm font-semibold text-stone-900">
-          {title}
+          {offerLabel}
         </h3>
         <span className="shrink-0 text-xs tabular-nums text-stone-400">
           {dateStr}

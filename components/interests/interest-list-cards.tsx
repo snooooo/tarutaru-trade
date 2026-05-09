@@ -193,7 +193,7 @@ function TradePostPanel({
     <section className="rounded-md bg-stone-50 p-4">
       <p className="text-xs font-medium text-stone-500">{label}</p>
       <h3 className="mt-1 font-semibold">
-        {post.title || offer?.display_bottle_name || "トレード投稿"}
+        {offer?.display_bottle_name || "トレード投稿"}
       </h3>
       <div className="mt-3 grid gap-2 text-sm">
         <div>

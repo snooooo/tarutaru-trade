@@ -31,20 +31,6 @@ export default function RootLayout({
   return (
     <html lang="ja" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <div style={{
-          background: "#ff6b00",
-          boxSizing: "border-box",
-          color: "#fff",
-          width: "100%",
-          textAlign: "center",
-          padding: "8px 16px",
-          fontSize: "13px",
-          fontWeight: "bold",
-          letterSpacing: "0.03em",
-          lineHeight: "1.6",
-        }}>
-          🚧 試験運転中 — 表示されているデータはすべてサンプルです
-        </div>
         {children}
         <ActivityTracker />
       </body>

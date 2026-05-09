@@ -67,20 +67,9 @@ export function TradePostForm({ error, post }: TradePostFormProps) {
         <div>
           <h2 className="text-lg font-semibold">投稿全体</h2>
           <p className="mt-1 text-sm text-stone-600">
-            タイトルは任意です。出 / 求が読めれば空でも構いません。
+            出 / 求だけでは伝わりにくい条件があれば、補足にまとめてください。
           </p>
         </div>
-        <label className="grid gap-2">
-          <span className="text-sm font-medium text-stone-700">タイトル</span>
-          <input
-            type="text"
-            name="title"
-            maxLength={80}
-            defaultValue={post?.title ?? ""}
-            className="h-11 rounded-md border border-stone-300 bg-white px-3 outline-none transition focus:border-stone-950"
-            placeholder="例: スペイサイド同士でトレード希望"
-          />
-        </label>
         <label className="grid gap-2">
           <span className="text-sm font-medium text-stone-700">補足条件</span>
           <textarea
