@@ -22,7 +22,7 @@ export default function PrivacyPage() {
         <header>
           <p className="text-sm font-medium text-stone-500">Privacy Policy</p>
           <h1 className="mt-1 text-3xl font-semibold text-stone-950">プライバシーポリシー</h1>
-          <p className="mt-3 text-sm text-stone-600">最終更新日: 2026年5月4日</p>
+          <p className="mt-3 text-sm text-stone-600">最終更新日: 2026年5月9日</p>
         </header>
 
         <p className="leading-7">
@@ -61,9 +61,13 @@ export default function PrivacyPage() {
             <li>相談開始済みの相手に対するX IDの開示</li>
             <li>不正利用、規約違反、トラブル対応のための調査</li>
             <li>利用状況の集計分析、サービスの改善・開発</li>
+            <li>本サービスおよび姉妹サービスMaltPeriに関する機能追加、更新情報、キャンペーン、アンケート等の案内</li>
             <li>お問い合わせへの対応</li>
             <li>法令に基づく対応</li>
           </ul>
+          <p className="leading-7">
+            広告または宣伝を目的とする電子メールを送信する場合は、関連法令に従い、同意の取得、送信者情報の表示、配信停止方法の提供等、必要な対応を行います。
+          </p>
         </section>
 
         <section className="grid gap-3">
@@ -170,6 +174,9 @@ export default function PrivacyPage() {
                 退会ページ
               </Link>
               からアカウントを削除できます。
+            </li>
+            <li>
+              <span className="font-semibold">案内メールの停止</span> — 更新情報、キャンペーン、アンケート等の案内メールを送信する場合、利用者は所定の方法により配信停止を申し出ることができます。
             </li>
             <li>
               <span className="font-semibold">その他の請求</span> — 個人情報保護法に定める開示・利用停止・第三者提供記録の開示等の請求は、お問い合わせ先までご連絡ください。

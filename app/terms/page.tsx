@@ -22,7 +22,7 @@ export default function TermsPage() {
         <header>
           <p className="text-sm font-medium text-stone-500">Terms of Service</p>
           <h1 className="mt-1 text-3xl font-semibold text-stone-950">利用規約</h1>
-          <p className="mt-3 text-sm text-stone-600">最終更新日: 2026年5月6日</p>
+          <p className="mt-3 text-sm text-stone-600">最終更新日: 2026年5月9日</p>
         </header>
 
         <p className="leading-7">
@@ -227,21 +227,36 @@ export default function TermsPage() {
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第14条（規約の変更）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第14条（通知・連絡）</h2>
+          <ol className="grid list-decimal gap-2 pl-5 leading-7">
+            <li>
+              運営者は、本サービスの運営、機能変更、メンテナンス、障害対応、規約・ポリシーの変更その他本サービスに関する重要なお知らせについて、サービス上の表示、電子メールその他運営者が適切と判断する方法により利用者へ通知することがあります。
+            </li>
+            <li>
+              運営者は、利用者の同意がある場合または法令上認められる場合、本サービスおよび姉妹サービスMaltPeriに関する更新情報、キャンペーン、アンケート等の案内を送信することがあります。
+            </li>
+            <li>
+              電子メールによる通知は、利用者が登録したメールアドレス宛に送信した時点で到達したものとみなします。ただし、運営者の故意または重過失による場合を除き、登録情報の誤り、受信設定、通信環境等により通知が届かなかったことについて、運営者は責任を負いません。
+            </li>
+          </ol>
+        </section>
+
+        <section className="grid gap-3">
+          <h2 className="text-xl font-semibold text-stone-950">第15条（規約の変更）</h2>
           <p className="leading-7">
             運営者は、必要と判断した場合に本規約を変更することができます。変更後の規約は本ページに掲載した時点で効力を生じ、変更後に本サービスを継続利用した利用者は変更に同意したものとみなします。
           </p>
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第15条（準拠法・裁判管轄）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第16条（準拠法・裁判管轄）</h2>
           <p className="leading-7">
             本規約は日本法に準拠し、本サービスに関連して紛争が生じた場合は、運営者の本店所在地を管轄する裁判所を第一審の専属的合意管轄裁判所とします。
           </p>
         </section>
 
         <section className="grid gap-3">
-          <h2 className="text-xl font-semibold text-stone-950">第16条（お問い合わせ）</h2>
+          <h2 className="text-xl font-semibold text-stone-950">第17条（お問い合わせ）</h2>
           <p className="leading-7">
             本規約および本サービスに関するお問い合わせは、運営者までご連絡ください。連絡先は
             <Link href="/privacy" className="underline underline-offset-4">

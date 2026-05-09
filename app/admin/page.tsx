@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { AlertTriangle, Eye, EyeOff, Flag } from "lucide-react";
+import type { User } from "@supabase/supabase-js";
+import {
+  Activity,
+  AlertTriangle,
+  Eye,
+  EyeOff,
+  Flag,
+  UserCheck,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { getCurrentUser } from "@/lib/auth/require-user";
 import { createAdminSupabaseClient, getAdminUserIds } from "@/lib/supabase/admin";
@@ -29,6 +39,29 @@ type CountSupabase = {
   from: (table: string) => CountQuery;
 };
 
+type CountAllSupabase = {
+  from: (table: string) => {
+    select: (
+      columns: string,
+      options: { count: "exact"; head: true },
+    ) => Promise<{ count: number | null; error: { message: string } | null }>;
+  };
+};
+
+type ActiveUserSupabase = {
+  from: (table: string) => {
+    select: (columns: string) => Promise<{
+      data: unknown[] | null;
+      error: { message: string } | null;
+    }>;
+  };
+};
+
+type ActiveUserRow = {
+  maltperi_last_active_at: string | null;
+  tarutaru_last_active_at: string | null;
+};
+
 async function countRows(
   admin: CountSupabase,
   table: string,
@@ -42,6 +75,33 @@ async function countRows(
     count: result.count ?? 0,
     error: result.error?.message ?? null,
   };
+}
+
+async function countAllRows(admin: CountAllSupabase, table: string) {
+  const result = await admin.from(table).select("*", {
+    count: "exact",
+    head: true,
+  });
+  return {
+    count: result.count ?? 0,
+    error: result.error?.message ?? null,
+  };
+}
+
+async function listAllAuthUsers(admin: NonNullable<ReturnType<typeof createAdminSupabaseClient>>) {
+  const users: User[] = [];
+  let page = 1;
+  const perPage = 1000;
+
+  while (page <= 20) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
+    if (error) return { users, error: error.message };
+    users.push(...data.users);
+    if (data.users.length < perPage) break;
+    page += 1;
+  }
+
+  return { users, error: null };
 }
 
 export default async function AdminPage() {
@@ -62,8 +122,15 @@ export default async function AdminPage() {
   }
 
   const loose = admin as unknown as CountSupabase;
-  const [pendingReports, publicPosts, privatePosts, adminHiddenPosts] =
+  const countLoose = admin as unknown as CountAllSupabase;
+  const activeLoose = admin as unknown as ActiveUserSupabase;
+  const [authUsers, profileUsers, activeUsers, pendingReports, publicPosts, privatePosts, adminHiddenPosts] =
     await Promise.all([
+      listAllAuthUsers(admin),
+      countAllRows(countLoose, "trade_profiles"),
+      activeLoose
+        .from("app_active_users")
+        .select("maltperi_last_active_at,tarutaru_last_active_at"),
       countRows(loose, "trade_reports", (query) => query.eq("status", "pending")),
       countRows(loose, "trade_posts", (query) => query.eq("status", "public")),
       countRows(loose, "trade_posts", (query) => query.eq("status", "private")),
@@ -71,7 +138,23 @@ export default async function AdminPage() {
         query.not("admin_hidden_at", "is", null),
       ),
     ]);
+  const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const activeSince = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const registeredUsers = authUsers.users;
+  const newUsersThisMonth = registeredUsers.filter(
+    (authUser) => new Date(authUser.created_at) >= currentMonthStart,
+  ).length;
+  const activeUserRows = (activeUsers.data ?? []) as ActiveUserRow[];
+  const active30d = activeUserRows.filter((activeUser) =>
+    [activeUser.maltperi_last_active_at, activeUser.tarutaru_last_active_at]
+      .filter((value): value is string => Boolean(value))
+      .some((value) => new Date(value) >= activeSince),
+  ).length;
   const error = [
+    authUsers.error,
+    profileUsers.error,
+    activeUsers.error?.message,
     pendingReports.error,
     publicPosts.error,
     privatePosts.error,
@@ -88,6 +171,30 @@ export default async function AdminPage() {
       {error ? <AdminWarning message={error} /> : null}
 
       <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <DashboardCard
+          href="/admin/users"
+          label="登録ユーザ"
+          value={registeredUsers.length}
+          icon={<Users size={18} aria-hidden="true" />}
+        />
+        <DashboardCard
+          href="/admin/users"
+          label="今月の新規"
+          value={newUsersThisMonth}
+          icon={<UserPlus size={18} aria-hidden="true" />}
+        />
+        <DashboardCard
+          href="/admin/users"
+          label="プロフィール作成済み"
+          value={profileUsers.count}
+          icon={<UserCheck size={18} aria-hidden="true" />}
+        />
+        <DashboardCard
+          href="/admin/users?active=30d"
+          label="30日アクティブ"
+          value={active30d}
+          icon={<Activity size={18} aria-hidden="true" />}
+        />
         <DashboardCard
           href="/admin/reports"
           label="未対応の通報"
