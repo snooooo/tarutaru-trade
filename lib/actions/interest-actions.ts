@@ -86,7 +86,6 @@ export async function createPostInterestAction(formData: FormData) {
   const manualBottleNames = stringValues(formData, "proposal_manual_bottle_name");
   const boxConditions = stringValues(formData, "proposal_box_condition");
   const labelConditions = stringValues(formData, "proposal_label_condition");
-  const imageUrls = stringValues(formData, "proposal_image_url");
   const notes = stringValues(formData, "proposal_note");
 
   if (typeof targetPostId !== "string" || !targetPostId) {
@@ -105,7 +104,7 @@ export async function createPostInterestAction(formData: FormData) {
             manual_bottle_name: manualBottleName,
             box_condition: boxConditions[index] ?? "with_box_good",
             label_condition: labelConditions[index] ?? "good",
-            image_url: imageUrls[index] ?? null,
+            image_url: null,
             note: notes[index] ?? null,
           },
         ]

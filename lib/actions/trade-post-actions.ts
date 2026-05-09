@@ -132,7 +132,6 @@ function buildOfferItems(formData: FormData) {
   const names = stringValues(formData, "offer_manual_bottle_name");
   const boxConditions = stringValues(formData, "box_condition");
   const labelConditions = stringValues(formData, "label_condition");
-  const imageUrls = stringValues(formData, "image_url");
   const notes = stringValues(formData, "offer_note");
 
   return names.map((manualBottleName, index) => ({
@@ -140,7 +139,7 @@ function buildOfferItems(formData: FormData) {
     manualBottleName,
     boxCondition: boxConditions[index] ?? "with_box_good",
     labelCondition: labelConditions[index] ?? "good",
-    imageUrl: imageUrls[index] ?? null,
+    imageUrl: null,
     note: notes[index] ?? null,
     sortOrder: index,
   }));

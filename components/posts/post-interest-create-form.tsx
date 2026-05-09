@@ -137,17 +137,6 @@ function ProposalOfferFields({
       </div>
 
       <label className="grid gap-2">
-        <span className="text-sm font-medium text-stone-700">画像URL</span>
-        <input
-          type="url"
-          inputMode="url"
-          name="proposal_image_url"
-          className="h-11 rounded-md border border-stone-300 bg-white px-3 outline-none transition focus:border-stone-950"
-          placeholder="任意"
-        />
-      </label>
-
-      <label className="grid gap-2">
         <span className="text-sm font-medium text-stone-700">備考</span>
         <textarea
           name="proposal_note"
