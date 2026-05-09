@@ -53,7 +53,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
 
   return (
     <PageShell>
-      <section className="grid gap-6">
+      <section className="grid min-w-0 gap-6">
         {/* Header */}
         <div className="flex flex-col gap-5 rounded-md border border-stone-200 bg-white/82 p-5 shadow-sm sm:p-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -131,7 +131,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
 
 function PostsTab({ posts }: { posts: Parameters<typeof MyTradePostList>[0]["posts"] }) {
   return (
-    <section className="grid gap-4 pt-2">
+    <section className="grid min-w-0 gap-4 pt-2">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold">自分のトレード投稿</h2>
@@ -167,7 +167,7 @@ function InteractionsTab({
   const total = sent.length + received.length;
 
   return (
-    <section className="grid gap-4 pt-2">
+    <section className="grid min-w-0 gap-4 pt-2">
       <div>
         <h2 className="text-xl font-semibold">やりとり</h2>
         <p className="mt-1 text-sm text-stone-600">
@@ -191,7 +191,7 @@ function InteractionsTab({
 
 function AccountTab({ email }: { email: string }) {
   return (
-    <section className="grid gap-3 pt-2">
+    <section className="grid min-w-0 gap-3 pt-2">
       <h2 className="text-xl font-semibold">アカウント</h2>
       {/* ログイン中のメールアドレス */}
       <div className="flex items-center gap-3 rounded-md border border-stone-200 bg-stone-50 px-4 py-3">

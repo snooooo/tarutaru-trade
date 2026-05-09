@@ -29,8 +29,8 @@ export async function SiteHeader() {
   const pendingCount = user ? await getPendingActionCount() : 0;
 
   return (
-    <header className="sticky top-0 z-20 border-b border-stone-200/80 bg-[#f7f4ed]/94 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-[430px] items-center justify-between gap-2 px-4 lg:h-16 lg:max-w-6xl lg:px-6">
+    <header className="sticky top-0 z-20 w-full border-b border-stone-200/80 bg-[#f7f4ed]/94 backdrop-blur">
+      <div className="mx-auto flex h-14 w-full max-w-[430px] items-center justify-between gap-2 px-4 lg:h-16 lg:max-w-6xl lg:px-6">
         <Link
           href="/"
           className="flex min-w-0 shrink items-center gap-2 font-semibold"

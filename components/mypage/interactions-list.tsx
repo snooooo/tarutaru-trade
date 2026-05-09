@@ -107,9 +107,9 @@ export function InteractionsList({
       : allItems.filter((i) => classifyFilter(i) === filter);
 
   return (
-    <div className="grid gap-3">
+    <div className="grid min-w-0 gap-3">
       {/* Filter chips */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 -mb-1">
+      <div className="-mb-1 flex max-w-full gap-1.5 overflow-x-auto pb-1">
         {filterTabs.map((tab) => {
           const count = counts[tab.key];
           if (tab.key !== "all" && count === 0) return null;
@@ -141,7 +141,7 @@ export function InteractionsList({
 
       {/* List */}
       {filtered.length ? (
-        <div className="grid gap-2">
+        <div className="grid min-w-0 gap-2">
           {filtered.map((item) => (
             <InteractionRow key={`${item.direction}-${item.id}`} item={item} />
           ))}

@@ -77,9 +77,9 @@ export function MyTradePostList({ posts }: { posts: MyTradePost[] }) {
     filter === "all" ? posts : posts.filter((p) => p.status === filter);
 
   return (
-    <div className="grid gap-3">
+    <div className="grid min-w-0 gap-3">
       {/* Filter tabs */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 -mb-1">
+      <div className="-mb-1 flex max-w-full gap-1.5 overflow-x-auto pb-1">
         {filterTabs.map((tab) => {
           const count =
             tab.key === "all" ? posts.length : (counts[tab.key] ?? 0);
@@ -112,7 +112,7 @@ export function MyTradePostList({ posts }: { posts: MyTradePost[] }) {
 
       {/* Post list */}
       {filtered.length ? (
-        <div className="grid gap-2">
+        <div className="grid min-w-0 gap-2">
           {filtered.map((post) => (
             <CompactPostRow key={post.id} post={post} />
           ))}

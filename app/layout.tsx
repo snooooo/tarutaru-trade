@@ -33,7 +33,9 @@ export default function RootLayout({
       <body>
         <div style={{
           background: "#ff6b00",
+          boxSizing: "border-box",
           color: "#fff",
+          width: "100%",
           textAlign: "center",
           padding: "8px 16px",
           fontSize: "13px",

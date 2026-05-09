@@ -49,7 +49,7 @@ export function MyPageTabs({
     <>
       {/* Tab bar */}
       <nav
-        className="flex gap-1 rounded-lg border border-stone-200 bg-stone-100/80 p-1 shadow-sm"
+        className="flex w-full max-w-full gap-1 rounded-lg border border-stone-200 bg-stone-100/80 p-1 shadow-sm"
         role="tablist"
         aria-label="マイページナビゲーション"
       >
@@ -85,7 +85,7 @@ export function MyPageTabs({
       </nav>
 
       {/* Active tab content */}
-      <div role="tabpanel">{children[active]}</div>
+      <div className="min-w-0" role="tabpanel">{children[active]}</div>
     </>
   );
 }
