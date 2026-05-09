@@ -178,7 +178,9 @@ function ReportCard({
 }) {
   const isResolved = report.status === "resolved";
   const canHidePost =
-    !isResolved && post?.status === "public" && !post.admin_hidden_at;
+    !isResolved &&
+    (post?.status === "public" || post?.status === "closed") &&
+    !post.admin_hidden_at;
   return (
     <div className={`rounded-md border p-4 text-sm ${isResolved ? "border-stone-200 bg-white/50 text-stone-500" : "border-amber-200 bg-amber-50"}`}>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">

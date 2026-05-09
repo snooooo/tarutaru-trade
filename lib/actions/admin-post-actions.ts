@@ -7,12 +7,18 @@ import { createAdminSupabaseClient, getAdminUserIds } from "@/lib/supabase/admin
 
 type AdminPostUpdateSupabase = {
   from: (table: "trade_posts") => {
-    update: (values: {
-      status: "private";
-      admin_hidden_at: string;
-      admin_hidden_by: string;
-      admin_hidden_reason: string | null;
-    }) => {
+    select: (columns: "status,admin_hidden_at") => {
+      eq: (
+        column: string,
+        value: string,
+      ) => {
+        maybeSingle: () => Promise<{
+          data: { status: string; admin_hidden_at: string | null } | null;
+          error: { message: string } | null;
+        }>;
+      };
+    };
+    update: (values: Record<string, unknown>) => {
       eq: (
         column: string,
         value: string,
@@ -63,14 +69,35 @@ export async function adminHidePostAction(formData: FormData) {
     redirectWithAdminPostError("管理者用Supabase環境変数が未設定です。");
   }
 
-  const { error } = await (admin as unknown as AdminPostUpdateSupabase)
+  const loose = admin as unknown as AdminPostUpdateSupabase;
+  const { data: post, error: postError } = await loose
     .from("trade_posts")
-    .update({
-      status: "private",
-      admin_hidden_at: new Date().toISOString(),
-      admin_hidden_by: user.id,
-      admin_hidden_reason: adminReason(formData),
-    })
+    .select("status,admin_hidden_at")
+    .eq("id", postId)
+    .maybeSingle();
+
+  if (postError || !post) {
+    redirectWithAdminPostError(postError?.message ?? "投稿が見つかりません。");
+  }
+  if (post.admin_hidden_at) {
+    redirectWithAdminPostError("この投稿はすでに管理者非公開です。");
+  }
+  if (post.status !== "public" && post.status !== "closed") {
+    redirectWithAdminPostError("公開中または終了済みの投稿だけ管理者非公開にできます。");
+  }
+
+  const values: Record<string, unknown> = {
+    admin_hidden_at: new Date().toISOString(),
+    admin_hidden_by: user.id,
+    admin_hidden_reason: adminReason(formData),
+  };
+  if (post.status === "public") {
+    values.status = "private";
+  }
+
+  const { error } = await loose
+    .from("trade_posts")
+    .update(values)
     .eq("id", postId)
     .is("admin_hidden_at", null);
 

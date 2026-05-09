@@ -14,6 +14,17 @@ export type ReportState =
 
 type AdminReportSupabase = {
   from: (table: string) => {
+    select: (columns: string) => {
+      eq: (
+        column: string,
+        value: string,
+      ) => {
+        maybeSingle: () => Promise<{
+          data: { status: string; admin_hidden_at: string | null } | null;
+          error: { message: string } | null;
+        }>;
+      };
+    };
     update: (values: Record<string, unknown>) => {
       eq: (
         column: string,
@@ -131,14 +142,34 @@ export async function resolveAndHidePostAction(formData: FormData) {
   }
 
   const loose = admin as unknown as AdminReportSupabase;
+  const { data: post, error: postError } = await loose
+    .from("trade_posts")
+    .select("status,admin_hidden_at")
+    .eq("id", postId)
+    .maybeSingle();
+
+  if (postError || !post) {
+    reportRedirectWithError(postError?.message ?? "投稿が見つかりません。");
+  }
+  if (post.admin_hidden_at) {
+    reportRedirectWithError("この投稿はすでに管理者非公開です。");
+  }
+  if (post.status !== "public" && post.status !== "closed") {
+    reportRedirectWithError("公開中または終了済みの投稿だけ管理者非公開にできます。");
+  }
+
+  const postValues: Record<string, unknown> = {
+    admin_hidden_at: new Date().toISOString(),
+    admin_hidden_by: user.id,
+    admin_hidden_reason: reportAdminNote(formData),
+  };
+  if (post.status === "public") {
+    postValues.status = "private";
+  }
+
   const postUpdate = loose
     .from("trade_posts")
-    .update({
-      status: "private",
-      admin_hidden_at: new Date().toISOString(),
-      admin_hidden_by: user.id,
-      admin_hidden_reason: reportAdminNote(formData),
-    })
+    .update(postValues)
     .eq("id", postId);
   const postResult = postUpdate.is
     ? await postUpdate.is("admin_hidden_at", null)

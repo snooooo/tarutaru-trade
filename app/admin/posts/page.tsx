@@ -350,7 +350,9 @@ function PostAdminRow({
   reportCount: number;
   pendingReportCount: number;
 }) {
-  const canAdminHide = post.status === "public" && !post.admin_hidden_at;
+  const canAdminHide =
+    (post.status === "public" || post.status === "closed") &&
+    !post.admin_hidden_at;
 
   return (
     <article className="rounded-md border border-stone-200 bg-white/82 p-4">
