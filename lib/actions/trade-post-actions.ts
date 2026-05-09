@@ -19,6 +19,22 @@ type LooseRpcSupabase = {
 
 type LoosePostUpdateSupabase = {
   from: (table: "trade_posts") => {
+    select: (columns: "admin_hidden_at") => {
+      eq: (
+        column: "id",
+        value: string,
+      ) => {
+        eq: (
+          column: "user_id",
+          value: string,
+        ) => {
+          maybeSingle: () => Promise<{
+            data: { admin_hidden_at: string | null } | null;
+            error: { message: string } | null;
+          }>;
+        };
+      };
+    };
     update: (values: { status: "public" | "private" }) => {
       eq: (
         column: "id",
@@ -453,6 +469,29 @@ export async function updateTradePostVisibilityAction(formData: FormData) {
 
   if (userError || !user) {
     redirectWithError(redirectTo, userError?.message ?? "ログインが必要です。");
+  }
+
+  if (nextStatus === "public") {
+    const { data: post, error: postError } = await loose
+      .from("trade_posts")
+      .select("admin_hidden_at")
+      .eq("id", postId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (postError || !post) {
+      redirectWithError(
+        redirectTo,
+        postError?.message ?? "トレード投稿が見つかりません。",
+      );
+    }
+
+    if (post.admin_hidden_at) {
+      redirectWithError(
+        redirectTo,
+        "この投稿は管理者により非公開化されているため、再公開できません。",
+      );
+    }
   }
 
   const { error } = await loose

@@ -816,6 +816,9 @@ export type Database = {
       }
       trade_posts: {
         Row: {
+          admin_hidden_at: string | null
+          admin_hidden_by: string | null
+          admin_hidden_reason: string | null
           closed_at: string | null
           condition_note: string | null
           created_at: string
@@ -827,6 +830,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          admin_hidden_at?: string | null
+          admin_hidden_by?: string | null
+          admin_hidden_reason?: string | null
           closed_at?: string | null
           condition_note?: string | null
           created_at?: string
@@ -838,6 +844,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          admin_hidden_at?: string | null
+          admin_hidden_by?: string | null
+          admin_hidden_reason?: string | null
           closed_at?: string | null
           condition_note?: string | null
           created_at?: string

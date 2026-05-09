@@ -73,14 +73,15 @@ function XIdHelpPopup({ onClose }: { onClose: () => void }) {
 }
 
 export function ProfileForm({ profile, nextPath }: ProfileFormProps) {
-  const [showXIdHelp, setShowXIdHelp] = useState(false);
-  const [showSaved, setShowSaved] = useState(false);
   const searchParams = useSearchParams();
+  const [showXIdHelp, setShowXIdHelp] = useState(false);
+  const [showSaved, setShowSaved] = useState(
+    () => searchParams.get("profile_saved") === "1",
+  );
   const router = useRouter();
 
   useEffect(() => {
     if (searchParams.get("profile_saved") === "1") {
-      setShowSaved(true);
       // クエリパラメータを履歴から消す
       const url = new URL(window.location.href);
       url.searchParams.delete("profile_saved");
@@ -227,4 +228,3 @@ export function ProfileForm({ profile, nextPath }: ProfileFormProps) {
     </>
   );
 }
-

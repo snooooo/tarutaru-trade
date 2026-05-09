@@ -71,6 +71,9 @@ type LooseServerSupabase = {
 };
 
 type MyTradePostRow = {
+  admin_hidden_at: string | null;
+  admin_hidden_by: string | null;
+  admin_hidden_reason: string | null;
   id: string;
   title: string | null;
   condition_note: string | null;
@@ -227,13 +230,15 @@ export async function getMyTradePosts(): Promise<QueryResult<MyTradePost>> {
     error: userError,
   } = await loose.auth.getUser();
 
-  if (!user) {
-    return { data: [], error: null, isConfigured: true };
+  if (userError || !user) {
+    return { data: [], error: userError?.message ?? null, isConfigured: true };
   }
 
   const postResult = await loose
     .from("trade_posts")
-    .select("id,title,condition_note,status,created_at,published_at,closed_at")
+    .select(
+      "id,title,condition_note,status,created_at,published_at,closed_at,admin_hidden_at,admin_hidden_by,admin_hidden_reason",
+    )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
   const postRows = (postResult.data ?? []) as MyTradePostRow[];

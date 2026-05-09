@@ -59,6 +59,9 @@ export type PublicTradePost = PublicOwnerStats & {
 };
 
 export type MyTradePost = {
+  admin_hidden_at: string | null;
+  admin_hidden_by: string | null;
+  admin_hidden_reason: string | null;
   id: string;
   title: string | null;
   condition_note: string | null;

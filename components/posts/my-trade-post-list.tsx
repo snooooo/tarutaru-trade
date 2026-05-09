@@ -133,7 +133,8 @@ function CompactPostRow({ post }: { post: MyTradePost }) {
   const title = post.title || offerLabel;
   const dateStr = formatShortDate(post.published_at ?? post.created_at);
   const canEdit =
-    post.status === "public" || post.status === "private";
+    !post.admin_hidden_at &&
+    (post.status === "public" || post.status === "private");
 
   return (
     <article className="group grid gap-2 rounded-md border border-stone-200 bg-white/82 p-3.5 shadow-sm transition hover:border-stone-300 hover:bg-white sm:p-4">
@@ -143,7 +144,7 @@ function CompactPostRow({ post }: { post: MyTradePost }) {
           className={`inline-flex shrink-0 items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-semibold ${config.color}`}
         >
           {config.icon}
-          {config.label}
+          {post.admin_hidden_at ? "管理者非公開" : config.label}
         </span>
         <h3 className="min-w-0 flex-1 truncate text-sm font-semibold text-stone-900">
           {title}
@@ -172,7 +173,7 @@ function CompactPostRow({ post }: { post: MyTradePost }) {
 
       {/* Row 3: actions */}
       <div className="flex items-center gap-2 pt-0.5">
-        {post.status === "public" ? (
+        {post.status === "public" && !post.admin_hidden_at ? (
           <Link
             href={`/posts/${post.id}`}
             className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold text-stone-600 transition hover:bg-stone-100"

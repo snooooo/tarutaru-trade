@@ -27,7 +27,9 @@ export default async function EditTradePostPage({
     notFound();
   }
 
-  const canEdit = post?.status === "public" || post?.status === "private";
+  const isAdminHidden = Boolean(post?.admin_hidden_at);
+  const canEdit =
+    !isAdminHidden && (post?.status === "public" || post?.status === "private");
 
   return (
     <PageShell>
@@ -49,6 +51,13 @@ export default async function EditTradePostPage({
         </div>
 
         <DataStatusNote isConfigured={result.isConfigured} error={result.error} />
+
+        {post && isAdminHidden ? (
+          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
+            この投稿は管理者により非公開化されているため、編集や再公開はできません。
+            {post.admin_hidden_reason ? ` 理由: ${post.admin_hidden_reason}` : ""}
+          </div>
+        ) : null}
 
         {post && canEdit ? <TradePostForm post={post} error={error} /> : null}
 
