@@ -5,10 +5,15 @@ import type { PublicTradePost } from "@/lib/types/trade-posts";
 export function TradePostList({
   posts,
   className = "grid gap-3 lg:grid-cols-2",
+  likeCounts,
+  likedPostIds,
 }: {
   posts: PublicTradePost[];
   className?: string;
+  likeCounts?: Record<string, number>;
+  likedPostIds?: string[];
 }) {
+  const likedSet = new Set(likedPostIds ?? []);
   if (!posts.length) {
     return (
       <div className="grid gap-4 rounded-md border border-dashed border-stone-300 bg-white/62 p-6 text-stone-700">
@@ -30,7 +35,12 @@ export function TradePostList({
   return (
     <div className={className}>
       {posts.map((post) => (
-        <TradePostCard key={post.id} post={post} />
+        <TradePostCard
+          key={post.id}
+          post={post}
+          likeCount={likeCounts?.[post.id] ?? 0}
+          isLiked={likedSet.has(post.id)}
+        />
       ))}
     </div>
   );

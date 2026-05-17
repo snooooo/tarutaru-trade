@@ -5,10 +5,21 @@ import { TradePostList } from "@/components/posts/trade-post-list";
 import { ButtonLink } from "@/components/ui/button-link";
 import { SearchForm } from "@/components/ui/search-form";
 import { DataStatusNote } from "@/components/ui/status-note";
+import {
+  getLikeCountsByPostIds,
+  getMyLikedPostIdSet,
+} from "@/lib/data/likes";
 import { getPublicTradePosts } from "@/lib/data/trade-posts";
 
 async function NewPosts() {
   const posts = await getPublicTradePosts({ limit: 8 });
+  const postIds = posts.data.map((p) => p.id);
+  const [likeCountsMap, likedSet] = await Promise.all([
+    getLikeCountsByPostIds(postIds),
+    getMyLikedPostIdSet(postIds),
+  ]);
+  const likeCounts: Record<string, number> = {};
+  for (const [id, n] of likeCountsMap) likeCounts[id] = n;
   return (
     <>
       <div className="grid gap-3">
@@ -22,7 +33,11 @@ async function NewPosts() {
             </p>
             <h2 className="mt-1 text-2xl font-bold">注目のトレード投稿</h2>
           </div>
-          <TradePostList posts={posts.data} />
+          <TradePostList
+            posts={posts.data}
+            likeCounts={likeCounts}
+            likedPostIds={Array.from(likedSet)}
+          />
           <div className="flex justify-center">
             <ButtonLink href="/posts" variant="ghost">
               すべて見る
