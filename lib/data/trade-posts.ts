@@ -19,8 +19,8 @@ function newPostBoost(publishedAt: string | null | undefined): number {
   const t = Date.parse(publishedAt);
   if (Number.isNaN(t)) return 0;
   const ageHours = (Date.now() - t) / (1000 * 60 * 60);
-  if (ageHours < 24) return 3;
-  if (ageHours < 48) return 1;
+  if (ageHours < 24) return 1;
+  if (ageHours < 48) return 0.5;
   return 0;
 }
 
