@@ -18,9 +18,9 @@ async function NewPosts() {
         <section className="grid content-start gap-5">
           <div>
             <p className="text-sm font-bold uppercase tracking-normal text-stone-500">
-              New posts
+              Picks
             </p>
-            <h2 className="mt-1 text-2xl font-bold">新着トレード投稿</h2>
+            <h2 className="mt-1 text-2xl font-bold">注目のトレード投稿</h2>
           </div>
           <TradePostList posts={posts.data} />
           <div className="flex justify-center">

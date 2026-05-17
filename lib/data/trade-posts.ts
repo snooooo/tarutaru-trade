@@ -1,5 +1,6 @@
 import { createPublicSupabaseClient } from "@/lib/supabase/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getLikeCountsByPostIds } from "@/lib/data/likes";
 import type {
   MyTradePost,
   PublicTradePost,
@@ -9,6 +10,24 @@ import type {
 } from "@/lib/types/trade-posts";
 
 const PAGE_SIZE = 24;
+
+// 立ち上げ期は人気順(=いいね数)をデフォルトにしつつ、新着が完全に
+// 埋もれないよう、公開直後の投稿にスコア上のブーストを与える。
+// 0-24h: +3, 24-48h: +1, それ以降: 0
+function newPostBoost(publishedAt: string | null | undefined): number {
+  if (!publishedAt) return 0;
+  const t = Date.parse(publishedAt);
+  if (Number.isNaN(t)) return 0;
+  const ageHours = (Date.now() - t) / (1000 * 60 * 60);
+  if (ageHours < 24) return 3;
+  if (ageHours < 48) return 1;
+  return 0;
+}
+
+// 上位 N 件を返す前に、いいね数とブーストでスコア計算するため、
+// DB からは余裕を持って取得する。
+const POPULARITY_FETCH_MULTIPLIER = 4;
+const POPULARITY_FETCH_MAX = 200;
 
 type QueryResult<T> = {
   data: T[];
@@ -134,21 +153,54 @@ export async function getPublicTradePosts(options?: {
   }
 
   const pattern = ilikePattern(options?.query);
+  const limit = options?.limit ?? PAGE_SIZE;
+  const fetchLimit = Math.min(
+    POPULARITY_FETCH_MAX,
+    Math.max(limit, limit * POPULARITY_FETCH_MULTIPLIER),
+  );
   let request = supabase
     .from("trade_public_posts")
     .select("*")
     .order("is_closed", { ascending: true })
     .order("published_at", { ascending: false })
-    .limit(options?.limit ?? PAGE_SIZE);
+    .limit(fetchLimit);
 
   if (pattern) {
     request = request.or(`search_text.ilike.${pattern}`);
   }
 
   const { data, error } = await executeList(request);
+  const posts = (data ?? []).map(normalizePost);
+
+  // クローズ済み・オープン中を分けたうえで、オープン中のみ人気順(+ブースト)で並べ替える。
+  // クローズ済みは published_at 降順のまま末尾に置く。
+  const open: PublicTradePost[] = [];
+  const closed: PublicTradePost[] = [];
+  for (const post of posts) {
+    if ((post as PublicTradePost & { is_closed?: boolean }).is_closed) {
+      closed.push(post);
+    } else {
+      open.push(post);
+    }
+  }
+
+  if (open.length) {
+    const likeCounts = await getLikeCountsByPostIds(open.map((p) => p.id));
+    open.sort((a, b) => {
+      const scoreA =
+        (likeCounts.get(a.id) ?? 0) + newPostBoost(a.published_at);
+      const scoreB =
+        (likeCounts.get(b.id) ?? 0) + newPostBoost(b.published_at);
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      // 同点なら新着優先
+      const tA = a.published_at ? Date.parse(a.published_at) : 0;
+      const tB = b.published_at ? Date.parse(b.published_at) : 0;
+      return tB - tA;
+    });
+  }
 
   return {
-    data: (data ?? []).map(normalizePost),
+    data: [...open, ...closed].slice(0, limit),
     error: error?.message ?? null,
     isConfigured: true,
   };
