@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireCompleteTradeProfile } from "@/lib/auth/require-user";
+import { notifyPostInterestReceived } from "@/lib/email/interest-notifications";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { InterestTargetType } from "@/lib/types/interests";
 
@@ -13,7 +14,7 @@ type LooseRpcSupabase = {
       p_target_trade_post_id: string;
       p_proposal_offer_items: unknown[];
     },
-  ) => Promise<{ error: { message: string } | null }>;
+  ) => Promise<{ data: string | null; error: { message: string } | null }>;
 };
 
 function safePath(value: FormDataEntryValue | null, fallback: string) {
@@ -75,7 +76,7 @@ export async function createInterestAction(formData: FormData) {
 
 export async function createPostInterestAction(formData: FormData) {
   const returnPath = safePath(formData.get("return_path"), "/posts");
-  await requireCompleteTradeProfile(returnPath);
+  const { user, profile } = await requireCompleteTradeProfile(returnPath);
   const supabase = await createServerSupabaseClient();
 
   if (!supabase) {
@@ -111,7 +112,7 @@ export async function createPostInterestAction(formData: FormData) {
       : [],
   );
 
-  const { error } = await (supabase as unknown as LooseRpcSupabase).rpc(
+  const { data: interestId, error } = await (supabase as unknown as LooseRpcSupabase).rpc(
     "trade_create_post_interest",
     {
       p_target_trade_post_id: targetPostId,
@@ -122,6 +123,16 @@ export async function createPostInterestAction(formData: FormData) {
   if (error) {
     redirectWithError(returnPath, error.message);
   }
+
+  await notifyPostInterestReceived({
+    interestId,
+    requesterDisplayName: profile.display_name,
+    requesterUserId: user.id,
+    targetPostId,
+    proposalBottleNames: proposalOfferItems
+      .map((item) => item.manual_bottle_name)
+      .filter((name): name is string => Boolean(name)),
+  });
 
   revalidatePath("/mypage/interests/sent");
   revalidatePath("/mypage/interests/received");
