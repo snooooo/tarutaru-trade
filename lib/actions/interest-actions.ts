@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireCompleteTradeProfile } from "@/lib/auth/require-user";
-import { notifyPostInterestReceived } from "@/lib/email/interest-notifications";
+import {
+  notifyConsultingStarted,
+  notifyPostInterestReceived,
+  notifyTradeCompletionUpdated,
+} from "@/lib/email/interest-notifications";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { InterestTargetType } from "@/lib/types/interests";
 
@@ -141,7 +145,7 @@ export async function createPostInterestAction(formData: FormData) {
 
 export async function startConsultingInterestAction(formData: FormData) {
   const redirectTo = safePath(formData.get("redirect_to"), "/mypage/interests/received");
-  await requireCompleteTradeProfile(redirectTo);
+  const { user } = await requireCompleteTradeProfile(redirectTo);
   const supabase = await createServerSupabaseClient();
   const interestId = formData.get("interest_id");
 
@@ -160,6 +164,11 @@ export async function startConsultingInterestAction(formData: FormData) {
   if (error) {
     redirectWithError(redirectTo, error.message);
   }
+
+  await notifyConsultingStarted({
+    interestId,
+    actorUserId: user.id,
+  });
 
   revalidatePath("/mypage/interests/sent");
   revalidatePath("/mypage/interests/received");
@@ -222,7 +231,7 @@ export async function cancelInterestAction(formData: FormData) {
 
 export async function markTradeCompletedAction(formData: FormData) {
   const redirectTo = safePath(formData.get("redirect_to"), "/mypage/interests/sent");
-  await requireCompleteTradeProfile(redirectTo);
+  const { user } = await requireCompleteTradeProfile(redirectTo);
   const supabase = await createServerSupabaseClient();
   const interestId = formData.get("interest_id");
 
@@ -241,6 +250,12 @@ export async function markTradeCompletedAction(formData: FormData) {
   if (error) {
     redirectWithError(redirectTo, error.message);
   }
+
+  await notifyTradeCompletionUpdated({
+    interestId,
+    actorUserId: user.id,
+    status: data ?? null,
+  });
 
   revalidatePath("/mypage/interests/sent");
   revalidatePath("/mypage/interests/received");

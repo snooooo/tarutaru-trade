@@ -14,6 +14,18 @@ type TradePostNotificationRow = {
   user_id: string;
 };
 
+type InterestNotificationRow = {
+  id: string;
+  requester_user_id: string;
+  receiver_user_id: string;
+  target_trade_post_id: string | null;
+};
+
+type TradeProfileNotificationRow = {
+  user_id: string;
+  display_name: string;
+};
+
 const resendEndpoint = "https://api.resend.com/emails";
 
 function appUrl(path: string) {
@@ -86,6 +98,95 @@ async function sendResendEmail(params: {
   }
 }
 
+function otherParticipant(interest: InterestNotificationRow, actorUserId: string) {
+  if (interest.requester_user_id === actorUserId) return interest.receiver_user_id;
+  if (interest.receiver_user_id === actorUserId) return interest.requester_user_id;
+  return null;
+}
+
+async function getUserEmail(
+  adminSupabase: NonNullable<ReturnType<typeof createAdminSupabaseClient>>,
+  userId: string,
+) {
+  const {
+    data: { user },
+    error,
+  } = await adminSupabase.auth.admin.getUserById(userId);
+
+  if (error || !user?.email) {
+    console.error("Failed to load user email for trade notification.", error);
+    return null;
+  }
+
+  return user.email;
+}
+
+async function getInterestContext(interestId: string) {
+  const adminSupabase = createAdminSupabaseClient();
+
+  if (!adminSupabase) {
+    console.warn("Skipping trade email: Supabase service role is not configured.");
+    return null;
+  }
+
+  const { data: interest, error: interestError } = await adminSupabase
+    .from("trade_interests")
+    .select("id,requester_user_id,receiver_user_id,target_trade_post_id")
+    .eq("id", interestId)
+    .single<InterestNotificationRow>();
+
+  if (interestError || !interest) {
+    console.error("Failed to load interest for trade email.", interestError);
+    return null;
+  }
+
+  const profileUserIds = [interest.requester_user_id, interest.receiver_user_id];
+  const [{ data: profiles, error: profilesError }, postResult] = await Promise.all([
+    adminSupabase
+      .from("trade_profiles")
+      .select("user_id,display_name")
+      .in("user_id", profileUserIds),
+    interest.target_trade_post_id
+      ? adminSupabase
+          .from("trade_posts")
+          .select("id,title,user_id")
+          .eq("id", interest.target_trade_post_id)
+          .single<TradePostNotificationRow>()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
+
+  if (profilesError) {
+    console.error("Failed to load profiles for trade email.", profilesError);
+  }
+
+  const profileMap = new Map(
+    ((profiles ?? []) as TradeProfileNotificationRow[]).map((profile) => [
+      profile.user_id,
+      profile.display_name,
+    ]),
+  );
+
+  return {
+    adminSupabase,
+    interest,
+    post: postResult.data,
+    postError: postResult.error,
+    profileMap,
+  };
+}
+
+function displayName(
+  profileMap: Map<string, string>,
+  userId: string,
+  fallback = "相手",
+) {
+  return profileMap.get(userId) ?? fallback;
+}
+
+function postTitle(post: TradePostNotificationRow | null) {
+  return post?.title?.trim() || "トレード案件";
+}
+
 export async function notifyPostInterestReceived(input: NotifyPostInterestReceivedInput) {
   try {
     const adminSupabase = createAdminSupabaseClient();
@@ -151,5 +252,127 @@ export async function notifyPostInterestReceived(input: NotifyPostInterestReceiv
     });
   } catch (error) {
     console.error("Failed to send interest email notification.", error);
+  }
+}
+
+export async function notifyConsultingStarted(input: {
+  interestId: string;
+  actorUserId: string;
+}) {
+  try {
+    const context = await getInterestContext(input.interestId);
+    if (!context) return;
+
+    const recipientUserId = otherParticipant(context.interest, input.actorUserId);
+    if (!recipientUserId) return;
+
+    const recipientEmail = await getUserEmail(context.adminSupabase, recipientUserId);
+    if (!recipientEmail) return;
+
+    if (context.postError) {
+      console.error("Failed to load post for consulting email.", context.postError);
+    }
+
+    const title = postTitle(context.post);
+    const actorName = displayName(context.profileMap, input.actorUserId);
+    const tradeUrl = appUrl(`/trades/${input.interestId}`);
+
+    await sendResendEmail({
+      to: recipientEmail,
+      subject: `【TaruTaruTrade】「${title}」の相談が開始されました`,
+      text: [
+        `${actorName}さんが「${title}」のトレード相談を開始しました。`,
+        "",
+        "取引詳細を確認する:",
+        tradeUrl,
+      ].join("\n"),
+      html: [
+        `<p>${escapeHtml(actorName)}さんが「${escapeHtml(title)}」のトレード相談を開始しました。</p>`,
+        `<p><a href="${escapeHtml(tradeUrl)}">取引詳細を確認する</a></p>`,
+      ].join(""),
+    });
+  } catch (error) {
+    console.error("Failed to send consulting email notification.", error);
+  }
+}
+
+export async function notifyTradeCompletionUpdated(input: {
+  interestId: string;
+  actorUserId: string;
+  status: string | null;
+}) {
+  try {
+    const context = await getInterestContext(input.interestId);
+    if (!context) return;
+
+    if (context.postError) {
+      console.error("Failed to load post for completion email.", context.postError);
+    }
+
+    const title = postTitle(context.post);
+    const actorName = displayName(context.profileMap, input.actorUserId);
+    const tradeUrl = appUrl(`/trades/${input.interestId}`);
+
+    if (input.status === "completed") {
+      const recipients = await Promise.all(
+        [context.interest.requester_user_id, context.interest.receiver_user_id].map(
+          async (userId) => ({
+            userId,
+            email: await getUserEmail(context.adminSupabase, userId),
+          }),
+        ),
+      );
+
+      await Promise.all(
+        recipients
+          .filter((recipient): recipient is { userId: string; email: string } =>
+            Boolean(recipient.email),
+          )
+          .map((recipient) =>
+            sendResendEmail({
+              to: recipient.email,
+              subject: `【TaruTaruTrade】「${title}」のトレードが完了しました`,
+              text: [
+                `「${title}」の双方の完了確認が揃い、トレードが完了しました。`,
+                "",
+                "取引詳細を確認する:",
+                tradeUrl,
+              ].join("\n"),
+              html: [
+                `<p>「${escapeHtml(title)}」の双方の完了確認が揃い、トレードが完了しました。</p>`,
+                `<p><a href="${escapeHtml(tradeUrl)}">取引詳細を確認する</a></p>`,
+              ].join(""),
+            }),
+          ),
+      );
+      return;
+    }
+
+    if (input.status === "completion_requested") {
+      const recipientUserId = otherParticipant(context.interest, input.actorUserId);
+      if (!recipientUserId) return;
+
+      const recipientEmail = await getUserEmail(context.adminSupabase, recipientUserId);
+      if (!recipientEmail) return;
+
+      await sendResendEmail({
+        to: recipientEmail,
+        subject: `【TaruTaruTrade】「${title}」の完了確認が届きました`,
+        text: [
+          `${actorName}さんが「${title}」の完了確認をしました。`,
+          "内容を確認して、問題なければあなたも完了確認をしてください。",
+          "",
+          "取引詳細を確認する:",
+          tradeUrl,
+        ].join("\n"),
+        html: [
+          `<p>${escapeHtml(actorName)}さんが「${escapeHtml(title)}」の完了確認をしました。</p>`,
+          "<p>内容を確認して、問題なければあなたも完了確認をしてください。</p>",
+          `<p><a href="${escapeHtml(tradeUrl)}">取引詳細を確認する</a></p>`,
+        ].join(""),
+      });
+    }
+  } catch (error) {
+    console.error("Failed to send trade completion email notification.", error);
   }
 }
