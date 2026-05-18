@@ -27,10 +27,15 @@ Required:
 ```text
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+RESEND_API_KEY
+RESEND_FROM_EMAIL
+TARUTARU_TRADE_APP_URL
 ```
 
-Do not add a service role key to Netlify unless a future server-only job explicitly needs it.
-The current app uses the anon key plus Supabase Auth/RLS.
+`SUPABASE_SERVICE_ROLE_KEY` is used server-side only to look up the post owner's
+Auth email address for interest notification emails. Never expose it with a
+`NEXT_PUBLIC_` prefix.
 
 ## Supabase Ownership
 

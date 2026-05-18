@@ -73,6 +73,10 @@ Netlify environment variables must match `.env.local`:
 ```text
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+RESEND_API_KEY
+RESEND_FROM_EMAIL
+TARUTARU_TRADE_APP_URL
 ```
 
 After deploy, smoke test:
